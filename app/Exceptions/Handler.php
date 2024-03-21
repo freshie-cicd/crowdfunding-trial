@@ -37,8 +37,11 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
+
+        $this->renderable(function (\Exception $e) {
+            if ($e->getPrevious() instanceof \Illuminate\Session\TokenMismatchException) {
+                return redirect()->route('login');
+            };
         });
     }
 
@@ -48,18 +51,15 @@ class Handler extends ExceptionHandler
         if (in_array('administrator', $exception->guards())) {
             return $request->expectsJson()
                 ? response()->json([
-                      'message' => $exception->getMessage()
+                    'message' => $exception->getMessage()
                 ], 401)
                 : redirect()->guest(route('administrator.login'));
         }
 
         return $request->expectsJson()
             ? response()->json([
-                  'message' => $exception->getMessage()
+                'message' => $exception->getMessage()
             ], 401)
             : redirect()->guest(route('login'));
     }
-
-    
-    
 }

@@ -13,23 +13,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Auth::routes(); 
+Auth::routes();
 
 
-Route::namespace("Administrator")->prefix('administrator')->group(function(){
- Route::get('/', [App\Http\Controllers\Administrator\DashboardController::class, 'index'])->name('home');
- Route::get('/home', [App\Http\Controllers\Administrator\DashboardController::class, 'index'])->name('administrator.home');
+Route::namespace("Administrator")->prefix('administrator')->group(function () {
+   Route::get('/', [App\Http\Controllers\Administrator\DashboardController::class, 'index'])->name('home');
+   Route::get('/home', [App\Http\Controllers\Administrator\DashboardController::class, 'index'])->name('administrator.home');
 
- Route::get('/team', [App\Http\Controllers\Administrator\AdminController::class, 'index'])->name('team.list');
- Route::get('/team/add', [App\Http\Controllers\Administrator\AdminController::class, 'create'])->name('team.create');
- Route::post('/team/store', [App\Http\Controllers\Administrator\AdminController::class, 'store'])->name('team.store');
- 
- Route::namespace('Auth')->group(function(){
-    Route::get('/login', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'ShowLoginForm'])->name('administrator.login');
-    Route::post('/login/', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'login'])->name('administrator.login.process');
-    Route::post('logout', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'logout'])->name('administrator.logout');
- });
+   Route::get('/team', [App\Http\Controllers\Administrator\AdminController::class, 'index'])->name('team.list');
+   Route::get('/team/add', [App\Http\Controllers\Administrator\AdminController::class, 'create'])->name('team.create');
+   Route::post('/team/store', [App\Http\Controllers\Administrator\AdminController::class, 'store'])->name('team.store');
 
+   Route::namespace('Auth')->group(function () {
+      Route::get('/login', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'ShowLoginForm'])->name('administrator.login');
+      Route::post('/login/', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'login'])->name('administrator.login.process');
+      Route::post('logout', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'logout'])->name('administrator.logout');
+   });
 });
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('index');
@@ -69,11 +68,26 @@ Route::get('/agreements', [App\Http\Controllers\AgreementController::class, 'ind
 Route::get('/agreement/{booking_id}/download', [App\Http\Controllers\AgreementController::class, 'download'])->name('agreement.download');
 
 Route::get('/agreement/hard-copy/request/{id}', [App\Http\Controllers\AgreementController::class, 'hard_copy_request'])->name('agreement.hard_copy');
-Route::post('/agreement/hard-copy/store', [App\Http\Controllers\AgreementController::class, 'hard_copy_request_store'])->name('agreement.hard_copy.store'); 
+Route::post('/agreement/hard-copy/store', [App\Http\Controllers\AgreementController::class, 'hard_copy_request_store'])->name('agreement.hard_copy.store');
 
 
 
 
+
+
+Route::get('/mature-batches', [App\Http\Controllers\ClosingController::class, 'index'])->name('mature.index');
+Route::get('/mature-batches/request/{code}/withdrawal', [App\Http\Controllers\ClosingController::class, 'withdrawal_request'])->name('withdrawal.request');
+Route::post('/mature-batches/request/store', [App\Http\Controllers\ClosingController::class, 'withdrawal_request_store'])->name('withdrawal.request.store');
+
+
+
+
+Route::get('/administrator/closing/requests', [App\Http\Controllers\Administrator\ClosingController::class, 'index'])->name('admin.closing.requests');
+Route::get('/administrator/closing/report', [App\Http\Controllers\Administrator\ClosingController::class, 'report'])->name('admin.closing.report');
+
+Route::get('/administrator/closing/profit', [App\Http\Controllers\Administrator\ClosingController::class, 'profit_return'])->name('admin.closing.profit');
+
+Route::get('/administrator/closing/capital', [App\Http\Controllers\Administrator\ClosingController::class, 'capital_return_report'])->name('admin.capital_return.report');
 
 
 
@@ -181,34 +195,3 @@ Route::get('/administrator/agreement/hard-copy/{code}/download', [App\Http\Contr
 Route::get('/administrator/borga/cow-profiles', [App\Http\Controllers\Administrator\BorgaController::class, 'cow_profiles'])->name('admin.borga.cow_profile');
 Route::get('/administrator/borga/cow-profile/create', [App\Http\Controllers\Administrator\BorgaController::class, 'cow_profile_create'])->name('admin.borga.cow_profile_create');
 Route::post('/administrator/borga/cow-profile/store', [App\Http\Controllers\Administrator\BorgaController::class, 'cow_profile_store'])->name('admin.borga.cow_profile_store');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
