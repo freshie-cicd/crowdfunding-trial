@@ -104,66 +104,28 @@ class BookingController extends Controller
 
     public function payment_approve($booking_id, $note, $user_id)
     {
-
-
-
         $user_id = Booking::where('id', $booking_id)->pluck('user_id');
-
-
-
         $email = User::where('id', $user_id)->pluck('email');
-
-
-
         $check = BookingPayment::where('booking_id', $booking_id)->update(['status' => 'complete']);
-
-
-
         if ($check) {
-
             Booking::where('id', $booking_id)->update(['status' => 'approved', 'note' => $note, 'discount' => $user_id, 'updated_by' => Auth::guard('administrator')->user()->email]);
-
             Mail::to($email)->send(new PaymentConfirmationMail());
-
             return redirect()->back()->with('success', 'Payment Approved Successfully');
         } else {
-
             echo "error";
         }
     }
 
-
-
-
-
-
-
     public function payment_reject($booking_id, $note, $user_id)
     {
-
-
-
         $user_id = Booking::where('id', $booking_id)->pluck('user_id');
-
-
-
         $email = User::where('id', $user_id)->pluck('email');
-
-
-
         $check = BookingPayment::where('booking_id', $booking_id)->update(['status' => 'rejected']);
-
-
-
         if ($check) {
-
             Booking::where('id', $booking_id)->update(['status' => 'rejected', 'note' => $note, 'discount' => $user_id, 'updated_by' => Auth::guard('administrator')->user()->email]);
-
             Mail::to($email)->send(new PaymentRejectionMail());
-
             return redirect()->back()->with('success', 'Payment Rejected Successfully');
         } else {
-
             echo "error";
         }
     }
@@ -174,24 +136,12 @@ class BookingController extends Controller
 
     public function decision(Request $request)
     {
-
-
-
-        //dd($request->decision);
-
-
-
         if ($request->decision == 'approve') {
-
             $this->payment_approve($request->booking_id, $request->note, $request->user_id);
-
             return redirect()->back()->with('success', 'Approved Successfully');
         } else 
-
         if ($request->decision == 'reject') {
-
             $this->payment_reject($request->booking_id, $request->note, $request->user_id);
-
             return redirect()->back()->with('success', 'Rejected Successfully');
         }
     }

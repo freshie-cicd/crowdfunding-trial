@@ -13,18 +13,16 @@
       <nav class="menu open-current-submenu">
 
         <ul>
+          <li class="menu-item">
+            <a href="{{ route('administrator.home') }}">
+              <span class="menu-icon"><i class="fa-solid fa-house"></i></span><span class="menu-title">Dashboard</span>
+            </a>
+          </li>
 
           <li class="menu-item sub-menu">
-
             <a href="#">
-
               <span class="menu-icon"><i class="fa-solid fa-gear"></i></span><span class="menu-title">Projects</span>
-
             </a>
-
-            <!--Sub Menu Starts-->
-
-
 
             <div class="sub-menu-list">
 
@@ -80,65 +78,16 @@
 
 
 
-          <li class="menu-item sub-menu">
-
+          <!-- <li class="menu-item sub-menu">
             <a href="#">
-
-              <span class="menu-icon"><i class="fa-solid fa-cash-register"></i></span><span class="menu-title">Expense Tracker</span>
-
+              <span class="menu-icon"><i class="fa-solid fa-cash-register"></i></span><span class="menu-title">Investment Booking</span>
             </a>
-
-            <!--Sub Menu Starts-->
-
             <div class="sub-menu-list">
-
               <ul>
-
-                <li class="menu-item"><a href="{{ route('expense_head.index') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Chart of Expenses</span></a></li>
-
-                <li class="menu-item"><a href="{{ route('expense.index') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">New Expense Entry</span></a></li>
-
-                <li class="menu-item"><a href="#"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Expense Report</span></a></li>
-
+                <li class="menu-item"><a href="{{ route('expense_head.index') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Booking</span></a></li>
               </ul>
-
             </div>
-
-            <!--Sub Menu Ends-->
-
-          </li>
-
-
-
-          <li class="menu-item sub-menu">
-
-            <a href="#">
-
-              <span class="menu-icon"><i class="fa-solid fa-cash-register"></i></span><span class="menu-title">Updates Tracker</span>
-
-            </a>
-
-            <!--Sub Menu Starts-->
-
-            <div class="sub-menu-list">
-
-              <ul>
-
-                <li class="menu-item"><a href="{{ route('update.index') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Updates</span></a></li>
-
-                <li class="menu-item"><a href="{{ route('update.create') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">New Update Entry</span></a></li>
-
-                <li class="menu-item"><a href="#"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Report</span></a></li>
-
-              </ul>
-
-            </div>
-
-            <!--Sub Menu Ends-->
-
-          </li>
-
-
+          </li> -->
 
           <li class="menu-item sub-menu">
 
@@ -174,49 +123,17 @@
 
             <a href="#">
 
-              <span class="menu-icon"><i class="fa-solid fa-money-bill-transfer"></i></span><span class="menu-title">Transactions</span>
+              <span class="menu-icon"><i class="fa-solid fa-money-bill-transfer"></i></span><span class="menu-title">Investments</span>
 
             </a>
 
             <!--Sub Menu Starts-->
 
             <div class="sub-menu-list">
-
               <ul>
-
-                <li class="menu-item"><a href="{{ route('admin.payment.approved') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">All Transactions</span></a></li>
-
+                <li class="menu-item"><a href="{{ route('admin.payment.approved') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">All </span></a></li>
                 <li class="menu-item"><a href="{{ route('admin.payment.index') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Pending Approvals</span></a></li>
-
-                <li class="menu-item"><a href="{{ route('admin.payment.approved') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Approved Investors</span></a></li>
-
-              </ul>
-
-            </div>
-
-            <!--Sub Menu Ends-->
-
-          </li>
-
-
-
-          <li class="menu-item sub-menu">
-
-            <a href="#">
-
-              <span class="menu-icon"><i class="fa-solid fa-money-bill-transfer"></i></span><span class="menu-title">Project Borga</span>
-
-            </a>
-
-            <!--Sub Menu Starts-->
-
-            <div class="sub-menu-list">
-
-              <ul>
-
-                <li class="menu-item"><a href="{{ route('admin.borga.cow_profile') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Cow Profiles </span></a></li>
-
-                <li class="menu-item"><a href="{{ route('admin.borga.cow_profile_create') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Add New Cow Profile</span></a></li>
+                <li class="menu-item"><a href="{{ route('admin.payment.approved') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Approved</span></a></li>
 
               </ul>
 
@@ -225,10 +142,6 @@
             <!--Sub Menu Ends-->
 
           </li>
-
-
-
-
 
 
 

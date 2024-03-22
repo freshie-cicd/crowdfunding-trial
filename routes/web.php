@@ -31,6 +31,8 @@ Route::namespace("Administrator")->prefix('administrator')->group(function () {
    });
 });
 
+
+
 Route::get('/', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('index');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('home');
 
