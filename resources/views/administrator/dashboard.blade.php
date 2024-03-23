@@ -58,7 +58,7 @@
                         <td class="border border-gray-300 p-2" x-text="formatNumberBangladeshi(getTotalValueByStatus('approved'))"></td>
                         <td class="border border-gray-300 p-2" x-text="formatNumberBangladeshi(getTotalValueByStatus('rejected'))"></td>
                         <td class="border border-gray-300 p-2">
-                            <span x-text="formatNumberBangladeshi(stats.filter(stat => stat.package_id === package).reduce((total, stat) => total + stat.total_value, 0))"></span>
+                            <span x-text="formatNumberBangladeshi(stats.filter(stat => stat.package_id === package).reduce((total, stat) => parseInt(total) + parseInt(stat.total_value), 0))"></span>
                         </td>
                     </tr>
                 </tbody>
