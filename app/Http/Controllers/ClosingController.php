@@ -26,7 +26,7 @@ class ClosingController extends Controller
                 ->select('bookings.code', 'packages.code as pcode', 'packages.value', 'bookings.booking_quantity' , 'bookings.status', 'bookings.id', 'packages.batch_id', 'closing_init.status as closing_status', 'closing_init.profit_value', 'closing_requests.status as processing_status', 'closing_requests.package_to_withdraw', 'closing_requests.capital_withdrawal_amount', 'closing_requests.package_after_withdrawal', 'closing_requests.after_withdrawal_amount', 'closing_requests.profit_withdrawal_amount',)
                 ->get();
 
-        
+
 
         //dd($bookings);
 
@@ -52,7 +52,7 @@ class ClosingController extends Controller
                 ->select('bookings.code as booking_code', 'bookings.booking_quantity', 'bookings.status as booking_status', 'packages.id as package_id' , 'packages.name as package_name', 'packages.value as package_value', 'packages.status as package_status', 'closing_init.profit_value')
                 ->first();
 
-           
+
             if($data){
                 return view('closing.request', compact('data', 'bank'));
             }else{
@@ -68,7 +68,7 @@ class ClosingController extends Controller
 
 
     public function withdrawal_request_store(Request $request){
-            
+
         $validated = $request->validate([
             'booking_code' => 'required',
             'reinvest_quantity' => 'required',
@@ -82,9 +82,9 @@ class ClosingController extends Controller
         $withdrawal_quantity = $request->booking_quantity-$request->reinvest_quantity;
         $withdrawal_amount = $withdrawal_quantity * $request->package_price;
         $reinvest_amount = $request->reinvest_quantity * $request->package_price;
-        
+
         $check = DB::table('closing_requests')->insert(['user_id'=> auth()->user()->id, 'booking_code' => $request->booking_code, 'package_to_withdraw' => $withdrawal_quantity, 'capital_withdrawal_amount' => $withdrawal_amount, 'package_after_withdrawal' => $request->reinvest_quantity, 'after_withdrawal_amount' => $reinvest_amount, 'profit_withdrawal_amount' => $request->profit, 'is_bank_detail_correct' => $request->bank, 'note' => $request->note, 'will_reinvest' => $request->reinvest]);
-        
+
         //dump($check);
 
         if($check){
@@ -95,5 +95,6 @@ class ClosingController extends Controller
 
     }
 
-    
+
+
 }

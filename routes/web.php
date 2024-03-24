@@ -26,9 +26,11 @@ Route::namespace("Administrator")->prefix('administrator')->group(function () {
 
    Route::namespace('Auth')->group(function () {
       Route::get('/login', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'ShowLoginForm'])->name('administrator.login');
-      Route::post('/login/', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'login'])->name('administrator.login.process');
+      Route::post('/login', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'login'])->name('administrator.login.process');
       Route::post('logout', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'logout'])->name('administrator.logout');
    });
+
+   Route::get('/migration/{booking_code}/i/{investor_id}/p/{package_id}', [App\Http\Controllers\Administrator\ClosingController::class, 'migration'])->name('admin.migration');
 });
 
 
@@ -90,6 +92,10 @@ Route::get('/administrator/closing/report', [App\Http\Controllers\Administrator\
 Route::get('/administrator/closing/profit', [App\Http\Controllers\Administrator\ClosingController::class, 'profit_return'])->name('admin.closing.profit');
 
 Route::get('/administrator/closing/capital', [App\Http\Controllers\Administrator\ClosingController::class, 'capital_return_report'])->name('admin.capital_return.report');
+
+
+
+
 
 
 
