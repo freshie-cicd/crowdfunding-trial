@@ -1,82 +1,81 @@
 <?php
 
-
-
 namespace App\Http\Controllers\Administrator;
 
-
-
 use App\Http\Controllers\Controller;
-
 use App\Models\Booking;
-
-use App\Models\Batch;
-
-use App\Models\Project;
-
 use App\Models\AgreementRequest;
-
-use App\Models\pacSkage;
-
 use App\Models\User;
-
 use App\Models\BookingPayment;
-
 use App\Http\Controllers\AgreementController;
-
 use Illuminate\Http\Request;
-
 use App\Mail\PaymentConfirmationMail;
-
 use App\Mail\PaymentRejectionMail;
-
 use Illuminate\Support\Facades\Mail;
-
 use Illuminate\Support\Facades\Auth;
+use App\Traits\FormatsNumbers;
+use App\Models\Package;
 
 use PDF;
 
-
-
 class BookingController extends Controller
-
 {
-
-
+    use FormatsNumbers;
 
     public function __construct()
-
     {
-
         $this->middleware('auth:administrator');
     }
 
     /**
-
      * Display a listing of the resource.
-
      *
-
      * @return \Illuminate\Http\Response
-
      */
-
-    public function index()
-
+    public function index(Request $request)
     {
 
-        $bookings = Booking::where('status', 'pending')->get();
 
+        $dataSize = $request->query('dataSize', 10);
+        $dataSize = filter_var($dataSize, FILTER_VALIDATE_INT, [
+            'options' => [
+                'default' => 10,
+                'min_range' => 1,
+                'max_range' => 100,
+            ],
+        ]);
 
+        $status = $request->query('status', '');
+        $package = $request->query('package', '');
+        $search = $request->query('search', '');
 
-        return view('administrator.booking', compact('bookings'));
+        $bookings = Booking::when($status, function ($query, $status) {
+            return $query->where('bookings.status', $status);
+        })->when($package, function ($query, $package) {
+            return $query->where('bookings.package_id', $package);
+        })->when($search, function ($query, $search) {
+            return $query->where('bookings.code', 'like', '%' . $search . '%')
+                ->orWhere('users.name', 'like', '%' . $search . '%')
+                ->orWhere('users.phone', 'like', '%' . $search . '%')
+                ->orWhere('users.email', 'like', '%' . $search . '%')
+                ->orWhere('bookings.note', 'like', '%' . $search . '%');
+        })
+            ->join('packages', 'packages.id', '=', 'bookings.package_id')
+            ->join('users', 'users.id', '=', 'bookings.user_id')
+            ->select('bookings.*', 'packages.name as package_name', 'packages.value as package_value', 'users.name as user_name', 'users.phone as user_phone', 'users.email as user_email')
+            ->latest()->paginate($dataSize);
+        $distinctStatus = Booking::select('status')->distinct()->get();
+
+        $packagesData = Package::select('id', 'name')->latest()->get();
+
+        foreach ($bookings as $booking) {
+            $booking->total_value = $this->numberFormatBangladeshi($booking->package_value * $booking->booking_quantity);
+        }
+
+        $bookings->appends(['dataSize' => $dataSize, 'status' => $status, 'package' => $package, 'search' => $search]);
+
+        return view('administrator.booking', compact('bookings', 'distinctStatus', 'packagesData'));
     }
-
-
-
-
-
-
 
     public function payment_pending(Request $request)
     {

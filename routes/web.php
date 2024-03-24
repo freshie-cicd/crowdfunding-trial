@@ -16,22 +16,26 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 
-Route::namespace("Administrator")->prefix('administrator')->group(function () {
-   Route::get('/', [App\Http\Controllers\Administrator\DashboardController::class, 'index'])->name('home');
-   Route::get('/home', [App\Http\Controllers\Administrator\DashboardController::class, 'index'])->name('administrator.home');
+Route::namespace("Administrator")
+   ->prefix('administrator')
+   ->group(function () {
+      Route::get('/', [App\Http\Controllers\Administrator\DashboardController::class, 'index'])->name('home');
+      Route::get('/home', [App\Http\Controllers\Administrator\DashboardController::class, 'index'])->name('administrator.home');
 
-   Route::get('/team', [App\Http\Controllers\Administrator\AdminController::class, 'index'])->name('team.list');
-   Route::get('/team/add', [App\Http\Controllers\Administrator\AdminController::class, 'create'])->name('team.create');
-   Route::post('/team/store', [App\Http\Controllers\Administrator\AdminController::class, 'store'])->name('team.store');
+      Route::get('/team', [App\Http\Controllers\Administrator\AdminController::class, 'index'])->name('team.list');
+      Route::get('/team/add', [App\Http\Controllers\Administrator\AdminController::class, 'create'])->name('team.create');
+      Route::post('/team/store', [App\Http\Controllers\Administrator\AdminController::class, 'store'])->name('team.store');
 
-   Route::namespace('Auth')->group(function () {
-      Route::get('/login', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'ShowLoginForm'])->name('administrator.login');
-      Route::post('/login', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'login'])->name('administrator.login.process');
-      Route::post('logout', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'logout'])->name('administrator.logout');
+      Route::namespace('Auth')->group(function () {
+         Route::get('/login', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'ShowLoginForm'])->name('administrator.login');
+         Route::post('/login', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'login'])->name('administrator.login.process');
+         Route::post('logout', [App\Http\Controllers\Administrator\Auth\LoginController::class, 'logout'])->name('administrator.logout');
+      });
+
+      Route::get('/migration/{booking_code}/i/{investor_id}/p/{package_id}', [App\Http\Controllers\Administrator\ClosingController::class, 'migration'])->name('admin.migration');
+
+      Route::get('/administrator/bookings', [App\Http\Controllers\Administrator\BookingController::class, 'index'])->name('administrator.booking');
    });
-
-   Route::get('/migration/{booking_code}/i/{investor_id}/p/{package_id}', [App\Http\Controllers\Administrator\ClosingController::class, 'migration'])->name('admin.migration');
-});
 
 
 
@@ -166,8 +170,6 @@ Route::get('/administrator/update/delete/{id}', [App\Http\Controllers\Administra
 
 
 
-
-Route::get('/administrator/bookings/pending', [App\Http\Controllers\Administrator\BookingController::class, 'index'])->name('admin.booking.index');
 
 Route::get('/administrator/payment/pending', [App\Http\Controllers\Administrator\BookingController::class, 'payment_pending'])->name('admin.payment.index');
 Route::get('/administrator/payment/approve/{booking_id}', [App\Http\Controllers\Administrator\BookingController::class, 'payment_approve'])->name('admin.payment.approve');

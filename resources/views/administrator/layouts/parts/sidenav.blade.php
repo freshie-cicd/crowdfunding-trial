@@ -18,6 +18,12 @@
               <span class="menu-icon"><i class="fa-solid fa-house"></i></span><span class="menu-title">Dashboard</span>
             </a>
           </li>
+          <li class="menu-item">
+            <a href="{{ route('administrator.booking') }}">
+              <span class="menu-icon"><i class="fa-solid fa-calendar-day"></i></span><span class="menu-title">Bookings</span>
+
+            </a>
+          </li>
 
           <li class="menu-item sub-menu">
             <a href="#">
