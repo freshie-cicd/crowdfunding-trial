@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\ClosingRequest;
 use App\Models\User;
 use App\Models\Booking;
+use App\Models\BookingPayment;
 use App\Mail\MigrationConfirmationMail;
 use Illuminate\Support\Facades\Mail;
 
@@ -118,16 +119,29 @@ class ClosingController extends Controller
                 $book['package_id'] = $package_id;
                 $book['booking_quantity'] = $migration_info->package_after_withdrawal;
                 $book['status'] = 'approved';
-                $book['note'] = 'Migrated';
+                $book['note'] = 'Migrated from batch 4 to 6';
                 $check = $book->save();
 
                 if ($check) {
 
-                    $reinvestAmount = $migration_info->after_withdrawal_amount;
+                    $previousPayment = BookingPayment::join('bookings', 'bookings.id', '=', 'booking_payments.booking_id')
+                        ->where('bookings.code', $booking_code)
+                        ->first();
+                    $previousPaymentId = $previousPayment->id;
+
+                    $newBookingPayment = BookingPayment::find($previousPaymentId)->replicate();
+                    $newBookingPayment->booking_id = $book->id;
+                    $newBookingPayment->payment_method = 'migration';
+                    $newBookingPayment->deposit_reference = "previous payment id " . $previousPaymentId . ", migrated from Batch 4 to Batch 6";
+                    $newBookingPayment->status = 'complete';
+                    $newBookingPayment->note = null;
+                    $newBookingPayment->save();
+
 
                     DB::table('bookings')->where('code', $booking_code)->where('user_id', $investor_id)->update(['status' => 'migrated']);
                     DB::table('closing_requests')->where('booking_code', $booking_code)->where('user_id', $investor_id)->update(['status' => 'disbursed']);
 
+                    $reinvestAmount = $migration_info->after_withdrawal_amount;
                     Mail::to($user_email)->send(new MigrationConfirmationMail($reinvestAmount));
 
                     return redirect()->back()->with('success', "Migrated Successfully, User is informed.");
