@@ -41,13 +41,14 @@ Route::namespace("Administrator")
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('index');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('home');
+Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('dashboard');
 
 Route::get('/packages', [App\Http\Controllers\HomeController::class, 'index'])->name('packages');
 
 Route::get('profile/change_password', [App\Http\Controllers\HomeController::class, 'change_password'])->name('change_password');
 Route::post('profile/change_password/update', [App\Http\Controllers\HomeController::class, 'change_password_update'])->name('change_password.update');
 
-Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('dashboard');
+
 
 Route::get('/profile', [App\Http\Controllers\HomeController::class, 'profile'])->name('profile');
 Route::get('/profile/edit', [App\Http\Controllers\HomeController::class, 'profile_edit'])->name('profile.edit');

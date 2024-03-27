@@ -134,54 +134,28 @@ class HomeController extends Controller
     public function dashboard()
     {
 
-
-
-        $bookings = Booking::where('bookings.user_id', auth()->user()->id)->where('packages.status', 1)
-
+        $bookings = Booking::where('bookings.user_id', auth()->user()->id)
+            ->where('bookings.status', '!=', 'rejected')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-
             ->join('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
-
             ->select('bookings.code', 'packages.code as pcode', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.batch_id', 'facebook_groups.url')
-
+            ->orderByRaw("CASE WHEN bookings.status = 'complete' THEN 1 WHEN bookings.status = 'pending' THEN 2 WHEN bookings.status = 'pending_approval' THEN 3 ELSE 4 END, bookings.id DESC")
             ->get();
-
-
-
-
 
         $packages = Package::where('status', 1)->get();
 
-
-
-
-
-        $bookings_ = Booking::where('bookings.user_id', auth()->user()->id)->where('booking_payments.status', 'complete')
-
+        $bookingSum = Booking::where('bookings.user_id', auth()->user()->id)->where('booking_payments.status', 'complete')
             ->join('packages', 'bookings.package_id', '=', 'packages.id')
-
             ->join('booking_payments', 'bookings.id', '=', 'booking_payments.booking_id')
-
             ->select('bookings.id', 'packages.name', 'packages.value', 'packages.name', 'bookings.code', 'bookings.booking_quantity', 'booking_payments.status')
-
+            ->orderBy('bookings.id', 'desc')
             ->get();
-
-        //dump($bookings);
-
-        //dump($packages);
 
         $total_investment = 0;
 
-        foreach ($bookings_ as $booking) {
-
+        foreach ($bookingSum as $booking) {
             $total_investment = $total_investment + $booking->value * $booking->booking_quantity;
         }
-
-
-
-        // dump($total_investment);
-
-
 
         return view('dashboard', compact('bookings', 'packages', 'total_investment'));
     }

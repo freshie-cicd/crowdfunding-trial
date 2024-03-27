@@ -109,14 +109,6 @@ class BookingController extends Controller
             ->get();
 
 
-        if ($status == 'pending') {
-            $bookings = $bookings->where('package_status', 1);
-        }
-
-
-
-
-
         $bookings_ = Booking::where('bookings.user_id', auth()->user()->id)->where('booking_payments.status', 'complete')
 
             ->join('packages', 'bookings.package_id', '=', 'packages.id')
@@ -126,8 +118,6 @@ class BookingController extends Controller
             ->select('bookings.id', 'packages.name', 'packages.value', 'packages.name', 'bookings.code', 'bookings.booking_quantity', 'booking_payments.status')
 
             ->get();
-
-        // dump($bookings_);
 
         $total_investment = 0;
 
