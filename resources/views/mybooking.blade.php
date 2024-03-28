@@ -123,21 +123,7 @@
 
     <p>২. আপনি সরাসরি Bank Deposit করতে পারবেন। অথবা BEFTN, NPSB এর মাধ্যমেও টাকা পাঠাতে পারবেন। </p>
 
-
-
-    <P style="line-height: 16px;font-size:15px; margin-left:48px;font-weight:600;"> Southeast Bank PLC</P>
-
-    <P style="line-height: 16px;font-size:15px; margin-left:48px;font-weight:600;"> Karwan bazar</P>
-
-    <P style="line-height: 16px;font-size:15px; margin-left:48px;font-weight:600;"> Freshie Farm</P>
-
-    <P style="line-height: 16px;font-size:15px; margin-left:48px;font-weight:600;"> A/C No: 001511100007771 </P>
-
-    <P style="line-height: 16px;font-size:15px; margin-left:48px;font-weight:600;"> Routing NO: 205262535 </P>
-
-
-
-
+    @include('shared.bank-details')
 
     <p>৩. টাকা পাঠানোর সময় Deposit Slip অথবা ফর্ম এর রেফারেন্সের ঘরে অবশ্যই আপনার বুকিং কোড উল্লেখ করুন।</p>
 
@@ -173,23 +159,9 @@
 
         <p>২. আপনি সরাসরি Bank Deposit করতে পারবেন। অথবা BEFTN, NPSB এর মাধ্যমেও টাকা পাঠাতে পারবেন। </p>
 
-
-
         <br>
 
-        <P style="line-height: 16px;font-size:15px; margin-left:48px;font-weight:600;"> Southeast Bank PLC</P>
-
-        <P style="line-height: 16px;font-size:15px; margin-left:48px;font-weight:600;"> Karwan bazar</P>
-
-        <P style="line-height: 16px;font-size:15px; margin-left:48px;font-weight:600;"> Freshie Farm</P>
-
-        <P style="line-height: 16px;font-size:15px; margin-left:48px;font-weight:600;"> A/C No: 001511100007771 </P>
-
-        <P style="line-height: 16px;font-size:15px; margin-left:48px;font-weight:600;"> Routing NO: 205262535 </P>
-
-
-
-
+        @include('shared.bank-details')
 
         <p>৩. টাকা পাঠানোর সময় Deposit Slip অথবা ফর্ম এর রেফারেন্সের ঘরে অবশ্যই আপনার বুকিং কোড উল্লেখ করুন।</p>
 
