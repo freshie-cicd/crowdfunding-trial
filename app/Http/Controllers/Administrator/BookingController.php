@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\FormatsNumbers;
 use App\Models\Package;
+use App\Models\ClosingRequest;
+use App\Models\InvestorBankDetail;
 
 use PDF;
 
@@ -34,8 +36,6 @@ class BookingController extends Controller
      */
     public function index(Request $request)
     {
-
-
         $dataSize = $request->query('dataSize', 10);
         $dataSize = filter_var($dataSize, FILTER_VALIDATE_INT, [
             'options' => [
@@ -60,9 +60,22 @@ class BookingController extends Controller
                 ->orWhere('users.email', 'like', '%' . $search . '%')
                 ->orWhere('bookings.note', 'like', '%' . $search . '%');
         })
-            ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->join('users', 'users.id', '=', 'bookings.user_id')
-            ->select('bookings.*', 'packages.name as package_name', 'packages.value as package_value', 'users.name as user_name', 'users.phone as user_phone', 'users.email as user_email')
+            ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
+            ->leftJoin('users', 'users.id', '=', 'bookings.user_id')
+            ->leftJoin('booking_payments', 'booking_payments.booking_id', '=', 'bookings.id')
+            ->leftJoin('closing_requests', 'closing_requests.booking_code', '=', 'bookings.code')
+            ->select(
+                'bookings.*',
+                'packages.name as package_name',
+                'packages.value as package_value',
+                'users.name as user_name',
+                'users.phone as user_phone',
+                'users.email as user_email',
+                'booking_payments.status as payment_status',
+                'booking_payments.id as payment_id',
+                'closing_requests.status as closing_status',
+                'closing_requests.id as closing_id'
+            )
             ->latest()->paginate($dataSize);
         $distinctStatus = Booking::select('status')->distinct()->get();
 
@@ -74,32 +87,40 @@ class BookingController extends Controller
 
         $bookings->appends(['dataSize' => $dataSize, 'status' => $status, 'package' => $package, 'search' => $search]);
 
-        return view('administrator.booking', compact('bookings', 'distinctStatus', 'packagesData'));
+        return view('administrator.booking.index', compact('bookings', 'distinctStatus', 'packagesData'));
+    }
+
+    public function show($id)
+    {
+        $booking = Booking::where('bookings.id', $id)
+            ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
+            ->leftJoin('users', 'users.id', '=', 'bookings.user_id')
+            ->select('bookings.*', 'packages.name as package_name', 'packages.value as package_value', 'users.name as user_name', 'users.phone as user_phone', 'users.email as user_email')
+            ->first();
+
+        $booking->total_value = $this->numberFormatBangladeshi($booking->package_value * $booking->booking_quantity);
+
+        $payment = BookingPayment::where('booking_id', $id)->first();
+        $closing = ClosingRequest::where('booking_code', $booking->code)->first();
+        $bankDetails = InvestorBankDetail::where('user_id', $booking->user_id)
+            ->leftJoin('banks', 'banks.id', '=', 'investor_bank_details.bank_name')
+            ->leftJoin('districts', 'districts.id', '=', 'investor_bank_details.district')
+            ->first();
+
+        return view('administrator.booking.show', compact('booking', 'payment', 'closing', 'bankDetails'));
     }
 
     public function payment_pending(Request $request)
     {
-
-
-
         $pendings = BookingPayment::where('bookings.status', 'pending_approval')
-
             ->join('bookings', 'bookings.id', "=", 'booking_payments.booking_id')
-
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-
             ->join('users', 'users.id', '=', 'bookings.user_id')
-
             ->select('packages.name', 'packages.value', 'bookings.booking_quantity', 'bookings.code', 'booking_payments.payment_document', 'booking_payments.document_two', 'booking_payments.document_three', 'booking_payments.bank', 'booking_payments.branch', 'depositors_name', 'booking_payments.depositors_mobile_number', 'booking_payments.deposit_reference', 'booking_payments.payment_date', 'booking_payments.note', 'booking_payments.status', 'booking_payments.booking_id', 'users.name as investor_name', 'users.phone', 'users.email', 'users.id', 'booking_payments.payment_method')
-
             ->get();
 
-
-
-        return view('administrator.payment_pending', compact('pendings'));
+        return view('administrator.payment.pending', compact('pendings'));
     }
-
-
 
     public function payment_approve($booking_id, $note, $user_id)
     {
@@ -151,21 +172,12 @@ class BookingController extends Controller
 
     public function modal_info($id)
     {
-
-
-
         $information = User::where('users.id', $id)
-
             ->join('bookings', 'users.id', '=', 'bookings.user_id')
-
             ->join('booking_payments', 'bookings.id', '=', 'booking_payments.booking_id')
-
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-
             ->join('project_batches', 'project_batches.id', '=', 'packages.batch_id')
-
             ->join('projects', 'projects.id', '=', 'project_batches.project_id')
-
             ->select(
                 'users.id as user_id',
                 'users.name as user_name',
@@ -177,7 +189,6 @@ class BookingController extends Controller
                 'users.nominee_name as user_nominee_name',
                 'users.nominee_relation as user_nominee_relation',
                 'users.nominee_phone as user_nominee_phone',
-
                 'packages.name as package_name',
                 'packages.value as package_value',
                 'bookings.booking_quantity as booking_quantity',
@@ -186,39 +197,26 @@ class BookingController extends Controller
                 'bookings.code as booking_code',
                 'booking_payments.payment_method as payment_method',
                 'booking_payments.payment_document as payment_document',
-
                 'booking_payments.payment_date as payment_date',
                 'booking_payments.note as payment_note',
                 'booking_payments.status as payment_status'
             )->get();
 
-
-
         return response()->json($information);
     }
 
 
-
-
-
-    public function approved_list(Request $request)
+    public function paymentProof(Request $request)
     {
 
         $list = BookingPayment::where('booking_payments.status', 'complete')
-
             ->join('bookings', 'bookings.id', "=", 'booking_payments.booking_id')
-
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-
             ->join('users', 'users.id', '=', 'bookings.user_id')
-
             ->select('packages.name', 'packages.value', 'bookings.booking_quantity', 'bookings.code', 'booking_payments.payment_document', 'booking_payments.payment_date', 'booking_payments.note', 'booking_payments.status', 'booking_payments.booking_id', 'users.name as investor_name', 'users.phone', 'users.email', 'users.id', 'bookings.updated_by', 'booking_payments.payment_method')
-
             ->get();
 
-
-
-        return view('administrator.payment_approved', compact('list'));
+        return view('administrator.payment.approved', compact('list'));
     }
 
 
@@ -251,13 +249,10 @@ class BookingController extends Controller
 
     public function hard_copy_agreement_requests()
     {
-
         $dataX = AgreementRequest::where('agreement_requests.status', 'requested')
             ->join('bookings', 'bookings.code', '=', 'agreement_requests.booking_code')
             ->join('users', 'users.id', '=', 'bookings.user_id')
             ->get();
-
-
 
         return view('administrator.agreement.requests', compact('dataX'));
     }
@@ -265,93 +260,51 @@ class BookingController extends Controller
 
 
     public function hard_copy_download($code)
-
     {
-
         $booking_info = Booking::where('bookings.code', $code)
-
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-
             ->join('project_batches', 'packages.batch_id', '=', 'project_batches.id')
-
             ->join('booking_payments', 'booking_payments.booking_id', '=', 'bookings.id')
-
             ->join('users', 'users.id', '=', 'bookings.user_id')
-
             ->select('users.*', 'bookings.booking_quantity', 'packages.value', 'packages.note', 'bookings.code', 'project_batches.ending_date', 'project_batches.starting_date', 'bookings.code', 'booking_payments.payment_date', 'project_batches.project_id')
-
             ->get();
 
-
-
         $total_value = $booking_info[0]->value * $booking_info[0]->booking_quantity;
-
         $ac = new AgreementController;
-
         $inWord = $ac->inWords($total_value);
 
-
-
-
-
-
-
         $data = [
-
             'name' => $booking_info[0]->name,
-
             'nid' => $booking_info[0]->nid,
-
             'father_name' => $booking_info[0]->father_name,
-
             'mother_name' => $booking_info[0]->mother_name,
-
             'permanent_address' => $booking_info[0]->permanent_address,
-
             'present_address' => $booking_info[0]->present_address,
-
             'nominee_name' => $booking_info[0]->nominee_name,
-
             'nominee_address' => $booking_info[0]->nominee_address,
-
             'nominee_relation' => $booking_info[0]->nominee_relation,
-
             'booking_id' => $code,
-
             'project_ending_date' => $booking_info[0]->ending_date,
-
             'project_starting_date' => $booking_info[0]->starting_date,
-
             'value' => $booking_info[0]->value,
-
             'booking_quantity' => $booking_info[0]->booking_quantity,
-
             'booking_code' => $booking_info[0]->code,
-
             'inWords' => $inWord,
-
             'payment_date' => $booking_info[0]->payment_date,
-
         ];
-
 
 
         $file_name = $booking_info[0]->name . '_' . $code . '.pdf';
 
         if ($booking_info[0]->project_id == 1) {
-
             $pdf = PDF::loadView('administrator.agreement.hardcopy', $data, [], [
-
                 'format' => [209.55, 336.55],
-
             ]);
         } else {
             $pdf = PDF::loadView('agreement.paper_greenify', $data, [], [
                 'format' => [209.55, 336.55],
             ]);
         }
-
-
 
         return $pdf->stream($file_name);
     }

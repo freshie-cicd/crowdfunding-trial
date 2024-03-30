@@ -299,55 +299,13 @@
 @section('content')
 
 <div class="">
-
-    <div class="row mb-3">
-
-        <div class="col-md-9">
-            <h3>Investor List</h3>
-        </div>
-
-        <div class="col-md-3">
-
-            <form method="get" action="{{ route('admin.payment.approved_bybatch') }}">
-
-                <div class="input-group">
-
-                    <select class="form-select" id="inputGroupSelect04" name="package" aria-label="Example select with button addon">
-
-                        <option selected>Choose...</option>
-
-                        <option value="1">Batch 4 Package 1</option>
-
-                        <option value="2">Batch 5 Package 1</option>
-
-                        <option value="5">Batch 6 Package 1</option>
-                    </select>
-
-                    <button class="btn btn-outline-secondary" type="submit">Filter</button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-
     <div class="row justify-content-center">
-
-
-
-
-
-
 
         <div class="col-md-12">
 
             <div class="card">
 
-                <div class="card-header">{{ __('Payment Approved Investors List') }} </div>
+                <div class="card-header">{{ __('Pending Payments') }} </div>
 
 
 
@@ -360,10 +318,6 @@
                 </div>
 
                 @endif
-
-
-
-
 
 
 
@@ -393,15 +347,29 @@
 
                                 <th scope="col">Total Payment</th>
 
+                                <th scope="col">Payment Method</th>
+
                                 <th scope="col">Payment Document</th>
 
+                                <th scope="col">Document</th>
+
+                                <th scope="col">Document</th>
+
                                 <th scope="col">Payment Date</th>
+
+                                <th scope="col">bank</th>
+
+                                <th scope="col">Branch</th>
+
+                                <th scope="col">Depositor Name</th>
+
+                                <th scope="col">Mobile Number</th>
+
+                                <th scope="col">Deposit Reference</th>
 
                                 <th scope="col">Status</th>
 
                                 <th scope="col">Note</th>
-
-                                <th scope="col">Updated By</th>
 
 
 
@@ -410,8 +378,6 @@
                         </thead>
 
                         <tbody>
-
-
 
                             @php
 
@@ -424,8 +390,7 @@
                             @endphp
 
 
-
-                            @foreach ($list as $data)
+                            @foreach ($pendings as $data)
 
 
 
@@ -447,19 +412,44 @@
 
                                 <td>{{ $data->value * $data->booking_quantity }}</td>
 
-                                <td> <img class="lightbox" src="{{ url($data->payment_document) }}" alt=""> </td>
+                                <td>{{ $data->payment_method }}</td>
+
+                                <td>
+                                    @if($data->payment_document)
+                                    <img class="lightbox" src="{{ url($data->payment_document) }}" alt="" />
+                                    @endif
+                                </td>
+                                <td>
+                                    @if(!empty($data->document_two))
+                                    <img class="lightbox" src="{{ url($data->document_two) }}" alt="" />
+                                    @endif
+                                </td>
+
+                                <td>
+                                    @if(!empty($data->document_three))
+                                    <img class="lightbox" src="{{ url($data->document_three) }}" alt="">
+                                    @endif
+                                </td>
 
                                 <td>{{ $data->payment_date }}</td>
+
+                                <td>{{ $data->bank }}</td>
+
+                                <td>{{ $data->branch }}</td>
+
+                                <td>{{ $data->depositors_name }}</td>
+
+                                <td>{{ $data->depositors_mobile_number }}</td>
+
+                                <td>{{ $data->deposit_reference }}</td>
 
                                 <td>{{ $data->status }}</td>
 
                                 <td>{{ $data->note }}</td>
 
-                                <td>{{ $data->updated_by }}</td>
+
 
                             </tr>
-
-
 
                             @php
 
@@ -468,7 +458,6 @@
                             $totalInvestor = $totalInvestor + 1;
 
                             @endphp
-
 
 
                             @endforeach
@@ -487,52 +476,21 @@
 
 </div>
 
-
-
-@if(Auth::guard('administrator')->user()->email == 'ahkafy@gmail.com' || Auth::guard('administrator')->user()->email == 'kafy@freshie.farm')
-
-<h2>Total Invest = {{ $totalInvest * 50000 }}</h2>
-
-<h2>Total Package Sold = {{ $totalInvest }}</h2>
-
-<h2>Total Investor = {{ $totalInvestor }}</h2>
-
-@endif
-
-
-
 <!-- Modal -->
 
-
-
 <div class="modal fade" id="userShowModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-
     <div class="modal-dialog modal-dialog-centered modal-xl">
-
         <div class="modal-content">
-
             <div class="modal-header">
-
                 <h5 class="modal-title" id="#userShowModal">Investment Information</h5>
-
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-
             </div>
-
             <div class="modal-body">
-
-
-
                 <div class="row">
-
                     <div class="col-md-4">
-
                         <div class="card">
-
                             <div class="card-header">Investor Profile</div>
-
                             <div class="card-body">
-
                                 <p><strong>User ID:</strong> <span id="user-id"></span></p>
 
                                 <p><strong>Name:</strong> <span id="user-name"></span></p>
@@ -544,16 +502,11 @@
                                 <p><strong>Address:</strong> <span id="user-address"></span></p>
 
                                 <p><strong>NID:</strong> <span id="user_nid"></span></p>
-
-
-
                             </div>
 
                         </div>
 
                     </div>
-
-
 
                     <div class="col-md-4">
 
@@ -581,10 +534,6 @@
 
                     </div>
 
-
-
-
-
                     <div class="col-md-4">
 
                         <div class="card bg-success text-white">
@@ -610,37 +559,50 @@
                         </div>
 
                     </div>
-
-
-
                 </div>
 
+                <div class="card mt-4">
+                    <div class="card-header">
+                        Decision Form
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('admin.payment.decision') }}">
+                            @csrf
+                            <input type="hidden" name="booking_id" id="booking_id_form" value="1">
+                            <input type="hidden" name="user_id" id="user_id_form" value="1">
+                            <div class="row mb-3">
+                                <label for='description' class="col-md-4 col-form-label text-md-end">{{ __('Decision') }}</label>
+                                <div class="col-md-4">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="decision" id="approve" value="approve" required>
+                                        <label class="form-check-label" for="approve">
+                                            Approve
+                                        </label>
+                                    </div>
 
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="decision" id="reject" value="reject" required>
+                                        <label class="form-check-label" for="reject">
+                                            Reject
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
 
-
-
-
-
-
-
-
-
-
-
+                            <div class="row mb-3">
+                                <label for='note' class="col-md-4 col-form-label text-md-end">{{ __('Note') }}</label>
+                                <div class="col-md-4">
+                                    <input id='note' type="text" class="form-control @error('note') is-invalid @enderror" name='note' value="{{ old('note') }}" required autocomplete='note'>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
             <div class="modal-footer">
-
                 <button type="button" class="btn btn-secondary float-start" data-bs-dismiss="modal">Close</button>
-
-
-
                 <input type="submit" for="submit" name="Update" class="btn btn-danger float-end" />
-
-                </form>
-
-
-
             </div>
 
         </div>

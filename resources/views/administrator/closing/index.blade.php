@@ -22,7 +22,6 @@
         -webkit-animation: pop-in 0.5s;
         -moz-animation: pop-in 0.5s;
         -ms-animation: pop-in 0.5s;
-
     }
 
     .img-popup img {
@@ -161,7 +160,6 @@
 <div class="">
     <div class="row mb-3">
         <div class="col-md-9">
-            <h3>Closing Index</h3>
         </div>
         <div class="col-md-3">
             <form method="get" action="{{ route('admin.borga.cow_profile') }}">
@@ -178,11 +176,9 @@
 
     <div class="row justify-content-center">
 
-
-
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">{{ __('Closing Index') }} </div>
+                <div class="card-header">{{ __('Closing Requests') }} </div>
 
                 @if (\Session::has('success'))
                 <div class="alert alert-success">

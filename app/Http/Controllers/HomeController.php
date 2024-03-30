@@ -4,121 +4,66 @@
 
 namespace App\Http\Controllers;
 
-
-
 use Illuminate\Http\Request;
-
 use App\Models\Package;
-
 use App\Models\User;
-
 use App\Models\InvestorBankDetail;
-
 use App\Models\Booking;
-
 use App\Mail\BookingConfirmationMail;
-
 use Illuminate\Support\Facades\Mail;
-
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-
 
 class HomeController extends Controller
 
 {
 
     /**
-
      * Create a new controller instance.
-
      *
-
      * @return void
-
      */
-
     public function __construct()
-
     {
-
         $this->middleware('auth');
     }
 
 
 
     /**
-
      * Show the application dashboard.
-
      *
-
      * @return \Illuminate\Contracts\Support\Renderable
-
      */
-
     public function index()
-
     {
-
         $packages = Package::where('status', 1)->get();
-
-
 
         return view('package', compact('packages'));
     }
 
-
-
     public function book($id)
-
     {
-
         $data = Package::where('id', $id)->get();
-
-
 
         return view('book', compact(['data']));
     }
 
-
-
     public function store(Request $request)
-
     {
-
         $book = new Booking;
-
-
-
         do {
-
             $randomNumber = random_int(10000000, 99999999);
 
             $check = Booking::where('code', $randomNumber)->count();
         } while ($check);
 
-
-
         $book['code'] = $randomNumber;
-
-
-
         $book['user_id'] = $request->user_id;
-
         $book['package_id'] = $request->package_id;
-
         $book['booking_quantity'] = $request->booking_quantity;
-
         $book['note'] = $request->note;
-
-
-
         $book->save();
-
-
-
-
 
         Mail::to(auth()->user()->email)->send(new BookingConfirmationMail());
 
@@ -157,7 +102,9 @@ class HomeController extends Controller
             $total_investment = $total_investment + $booking->value * $booking->booking_quantity;
         }
 
-        return view('dashboard', compact('bookings', 'packages', 'total_investment'));
+        $checkPendingApproval = Booking::where('user_id', auth()->user()->id)->where('status', 'pending_approval')->count();
+
+        return view('dashboard', compact('bookings', 'packages', 'total_investment', 'checkPendingApproval'));
     }
 
 

@@ -65,27 +65,22 @@
               <p class="card-text text-uppercase">Status:<b> {{ $booking->status }}</b></p>
 
               <!-- Button trigger modal -->
-
-
-
               @if($booking->status=='pending')
-
-              <div class="d-grid gap-2">
-
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#instructionModal"> Instruction</button>
-
-                <a href="{{ url('payment-proof') }}/{{ $booking->id }}/submit/" class="btn btn-primary">Submit Payment Proof</a>
-
+              @if($checkPendingApproval==1)
+              <div class="d-grid gap 2">
+                <button type="button" class="btn btn-warning" disabled>Wait until admin approve your other Pending Approval Investment</button>
               </div>
-
-
+              @else
+              <div class="d-grid gap-2">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#instructionModal"> Instruction</button>
+                <a href="{{ url('payment-proof') }}/{{ $booking->id }}/submit/" class="btn btn-primary">Submit Payment Proof</a>
+              </div>
+              @endif
               @else
 
               <div class="d-grid gap-2">
                 <a href="{{ $booking->url }}" class="btn btn-primary" target="__blank"><i class="fa-brands fa-facebook"></i> JOIN FACEBOOK GROUP</a>
               </div>
-
-
 
               @endif
 
@@ -135,9 +130,13 @@
 
     <p>৭. আমাদের এডমিনের পক্ষ থেকে পেমেন্ট কনফার্মেশনের জন্য অপেক্ষা করুন।</p>
 
+    <p>বিঃ দ্রঃ আপনার যদি কোনো বুকিং "PENDING APPROVAL" অবস্থায় থাকে তাহলে নতুন করে আরেকটি বুকিং কোডে পেমেন্ট প্রুফ সাবমিট করতে পারবেন না।
+      আপনার আগের বুকিংটি এপ্রুভ হওয়া পর্যন্ত অপেক্ষা করুন।</p>
+
   </div>
 
-</div <!-- Modal -->
+</div>
+<!-- Modal -->
 
 <div class="modal fade" id="instructionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 
@@ -172,6 +171,9 @@
         <p>৬. একটি ফর্ম পাবেন। ফরমটি পুরন করুন এবং পেমেন্ট প্রুফ হিসেবে রাখা ছবিটি সংযোজন করে সেভ করুন।</p>
 
         <p>৭. আমাদের এডমিনের পক্ষ থেকে পেমেন্ট কনফার্মেশনের জন্য অপেক্ষা করুন।</p>
+
+        <p>বিঃ দ্রঃ আপনার যদি কোনো বুকিং "PENDING APPROVAL" অবস্থায় থাকে তাহলে নতুন করে আরেকটি বুকিং কোডে পেমেন্ট প্রুফ সাবমিট করতে পারবেন না।
+          আপনার আগের বুকিংটি এপ্রুভ হওয়া পর্যন্ত অপেক্ষা করুন।</p>
 
       </div>
 

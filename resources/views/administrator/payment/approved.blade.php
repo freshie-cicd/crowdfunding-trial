@@ -2,15 +2,10 @@
 
 <style>
     .lightbox {
-
         height: 100px;
-
         width: 200px;
-
         float: left;
-
         margin: 10px;
-
     }
 
 
@@ -300,40 +295,57 @@
 
 <div class="">
 
-    <div class="row justify-content-center">
+    <div class="row mb-3">
 
+        <div class="col-md-9">
+        </div>
+
+        <div class="col-md-3">
+
+            <form method="get" action="{{ route('admin.payment.approved_bybatch') }}">
+
+                <div class="input-group">
+
+                    <select class="form-select" id="inputGroupSelect04" name="package" aria-label="Example select with button addon">
+
+                        <option selected>Choose...</option>
+
+                        <option value="1">Batch 4 Package 1</option>
+
+                        <option value="2">Batch 5 Package 1</option>
+
+                        <option value="5">Batch 6 Package 1</option>
+                    </select>
+
+                    <button class="btn btn-outline-secondary" type="submit">Filter</button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="row justify-content-center">
         <div class="col-md-12">
 
             <div class="card">
 
-                <div class="card-header">{{ __('Pending Payments') }} </div>
-
-
-
+                <div class="card-header">{{ __('Payment Approved Investors List') }} </div>
                 @if (\Session::has('success'))
-
                 <div class="alert alert-success">
-
                     {!! \Session::get('success') !!}
-
                 </div>
-
                 @endif
 
-
-
                 <div class="card-body">
-
-
-
                     <table id="dataTable" class="table table-striped table-bordered table-hover table-responsive">
-
                         <thead class="thead-dark" style="background:#222;color:#fff">
-
                             <tr>
-
                                 <th scope="col">#</th>
-
                                 <th scope="col">Investor Name</th>
 
                                 <th scope="col">Phone</th>
@@ -348,29 +360,15 @@
 
                                 <th scope="col">Total Payment</th>
 
-                                <th scope="col">Payment Method</th>
-
                                 <th scope="col">Payment Document</th>
 
-                                <th scope="col">Document</th>
-
-                                <th scope="col">Document</th>
-
                                 <th scope="col">Payment Date</th>
-
-                                <th scope="col">bank</th>
-
-                                <th scope="col">Branch</th>
-
-                                <th scope="col">Depositor Name</th>
-
-                                <th scope="col">Mobile Number</th>
-
-                                <th scope="col">Deposit Reference</th>
 
                                 <th scope="col">Status</th>
 
                                 <th scope="col">Note</th>
+
+                                <th scope="col">Updated By</th>
 
 
 
@@ -379,6 +377,8 @@
                         </thead>
 
                         <tbody>
+
+
 
                             @php
 
@@ -391,7 +391,8 @@
                             @endphp
 
 
-                            @foreach ($pendings as $data)
+
+                            @foreach ($list as $data)
 
 
 
@@ -413,33 +414,27 @@
 
                                 <td>{{ $data->value * $data->booking_quantity }}</td>
 
-                                <td>{{ $data->payment_method }}</td>
-
-                                <td> <img class="lightbox" src="{{ url($data->payment_document) }}" alt=""> </td>
-
-                                <td> <img class="lightbox" src="@if(!empty($data->document_two)) {{ url($data->document_two) }} @endif" alt=""> </td>
-
-                                <td> <img class="lightbox" src="@if(!empty($data->document_three)) {{ url($data->document_three) }} @endif" alt=""> </td>
+                                <td>
+                                    @if($data->payment_document)
+                                    @if(pathinfo($data->payment_document, PATHINFO_EXTENSION) == 'pdf')
+                                    <a href="{{ url($data->payment_document) }}" target="_blank" class="btn btn-primary">View PDF</a>
+                                    @else
+                                    <img class="lightbox" src="{{ url($data->payment_document) }}" alt="">
+                                    @endif
+                                    @endif
+                                </td>
 
                                 <td>{{ $data->payment_date }}</td>
-
-                                <td>{{ $data->bank }}</td>
-
-                                <td>{{ $data->branch }}</td>
-
-                                <td>{{ $data->depositors_name }}</td>
-
-                                <td>{{ $data->depositors_mobile_number }}</td>
-
-                                <td>{{ $data->deposit_reference }}</td>
 
                                 <td>{{ $data->status }}</td>
 
                                 <td>{{ $data->note }}</td>
 
-
+                                <td>{{ $data->updated_by }}</td>
 
                             </tr>
+
+
 
                             @php
 
@@ -448,6 +443,7 @@
                             $totalInvestor = $totalInvestor + 1;
 
                             @endphp
+
 
 
                             @endforeach
@@ -468,16 +464,16 @@
 
 
 
-
 @if(Auth::guard('administrator')->user()->email == 'ahkafy@gmail.com' || Auth::guard('administrator')->user()->email == 'kafy@freshie.farm')
 
-<h2>Total Pending Invest = {{ $totalInvest * 50000 }}</h2>
+<h2>Total Invest = {{ $totalInvest * 50000 }}</h2>
 
-<h2>Total Pending Package Sold = {{ $totalInvest }}</h2>
+<h2>Total Package Sold = {{ $totalInvest }}</h2>
 
-<h2>Total Pending Investor = {{ $totalInvestor }}</h2>
+<h2>Total Investor = {{ $totalInvestor }}</h2>
 
 @endif
+
 
 
 <!-- Modal -->
@@ -485,235 +481,62 @@
 
 
 <div class="modal fade" id="userShowModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-
     <div class="modal-dialog modal-dialog-centered modal-xl">
-
         <div class="modal-content">
-
             <div class="modal-header">
-
                 <h5 class="modal-title" id="#userShowModal">Investment Information</h5>
-
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-
             </div>
-
             <div class="modal-body">
-
-
-
                 <div class="row">
-
                     <div class="col-md-4">
-
                         <div class="card">
-
                             <div class="card-header">Investor Profile</div>
-
                             <div class="card-body">
-
                                 <p><strong>User ID:</strong> <span id="user-id"></span></p>
-
                                 <p><strong>Name:</strong> <span id="user-name"></span></p>
-
                                 <p><strong>Email:</strong> <span id="user-email"></span></p>
-
                                 <p><strong>Phone:</strong> <span id="user-phone"></span></p>
-
                                 <p><strong>Address:</strong> <span id="user-address"></span></p>
-
                                 <p><strong>NID:</strong> <span id="user_nid"></span></p>
-
-
-
                             </div>
-
                         </div>
-
                     </div>
 
-
-
                     <div class="col-md-4">
-
                         <div class="card">
-
                             <div class="card-header">Investment History</div>
-
                             <div class="card-body">
-
                                 <p><strong>No of Approved Entries:</strong> <span id="approved_entries"></span></p>
-
                                 <p><strong>Total Approved Amount:</strong> <span id="approved_amount"></span></p>
-
                                 <p><strong>Total Pending Entries:</strong> <span id="pending_entries"></span></p>
-
                                 <p><strong>Total Pending Amount:</strong> <span id="pending_amount"></span></p>
-
                                 <p><strong>Total Rejected Entries:</strong> <span id="rejected_entries"></span></p>
-
                                 <p><strong>Total Rejected Amount:</strong> <span id="rejected_amount"></span></p>
-
                             </div>
-
                         </div>
-
                     </div>
-
-
-
-
 
                     <div class="col-md-4">
-
                         <div class="card bg-success text-white">
-
                             <div class="card-header">Current Investment Request</div>
-
                             <div class="card-body text-white">
-
                                 <p><strong>Booking Code:</strong> <span id="booking_code"></span></p>
-
                                 <p><strong>Package:</strong> <span id="package_name"></span></p>
-
                                 <p><strong>Unit Priece:</strong> <span id="package_value"></span></p>
-
                                 <p><strong>Booking Quantity:</strong> <span id="booking_quantity"></span></p>
-
                                 <p><strong>Payable Invest:</strong> <span id="invest_value"></span></p>
-
                                 <p><strong>Payment Method:</strong> <span id="payment_method"></span></p>
-
                             </div>
-
                         </div>
-
-                    </div>
-
-
-
-                </div>
-
-
-
-                <div class="card mt-4">
-
-                    <div class="card-header">
-
-                        Decision Form
-
-                    </div>
-
-
-
-                    <div class="card-body">
-
-                        <form method="POST" action="{{ route('admin.payment.decision') }}">
-
-
-
-                            @csrf
-
-
-
-                            <input type="hidden" name="booking_id" id="booking_id_form" value="1">
-
-                            <input type="hidden" name="user_id" id="user_id_form" value="1">
-
-
-
-                            <div class="row mb-3">
-
-                                <label for='description' class="col-md-4 col-form-label text-md-end">{{ __('Decision') }}</label>
-
-
-
-                                <div class="col-md-4">
-
-
-
-                                    <div class="form-check form-check-inline">
-
-                                        <input class="form-check-input" type="radio" name="decision" id="approve" value="approve" required>
-
-                                        <label class="form-check-label" for="approve">
-
-                                            Approve
-
-                                        </label>
-
-                                    </div>
-
-                                    <div class="form-check form-check-inline">
-
-                                        <input class="form-check-input" type="radio" name="decision" id="reject" value="reject" required>
-
-                                        <label class="form-check-label" for="reject">
-
-                                            Reject
-
-                                        </label>
-
-                                    </div>
-
-
-
-                                </div>
-
-                            </div>
-
-
-
-
-
-
-
-                            <div class="row mb-3">
-
-                                <label for='note' class="col-md-4 col-form-label text-md-end">{{ __('Note') }}</label>
-
-
-
-                                <div class="col-md-4">
-
-                                    <input id='note' type="text" class="form-control @error('note') is-invalid @enderror" name='note' value="{{ old('note') }}" required autocomplete='note'>
-
-                                </div>
-
-                            </div>
-
-
-
-
-
                     </div>
 
                 </div>
-
-
-
-
-
-
-
-
-
             </div>
 
             <div class="modal-footer">
-
                 <button type="button" class="btn btn-secondary float-start" data-bs-dismiss="modal">Close</button>
-
-
-
-                <input type="submit" for="submit" name="Update" class="btn btn-danger float-end" />
-
-                </form>
-
-
-
             </div>
-
         </div>
 
     </div>
@@ -930,36 +753,27 @@
 
 <script>
     $(document).ready(function() {
-
         "use strict";
 
         $(".lightbox").click(function() {
-
+            console.log('clicked img');
             var imgsrc = $(this).attr('src');
-
             $("body").append("<div class='img-popup'><span class='close-lightbox'>&times;</span><img src='" + imgsrc + "'></div>");
-
             $(".close-lightbox, .img-popup").click(function() {
-
                 $(".img-popup").fadeOut(500, function() {
 
                     $(this).remove();
-
                 }).addClass("lightboxfadeout");
-
             });
-
-
-
         });
 
         $(".lightbox").click(function() {
-
             $(".img-popup").fadeIn(500);
-
         });
 
-
+        $(".close-lightbox").click(function() {
+            $(".img-popup").fadeOut(500);
+        });
 
     });
 </script>

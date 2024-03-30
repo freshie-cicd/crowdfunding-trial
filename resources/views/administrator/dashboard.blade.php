@@ -20,24 +20,7 @@
             return otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree + afterPoint;
         }
     </script>
-    <div x-data="{
-            package: '',
-            packages: {{$packages}},
-            stats: {{$bookingStats}},
-            getTotalValueByStatus(status) {
-                return this.stats
-                    .filter(stat => stat.package_id === this.package && stat.status === status)
-                    .reduce((total, stat) => total + stat.total_value, 0);
-            }
-        }">
-        <div class="pb-2">
-            <select name="package" id="package" class="border border-gray-300 rounded-md p-2 bg-white" x-model="package">
-                <option value="">Select Package</option>
-                <template x-for="package in packages" :key="package.id">
-                    <option x-bind:value="package.id" x-text="package.name"></option>
-                </template>
-            </select>
-        </div>
+    <div>
         <div>
             <table class="table-auto w-full">
                 <thead>
@@ -51,20 +34,41 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr x-show="package">
-                        <td class="border border-gray-300 p-2" x-text="`${packages.find(p => p.id == package)?.name} [${packages.find(p => p.id == package)?.status? 'active': 'inactive'}]`"></td>
-                        <td class="border border-gray-300 p-2" x-text="formatNumberBangladeshi(getTotalValueByStatus('pending'))"></td>
-                        <td class="border border-gray-300 p-2" x-text="formatNumberBangladeshi(getTotalValueByStatus('pending_approval'))"></td>
-                        <td class="border border-gray-300 p-2" x-text="formatNumberBangladeshi(getTotalValueByStatus('approved'))"></td>
-                        <td class="border border-gray-300 p-2" x-text="formatNumberBangladeshi(getTotalValueByStatus('rejected'))"></td>
+                    @foreach($packages as $package)
+                    <tr>
                         <td class="border border-gray-300 p-2">
-                            <span x-text="formatNumberBangladeshi(stats.filter(stat => stat.package_id === package).reduce((total, stat) => parseInt(total) + parseInt(stat.total_value), 0))"></span>
+                            {{$package->name}}
+                        </td>
+                        <td class="border border-gray-300 p-2">
+                            <script>
+                                document.write(formatNumberBangladeshi(`{{$package->pending}}`))
+                            </script>
+                        </td>
+                        <td class="border border-gray-300 p-2">
+                            <script>
+                                document.write(formatNumberBangladeshi(`{{$package->pending_approval}}`))
+                            </script>
+                        </td>
+                        <td class="border border-gray-300 p-2">
+                            <script>
+                                document.write(formatNumberBangladeshi(`{{$package->approved}}`))
+                            </script>
+                        </td>
+                        <td class="border border-gray-300 p-2">
+                            <script>
+                                document.write(formatNumberBangladeshi(`{{$package->rejected}}`))
+                            </script>
+                        </td>
+                        <td class="border border-gray-300 p-2">
+                            <script>
+                                document.write(formatNumberBangladeshi(`{{$package->total_value}}`));
+                            </script>
                         </td>
                     </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
     </div>
-</div>
 </div>
 @endsection

@@ -34,7 +34,13 @@ Route::namespace("Administrator")
 
       Route::get('/migration/{booking_code}/i/{investor_id}/p/{package_id}', [App\Http\Controllers\Administrator\ClosingController::class, 'migration'])->name('admin.migration');
 
-      Route::get('/administrator/bookings', [App\Http\Controllers\Administrator\BookingController::class, 'index'])->name('administrator.booking');
+      Route::get('/bookings', [App\Http\Controllers\Administrator\BookingController::class, 'index'])->name('administrator.booking.index');
+      Route::get('/bookings/{id}', [App\Http\Controllers\Administrator\BookingController::class, 'show'])->name('administrator.booking.show');
+
+      Route::get('/investor/profiles', [App\Http\Controllers\Administrator\UserController::class, 'index'])->name('admin.investor.profile');
+
+      Route::get('/closing/{code}/edit', [App\Http\Controllers\Administrator\ClosingController::class, 'edit'])->name('administrator.closing.edit');
+      Route::post('/closing/{code}/edit', [App\Http\Controllers\Administrator\ClosingController::class, 'update'])->name('administrator.closing.update');
    });
 
 
@@ -65,7 +71,7 @@ Route::post('/book/store', [App\Http\Controllers\HomeController::class, 'store']
 
 
 Route::get('/bookings', [App\Http\Controllers\BookingController::class, 'index'])->name('mybookings');
-Route::get('/bookings/{status}', [App\Http\Controllers\BookingController::class, 'mybookings'])->name('mybookings_');
+Route::get('/bookings/{status}', [App\Http\Controllers\BookingController::class, 'myBookings'])->name('mybookings_');
 
 Route::get('/payment-proof/{booking_id}/submit', [App\Http\Controllers\BookingController::class, 'proof'])->name('paymentProof');
 Route::post('/payment-proof/store', [App\Http\Controllers\BookingController::class, 'proof_store'])->name('paymentProofStore');
@@ -80,10 +86,6 @@ Route::get('/agreement/hard-copy/request/{id}', [App\Http\Controllers\AgreementC
 Route::post('/agreement/hard-copy/store', [App\Http\Controllers\AgreementController::class, 'hard_copy_request_store'])->name('agreement.hard_copy.store');
 
 
-
-
-
-
 Route::get('/mature-batches', [App\Http\Controllers\ClosingController::class, 'index'])->name('mature.index');
 Route::get('/mature-batches/request/{code}/withdrawal', [App\Http\Controllers\ClosingController::class, 'withdrawal_request'])->name('withdrawal.request');
 Route::post('/mature-batches/request/store', [App\Http\Controllers\ClosingController::class, 'withdrawal_request_store'])->name('withdrawal.request.store');
@@ -92,27 +94,10 @@ Route::post('/mature-batches/request/store', [App\Http\Controllers\ClosingContro
 
 
 Route::get('/administrator/closing/requests', [App\Http\Controllers\Administrator\ClosingController::class, 'index'])->name('admin.closing.requests');
-Route::get('/administrator/closing/report', [App\Http\Controllers\Administrator\ClosingController::class, 'report'])->name('admin.closing.report');
+Route::get('/administrator/closing/profit-return', [App\Http\Controllers\Administrator\ClosingController::class, 'profitReturn'])->name('admin.closing.profitReturn');
 
-Route::get('/administrator/closing/profit', [App\Http\Controllers\Administrator\ClosingController::class, 'profit_return'])->name('admin.closing.profit');
 
 Route::get('/administrator/closing/capital', [App\Http\Controllers\Administrator\ClosingController::class, 'capital_return_report'])->name('admin.capital_return.report');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 Route::get('/administrator/projects', [App\Http\Controllers\Administrator\ProjectController::class, 'index'])->name('project.index');
 Route::get('/administrator/project/create', [App\Http\Controllers\Administrator\ProjectController::class, 'create'])->name('project.create');
@@ -181,23 +166,13 @@ Route::post('/administrator/payment/decision', [App\Http\Controllers\Administrat
 
 Route::get('/administrator/bookings/info/{id}', [App\Http\Controllers\Administrator\BookingController::class, 'modal_info'])->name('admin.booking.modal_info');
 
-Route::get('/administrator/payment/approved', [App\Http\Controllers\Administrator\BookingController::class, 'approved_list'])->name('admin.payment.approved');
+Route::get('/administrator/payment/approved', [App\Http\Controllers\Administrator\BookingController::class, 'paymentProof'])->name('admin.payment.approved');
 Route::get('/administrator/payment/approved/batch', [App\Http\Controllers\Administrator\BookingController::class, 'approved_list_bybatch'])->name('admin.payment.approved_bybatch');
-
-
-Route::get('/administrator/investor/profiles', [App\Http\Controllers\Administrator\UserController::class, 'index'])->name('admin.investor.profile');
-Route::get('/administrator/investor/active', [App\Http\Controllers\Administrator\UserController::class, 'active'])->name('admin.investor.active');
-Route::get('/administrator/investor/inactive', [App\Http\Controllers\Administrator\UserController::class, 'inactive'])->name('admin.investor.inactive');
 
 Route::get('/administrator/investor/change_password/{id}', [App\Http\Controllers\Administrator\UserController::class, 'change_password'])->name('admin.investor.change_password');
 Route::post('/administrator/investor/cp/store', [App\Http\Controllers\Administrator\UserController::class, 'store_password'])->name('admin.investor.store_password');
 
-
-
-
 Route::get('/administrator/investor/info/{uid}', [App\Http\Controllers\Administrator\UserController::class, 'investment_activity'])->name('admin.investor.activity');
-
-
 
 Route::get('/administrator/agreement/hard-copy-requests', [App\Http\Controllers\Administrator\BookingController::class, 'hard_copy_agreement_requests'])->name('admin.agreement.requests');
 Route::get('/administrator/agreement/hard-copy/{code}/download', [App\Http\Controllers\Administrator\BookingController::class, 'hard_copy_download'])->name('admin.agreement.download');

@@ -33,13 +33,23 @@ class DashboardController extends Controller
       ->get();
 
     $bookingStats = Booking::select(
-      'bookings.package_id',
       'bookings.status',
-      DB::raw('SUM(booking_quantity * packages.value) as total_value')
+      DB::raw('SUM(booking_quantity * packages.value) as total_value'),
+      'packages.name as package_name'
     )
       ->leftJoin('packages', 'bookings.package_id', '=', 'packages.id')
-      ->groupBy('bookings.package_id', 'bookings.status')
+      ->groupBy('packages.name', 'bookings.status')
       ->get();
+
+    $statuses = ['pending', 'pending_approval', 'approved', 'rejected'];
+
+    foreach ($packages as $package) {
+      $package->total_value = $bookingStats->where('package_name', $package->name)->sum('total_value');
+      foreach ($statuses as $status) {
+        $package->{$status} = $bookingStats->where('package_name', $package->name)->where('status', $status)->sum('total_value');
+      }
+    }
+
 
     return view('administrator.dashboard', compact('packages', 'bookingStats'));
   }
