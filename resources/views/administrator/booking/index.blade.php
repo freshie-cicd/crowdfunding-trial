@@ -15,12 +15,29 @@
                             <option value="{{ $package->id }}" {{ request()->package == $package->id ? 'selected' : '' }}>{{ $package->name }}</option>
                             @endforeach
                         </select>
-                        <select name="status" id="status" onchange="updateFilter()" class="block w-full sm:w-auto flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3">
+                        <select name="status" id="status" onchange="updateFilter()" class="block w-full sm:w-auto flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 mr-2">
                             <option value="">All</option>
                             @foreach ($distinctStatus as $status)
                             <option value="{{ $status->status }}" {{ request()->status == $status->status ? 'selected' : '' }}>{{ $status->status }}</option>
                             @endforeach
                         </select>
+                        <!-- toggle button -->
+                        <div class="flex items center">
+                            <div class="flex items center">
+                                <label for="toggle" class="flex items-center cursor-pointer">
+                                    <!-- toggle -->
+                                    <label for="toggle" class="flex items-center cursor-pointer">
+                                        <div class="relative">
+                                            <input id="migration" type="checkbox" class="" onchange="updateFilter()" {{ request()->migration == 1 ? 'checked' : '' }}>
+                                        </div>
+                                    </label>
+                                    <!-- label -->
+                                    <div class="ml-3 text-gray-700 font-medium">
+                                        MigrationOnly
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 @if (\Session::has('success'))
@@ -171,11 +188,18 @@
             let dataSize = document.getElementById('dataSizeForm').value;
             let package = document.getElementById('package').value;
             let search = document.getElementById('search').value;
+            let checked = document.getElementById('migration').checked;
+            console.log(checked);
             let url = new URL(window.location.href);
             url.searchParams.set('status', status);
             url.searchParams.set('dataSize', dataSize);
             url.searchParams.set('package', package);
             url.searchParams.set('search', search);
+            if (checked) {
+                url.searchParams.set('migration', 1);
+            } else {
+                url.searchParams.delete('migration');
+            }
             window.location.href = url.toString();
         }
     </script>

@@ -48,6 +48,8 @@ class BookingController extends Controller
         $status = $request->query('status', '');
         $package = $request->query('package', '');
         $search = $request->query('search', '');
+        $migration = $request->query('migration', '');
+
 
         $bookings = Booking::when($status, function ($query, $status) {
             return $query->where('bookings.status', $status);
@@ -60,6 +62,9 @@ class BookingController extends Controller
                 ->orWhere('users.email', 'like', '%' . $search . '%')
                 ->orWhere('bookings.note', 'like', '%' . $search . '%');
         })
+            ->when($migration, function ($query, $migration) {
+                return $query->where('closing_requests.package_after_withdrawal', '>', 0);
+            })
             ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
             ->leftJoin('users', 'users.id', '=', 'bookings.user_id')
             ->leftJoin('booking_payments', 'booking_payments.booking_id', '=', 'bookings.id')
@@ -85,7 +90,7 @@ class BookingController extends Controller
             $booking->total_value = $this->numberFormatBangladeshi($booking->package_value * $booking->booking_quantity);
         }
 
-        $bookings->appends(['dataSize' => $dataSize, 'status' => $status, 'package' => $package, 'search' => $search]);
+        $bookings->appends(['dataSize' => $dataSize, 'status' => $status, 'package' => $package, 'search' => $search, 'migration' => $migration]);
 
         return view('administrator.booking.index', compact('bookings', 'distinctStatus', 'packagesData'));
     }
