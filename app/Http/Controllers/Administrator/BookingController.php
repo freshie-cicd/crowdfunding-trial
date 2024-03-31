@@ -105,7 +105,8 @@ class BookingController extends Controller
 
         $booking->total_value = $this->numberFormatBangladeshi($booking->package_value * $booking->booking_quantity);
 
-        $payment = BookingPayment::where('booking_id', $id)->first();
+        $payment = BookingPayment::where('booking_id', '=', $id)->first();
+
         $closing = ClosingRequest::where('booking_code', $booking->code)->first();
         $bankDetails = InvestorBankDetail::where('user_id', $booking->user_id)
             ->leftJoin('banks', 'banks.id', '=', 'investor_bank_details.bank_name')

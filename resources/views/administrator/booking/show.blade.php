@@ -120,7 +120,9 @@
             <div class="grow p-4 bg-white shadow-md rounded-md">
                 <div class="flex flex-row">
                     <div class="grow">
-                        <h1 class="text-2xl font-semibold">Payment Details</h1>
+                        <h1 class="text-2xl font-semibold">Payment Details
+                            #{{ $payment ? $payment->id : '' }}
+                        </h1>
                         @if($payment)
                         <div class="form-group">
                             <label for="payment_method">Payment Method</label>

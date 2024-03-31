@@ -149,10 +149,13 @@ class ClosingController extends Controller
         $user_email = DB::table('users')->where('id', $investor_id)->select('email')->first();
 
         // if the user has a package to migrate
+
         if ($closing_request && $closing_request->package_after_withdrawal > 0) {
 
-            $previousPayment = BookingPayment::join('bookings', 'bookings.id', '=', 'booking_payments.booking_id')
+            $previousPayment = DB::table('booking_payments')
+                ->join('bookings', 'bookings.id', '=', 'booking_payments.booking_id')
                 ->where('bookings.code', $booking_code)
+                ->select('booking_payments.*')
                 ->first();
 
             if (!$previousPayment) {
@@ -177,6 +180,7 @@ class ClosingController extends Controller
             if ($check) {
 
                 $previousPaymentId = $previousPayment->id;
+
 
                 $newBookingPayment = BookingPayment::find($previousPaymentId)->replicate();
                 $newBookingPayment->booking_id = $book->id;
