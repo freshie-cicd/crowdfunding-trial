@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
-
 {
 
     /**
@@ -89,17 +88,12 @@ class HomeController extends Controller
 
         $packages = Package::where('status', 1)->get();
 
-        $bookingSum = Booking::where('bookings.user_id', auth()->user()->id)->where('booking_payments.status', 'complete')
-            ->join('packages', 'bookings.package_id', '=', 'packages.id')
-            ->join('booking_payments', 'bookings.id', '=', 'booking_payments.booking_id')
-            ->select('bookings.id', 'packages.name', 'packages.value', 'packages.name', 'bookings.code', 'bookings.booking_quantity', 'booking_payments.status')
-            ->orderBy('bookings.id', 'desc')
-            ->get();
-
         $total_investment = 0;
 
-        foreach ($bookingSum as $booking) {
-            $total_investment = $total_investment + $booking->value * $booking->booking_quantity;
+        foreach ($bookings as $key => $value) {
+            if ($value->status == 'approved') {
+                $total_investment += $value->value * $value->booking_quantity;
+            }
         }
 
         $checkPendingApproval = Booking::where('user_id', auth()->user()->id)->where('status', 'pending_approval')->count();
