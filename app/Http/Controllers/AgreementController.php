@@ -52,11 +52,10 @@ class AgreementController extends Controller
             ->join('project_batches', 'packages.batch_id', '=', 'project_batches.id')
             ->join('booking_payments', 'booking_payments.booking_id', '=', 'bookings.id')
             ->select('bookings.booking_quantity', 'packages.value', 'packages.note', 'bookings.code', 'project_batches.starting_date', 'project_batches.ending_date', 'bookings.code', 'booking_payments.payment_date', 'project_batches.project_id')
-            ->get();
+            ->first();
 
-        $total_value = $booking_info[0]->value * $booking_info[0]->booking_quantity;
+        $total_value = $booking_info->value * $booking_info->booking_quantity;
         $inWord = $this->inWords($total_value);
-
 
         $data = [
             'name' => auth()->user()->name,
@@ -69,25 +68,26 @@ class AgreementController extends Controller
             'nominee_address' => auth()->user()->nominee_address,
             'nominee_relation' => auth()->user()->nominee_relation,
             'booking_id' => $booking_id,
-            'project_ending_date' => $booking_info[0]->ending_date,
-            'project_starting_date' => $booking_info[0]->starting_date,
-            'value' => $booking_info[0]->value,
-            'booking_quantity' => $booking_info[0]->booking_quantity,
-            'booking_code' => $booking_info[0]->code,
+            'project_ending_date' => $booking_info->ending_date,
+            'project_starting_date' => $booking_info->starting_date,
+            'value' => $booking_info->value,
+            'booking_quantity' => $booking_info->booking_quantity,
+            'booking_code' => $booking_info->code,
             'inWords' => $inWord,
-            'payment_date' => $booking_info[0]->payment_date,
+            'payment_date' => $booking_info->payment_date,
         ];
 
         $file_name = auth()->user()->name . '_' . $booking_id . '.pdf';
 
-        if ($booking_info[0]->project_id == 1) {
+        if ($booking_info->project_id == 1) {
             $pdf = PDF::loadView('agreement.paper', $data);
-        } else if ($booking_info[0]->project_id == 2) {
+        }
+        else if ($booking_info->project_id == 2) {
             $pdf = PDF::loadView('agreement.paper_greenify', $data);
-        } else {
+        }
+        else {
             dd('Invalid Project');
         }
-
 
         return $pdf->stream($file_name);
     }

@@ -165,7 +165,7 @@ class BookingController extends Controller
         if ($request->decision == 'approve') {
             $this->payment_approve($request->booking_id, $request->note, $request->user_id);
             return redirect()->back()->with('success', 'Approved Successfully');
-        } else 
+        } else
         if ($request->decision == 'reject') {
             $this->payment_reject($request->booking_id, $request->note, $request->user_id);
             return redirect()->back()->with('success', 'Rejected Successfully');
@@ -303,10 +303,12 @@ class BookingController extends Controller
         $file_name = $booking_info[0]->name . '_' . $code . '.pdf';
 
         if ($booking_info[0]->project_id == 1) {
+
             $pdf = PDF::loadView('administrator.agreement.hardcopy', $data, [], [
                 'format' => [209.55, 336.55],
             ]);
-        } else {
+        }
+        else {
             $pdf = PDF::loadView('agreement.paper_greenify', $data, [], [
                 'format' => [209.55, 336.55],
             ]);

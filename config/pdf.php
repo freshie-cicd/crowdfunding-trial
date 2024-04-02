@@ -32,4 +32,12 @@ return [
     'pdfa'                     => false,
     'pdfaauto'                 => false,
     'use_active_forms'         => false,
+    'custom_font_dir'  => base_path('resources/fonts/'),
+    'custom_font_data' => [
+        'kalpurush' => [
+            'R'  => 'Kalpurush.ttf',
+            'useOTL' => 0xFF,
+            'useKashida' => 75,
+        ]
+    ],
 ];
