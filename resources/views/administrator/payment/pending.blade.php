@@ -595,15 +595,15 @@
                                     <input id='note' type="text" class="form-control @error('note') is-invalid @enderror" name='note' value="{{ old('note') }}" required autocomplete='note'>
                                 </div>
                             </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary float-start" data-bs-dismiss="modal">Close</button>
+                                <input type="submit" for="submit" name="Update" class="btn btn-danger float-end" />
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary float-start" data-bs-dismiss="modal">Close</button>
-                <input type="submit" for="submit" name="Update" class="btn btn-danger float-end" />
-            </div>
 
         </div>
 
@@ -613,200 +613,90 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <script type="text/javascript">
     $(document).ready(function() {
 
-
-
         /* When click show user information */
-
         $('body').on('click', '#show-user', function() {
-
             var userURL = $(this).data('url');
 
             $.get(userURL, function(data) {
 
                 $('#userShowModal').modal('show');
-
                 $('.modal-backdrop').remove();
-
                 $('#user-id').text(data[0].user_id);
-
                 $('#user-name').text(data[0].user_name);
-
                 $('#user-email').text(data[0].user_email);
-
                 $('#user-phone').text(data[0].user_phone);
-
                 $('#user-address').text(data[0].user_present_address);
-
                 $('#user_nid').text(data[0].user_nid);
-
                 $('#user_father_name').text(data[0].user_father_name);
-
                 $('#user_nominee_name').text(data[0].user_nominee_name);
-
                 $('#user_nominee_name').text(data[0].user_nominee_relation);
 
 
-
-
-
-
-
-                console.log(data);
-
-                console.log(data.length);
-
-
-
                 var invest_value = 0;
-
                 var number_of_approved_entries = 0
-
                 var approved_amount = 0;
-
                 var number_of_pending_entries = 0;
-
                 var pending_amount = 0;
-
                 var number_of_rejected_entries = 0;
-
                 var rejected_amount = 0;
-
-
-
 
 
                 for (var x = 0; x < data.length; x++) {
 
-
-
                     if (data[x].booking_status == "approved") {
-
                         approved_amount = approved_amount + data[x].package_value * data[x].booking_quantity;
-
                         number_of_approved_entries = number_of_approved_entries + 1;
-
                     }
 
 
 
                     $('#approved_entries').text(number_of_approved_entries);
-
                     $('#approved_amount').text(approved_amount);
 
 
-
-
-
-
-
                     if (data[x].booking_status == "pending" || data[x].booking_status == "") {
-
                         pending_amount = pending_amount + data[x].package_value * data[x].booking_quantity;
-
                         number_of_pending_entries = number_of_pending_entries + 1;
-
                     }
-
-
 
                     $('#pending_entries').text(number_of_pending_entries);
-
                     $('#pending_amount').text(pending_amount);
 
-
-
-
-
                     if (data[x].booking_status == "rejected") {
-
                         rejected_amount = rejected_amount + data[x].package_value * data[x].booking_quantity;
-
                         number_of_rejected_entries = number_of_rejected_entries + 1;
-
                     }
-
 
 
                     $('#rejected_entries').text(number_of_rejected_entries);
-
                     $('#rejected_amount').text(rejected_amount);
 
-
-
-
-
                     if (data[x].booking_status == "pending_approval") {
-
                         $('#package_name').text(data[x].package_name);
-
                         $('#package_value').text(data[x].package_value);
-
                         $('#booking_quantity').text(data[x].booking_quantity);
 
                         invest_value = data[x].booking_quantity * data[x].package_value;
 
                         $('#invest_value').text(invest_value);
-
                         $('#payment_method').text(data[x].payment_method);
-
                         $('#booking_code').text(data[x].booking_code);
-
                         $('#booking_id_form').attr('value', data[x].booking_id);
-
                         $('#user_id_form').attr('value', data[x].user_id);
 
 
-
                         var approve_link = 'https://pre.freshie.farm/administrator/payment/approve/' + data[x].booking_id;
-
                         $('#approve-link').attr('href', approve_link);
 
-
-
                         var reject_link = 'https://pre.freshie.farm/administrator/payment/reject/' + data[x].booking_id;
-
                         $('#reject-link').attr('href', reject_link);
-
                     }
-
-
-
-
-
-
-
                 }
-
-
-
-
-
-
-
             })
-
         });
-
-
 
     });
 </script>
@@ -859,45 +749,19 @@
 
 <script>
     const date = new Date();
-
-
-
     let day = date.getDate();
-
     let month = date.getMonth() + 1;
-
     let year = date.getFullYear();
-
-
-
     let currentDate = `${day}-${month}-${year}`;
 
 
-
-
-
-
-
     new DataTable('#dataTable', {
-
         dom: 'Bfrtip',
-
-        buttons: [
-
-            {
-
-                extend: 'excelHtml5',
-
-                title: 'Freshie_' + currentDate,
-
-                footer: true
-
-            },
-
-        ],
-
-
-
+        buttons: [{
+            extend: 'excelHtml5',
+            title: 'Freshie_' + currentDate,
+            footer: true
+        }, ],
         "pageLength": 20,
 
     });
