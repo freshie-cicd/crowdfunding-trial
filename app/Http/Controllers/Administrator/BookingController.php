@@ -17,6 +17,7 @@ use App\Traits\FormatsNumbers;
 use App\Models\Package;
 use App\Models\ClosingRequest;
 use App\Models\InvestorBankDetail;
+use Illuminate\Support\Facades\DB;
 
 use PDF;
 
@@ -114,6 +115,108 @@ class BookingController extends Controller
             ->first();
 
         return view('administrator.booking.show', compact('booking', 'payment', 'closing', 'bankDetails'));
+    }
+
+    public function edit($id)
+    {
+        $booking = Booking::where('bookings.id', $id)
+            ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
+            ->leftJoin('users', 'users.id', '=', 'bookings.user_id')
+            ->select('bookings.*', 'packages.name as package_name', 'packages.value as package_value', 'users.name as user_name', 'users.phone as user_phone', 'users.email as user_email')
+            ->first();
+
+        $query = "SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'bookings' AND COLUMN_NAME = 'status'";
+        $dbName = env('DB_DATABASE');
+        $statusEnum = DB::select($query, [$dbName]);
+        $statuesArray = explode("','", substr($statusEnum[0]->COLUMN_TYPE, 6, -2));
+
+        return view('administrator.booking.edit', compact('booking', 'statuesArray'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'booking_quantity' => 'required|numeric|min:1',
+            'note' => 'nullable|string',
+            'status' => 'required|string',
+        ]);
+
+        $booking = Booking::find($id);
+        $booking->booking_quantity = $request->booking_quantity;
+        $booking->note = $request->note;
+        $booking->status = $request->status;
+        $booking->updated_by = Auth::guard('administrator')->user()->email;
+        $booking->save();
+
+        return redirect()->route('administrator.booking.show', $id)->with('success', 'Booking updated successfully');
+    }
+
+    public function create($investor_id)
+    {
+
+
+        $query = "SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'bookings' AND COLUMN_NAME = 'status'";
+        $dbName = env('DB_DATABASE');
+        $statusEnum = DB::select($query, [$dbName]);
+        $statuesArray = explode("','", substr($statusEnum[0]->COLUMN_TYPE, 6, -2));
+
+        $packages = Package::select('id', 'name', 'value')->latest()->get();
+
+        return view('administrator.booking.create', compact('statuesArray', 'packages', 'investor_id'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'package_id' => 'required|numeric',
+            'booking_quantity' => 'required|numeric|min:1',
+            'note' => 'nullable|string',
+            'status' => 'required|string',
+            'investor_id' => 'required|numeric',
+        ]);
+
+        $availableCode = $this->getAvailableBookingCode();
+
+        if (!$availableCode) {
+            return redirect()->back()->with('error', 'Failed to generate booking code');
+        }
+
+        $booking = new Booking();
+        $booking->code = $availableCode;
+        $booking->package_id = $request->package_id;
+        $booking->booking_quantity = $request->booking_quantity;
+        $booking->note = $request->note;
+        $booking->status = $request->status;
+        $booking->created_by = Auth::guard('administrator')->user()->email;
+        $booking->user_id = $request->investor_id;
+        $booking->save();
+
+
+        return redirect()->route('administrator.booking.show', $booking->id)->with('success', 'Booking created successfully');
+    }
+
+    protected function getAvailableBookingCode()
+    {
+        $attemptLimit = 10;
+        $attemptCount = 0;
+
+        while ($attemptCount < $attemptLimit) {
+            $attemptCount++;
+            $codes = collect();
+
+            for ($i = 0; $i < 5; $i++) {
+                $codes->push(random_int(10000000, 99999999));
+            }
+
+            $usedCodes = Booking::whereIn('code', $codes)->pluck('code');
+            $availableCodes = $codes->diff($usedCodes);
+
+            if ($availableCode = $availableCodes->first()) {
+                return $availableCode; // Return the first available code
+            }
+        }
+
+        return null; // Return null if no available code found after attempts
     }
 
     public function payment_pending(Request $request)
@@ -307,8 +410,7 @@ class BookingController extends Controller
             $pdf = PDF::loadView('administrator.agreement.hardcopy', $data, [], [
                 'format' => [209.55, 336.55],
             ]);
-        }
-        else {
+        } else {
             $pdf = PDF::loadView('agreement.paper_greenify', $data, [], [
                 'format' => [209.55, 336.55],
             ]);

@@ -28,7 +28,13 @@
             <div class="grow p-4 bg-white shadow-md rounded-md">
                 <div class="flex flex-row">
                     <div class="grow">
-                        <h1 class="text-2xl font-semibold">Booking Details</h1>
+                        <div class="flex flex-row justify-between">
+                            <h1 class="text-2xl font-semibold">Booking Details</h1>
+
+                            <div class="flex items center space-x-2 px-2">
+                                <a href="{{ route('administrator.booking.edit', $booking->id) }}" class="btn btn-primary">Edit</a>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="code">Code</label>
                             <input type="text" class="form-control" id="code" name="code" value="{{ $booking->code }}" readonly>
@@ -39,7 +45,12 @@
                         </div>
                         <div class="form-group">
                             <label for="user_name">Investor</label>
-                            <input type="text" class="form-control" id="user_name" name="user_name" value="{{ $booking->user_name }}" readonly>
+                            <div class="flex">
+                                <input type="text" id="user_name" name="user_name" value="{{ $booking->user_name }}" readonly placeholder="Investor" class="border border-r-0 border-gray-300 rounded-l-md py-2 px-4 bg-white text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 flex-grow">
+                                <a class="border border-gray-300 rounded-r-md bg-gray-100 text-gray-700 px-4 py-2 hover:bg-gray-200 focus:outline-none" href="{{ route('administrator.investor.profile.show', $booking->user_id) }}">
+                                    View
+                                </a>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="user_email">Email</label>

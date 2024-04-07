@@ -1,20 +1,13 @@
 <?php
 
-
-
 namespace App\Http\Controllers\Administrator;
 
-
-
 use App\Http\Controllers\Controller;
-
 use App\Models\User;
-
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Hash;
-
-
+use App\Models\InvestorBankDetail;
+use App\Models\Booking;
 
 class UserController extends Controller
 
@@ -36,13 +29,29 @@ class UserController extends Controller
         return view('administrator.investor.index', compact('users'));
     }
 
+    public function show($id)
+    {
+        $user = User::where('id', $id)->first();
+        $bankDetails = InvestorBankDetail::where('user_id', $id)
+            ->leftJoin('banks', 'banks.id', '=', 'investor_bank_details.bank_name')
+            ->leftJoin('districts', 'districts.id', '=', 'investor_bank_details.district')
+            ->first();
+
+        $bookings = Booking::where('bookings.user_id', $id)
+            ->join('packages', 'packages.id', '=', 'bookings.package_id')
+            ->join('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
+            ->select('bookings.code', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.batch_id', 'facebook_groups.url', 'packages.status as package_status', 'packages.name as package_name')
+            ->get();
+
+        return view('administrator.investor.show', compact('user', 'bankDetails', 'bookings'));
+    }
+
     public function change_password($id)
     {
         $data = User::where('id', $id)->get();
 
         return view('administrator.investor.change_password', compact('data'));
     }
-
 
 
     public function store_password(Request $request)
