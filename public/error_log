@@ -1,1 +1,0 @@
-[17-Jul-2023 00:06:51 UTC] PHP Fatal error:  Could not check compatibility between App\Exceptions\Handler::render($request, App\Exceptions\Exception $e) and Illuminate\Foundation\Exceptions\Handler::render($request, Throwable $e), because class App\Exceptions\Exception is not available in /home/freshief/app.freshie.farm/app/Exceptions/Handler.php on line 63

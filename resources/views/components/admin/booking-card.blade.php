@@ -6,11 +6,6 @@
                 <h5 class="card-title">Booking Code: </h5>
                 <b class="text-danger"> {{ $booking->code }}</b>
             </div>
-            <!-- <p class="card-text">{{ $booking->description }}</p>
-            <p class="card-text text-uppercase">Package Name: <b> {{ $booking->package_name }}</b></p>
-            <p class="card-text text-uppercase">Booking Quantity: <b> {{ $booking->booking_quantity }}</b></p>
-            <p class="card-text text-uppercase">Purchase Price:<b> {{ $booking->value*$booking->booking_quantity }}</b></p>
-            <p class="card-text text-uppercase">Status:<b> {{ $booking->status }}</b></p> -->
             <div class="flex justify-between">
                 <p class="card-text">Package Name: </p>
                 <b> {{ $booking->package_name }}</b>

@@ -52,7 +52,6 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Investor Name</th>
                                 <th scope="col">Contact</th>
-                                <th scope="col">Address</th>
                                 <th scope="col">NID</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Member Since</th>
@@ -69,7 +68,6 @@
                                     {{ $data->email }}
                                 </td>
                                 <td>{{ $data->nid }}</td>
-                                <td>{{ $data->date_of_birth }}</td>
                                 <td>@if($data->is_active){{ __('Active') }} @endif</td>
                                 <td>{{ $data->created_at }}</td>
                                 <td>
