@@ -30,6 +30,8 @@
                         <th class="border border-gray-300 p-2">Pending Approval</th>
                         <th class="border border-gray-300 p-2">Approved</th>
                         <th class="border border-gray-300 p-2">Rejected</th>
+                        <th class="border border-gray-300 p-2">Migrated</th>
+                        <th class="border border-gray-300 p-2">Withdrawn</th>
                         <th class="border border-gray-300 p-2">Total Value</th>
                     </tr>
                 </thead>
@@ -61,6 +63,16 @@
                         </td>
                         <td class="border border-gray-300 p-2">
                             <script>
+                                document.write(formatNumberBangladeshi(`{{$package->migrated}}`))
+                            </script>
+                        </td>
+                        <td class="border border-gray-300 p-2">
+                            <script>
+                                document.write(formatNumberBangladeshi(`{{$package->withdrawn}}`))
+                            </script>
+                        </td>
+                        <td class="border border-gray-300 p-2">
+                            <script>
                                 document.write(formatNumberBangladeshi(`{{$package->total_value}}`));
                             </script>
                         </td>
@@ -71,4 +83,5 @@
         </div>
     </div>
 </div>
+
 @endsection

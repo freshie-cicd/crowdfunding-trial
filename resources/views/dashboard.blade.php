@@ -47,12 +47,10 @@
                 <a href="{{ $booking->url }}" class="btn btn-primary" target="__blank"><i class="fa-brands fa-facebook"></i> JOIN FACEBOOK GROUP</a>
               </div>
               @endif
-
             </div>
           </div>
         </div>
         @endforeach
-
       </div>
     </div>
   </div>
@@ -83,12 +81,11 @@
         </div>
         @endforeach
       </div>
-
     </div>
-
   </div>
 </div>
 
+<!-- Modal -->
 <div class="modal fade" id="instructionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" style="min-width:60%">
     <div class="modal-content">

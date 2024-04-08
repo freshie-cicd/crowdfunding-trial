@@ -41,7 +41,7 @@ class DashboardController extends Controller
       ->groupBy('packages.name', 'bookings.status')
       ->get();
 
-    $statuses = ['pending', 'pending_approval', 'approved', 'rejected'];
+    $statuses = ['pending', 'approved', 'rejected', 'pending_approval', 'migrated', 'withdrawn'];
 
     foreach ($packages as $package) {
       $package->total_value = $bookingStats->where('package_name', $package->name)->sum('total_value');
@@ -51,6 +51,6 @@ class DashboardController extends Controller
     }
 
 
-    return view('administrator.dashboard', compact('packages', 'bookingStats'));
+    return view('administrator.dashboard', compact('packages', 'bookingStats', 'statuses'));
   }
 }
