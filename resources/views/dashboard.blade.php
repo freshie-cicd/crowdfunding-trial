@@ -88,7 +88,38 @@
 
   </div>
 </div>
-</div>
+
+<div class="modal fade" id="instructionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="min-width:60%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Payment Instruction</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>১. আপনার বুকিং করা বিনিয়োগ প্যাকেজ পেন্ডিং আছে। অনুগ্রহপূর্বক লাল রঙ এর বুকিং কোড সংরক্ষন করুন।</p>
+        <p>২. আপনি সরাসরি Bank Deposit করতে পারবেন। অথবা BEFTN, NPSB এর মাধ্যমেও টাকা পাঠাতে পারবেন। </p>
+        <br>
+
+        @include('shared.bank-details')
+
+        <p>৩. টাকা পাঠানোর সময় Deposit Slip অথবা ফর্ম এর রেফারেন্সের ঘরে অবশ্যই আপনার বুকিং কোড উল্লেখ করুন।</p>
+        <p>৪. টাকা পাঠানোর পর Deposit Slip এর ছবি উঠান অথবা App এর Success Message এর Screenshot নিন।</p>
+        <p>৫. আমাদের User Dashboard এর My Bookings এ গিয়ে Submit Payment Proof বাটন প্রেস করুন। </p>
+        <p>৬. একটি ফর্ম পাবেন। ফরমটি পুরন করুন এবং পেমেন্ট প্রুফ হিসেবে রাখা ছবিটি সংযোজন করে সেভ করুন।</p>
+        <p>৭. আমাদের এডমিনের পক্ষ থেকে পেমেন্ট কনফার্মেশনের জন্য অপেক্ষা করুন।</p>
+        <p>
+          বিঃ দ্রঃ আপনার যদি কোনো বুকিং "PENDING APPROVAL" অবস্থায় থাকে তাহলে নতুন করে আরেকটি বুকিং কোডে পেমেন্ট প্রুফ সাবমিট করতে পারবেন না।
+          আপনার আগের বুকিংটি এপ্রুভ হওয়া পর্যন্ত অপেক্ষা করুন।
+        </p>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 @endsection

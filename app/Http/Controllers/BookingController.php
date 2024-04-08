@@ -41,7 +41,9 @@ class BookingController extends Controller
             }
         }
 
-        return view('mybooking', compact('bookings', 'total_investment'));
+        $checkPendingApproval = Booking::where('user_id', auth()->user()->id)->where('status', 'pending_approval')->count();
+
+        return view('mybooking', compact('bookings', 'total_investment', 'checkPendingApproval'));
     }
 
 
