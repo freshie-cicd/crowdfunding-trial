@@ -131,9 +131,18 @@
             <div class="grow p-4 bg-white shadow-md rounded-md">
                 <div class="flex flex-row">
                     <div class="grow">
-                        <h1 class="text-2xl font-semibold">Payment Details
-                            #{{ $payment ? $payment->id : '' }}
-                        </h1>
+                        <div class="flex flex-row justify-between">
+                            <h1 class="text-2xl font-semibold">Payment Details
+                                #{{ $payment ? $payment->id : '' }}
+                            </h1>
+                            @if(!$payment)
+                            <div class="flex items center space-x-2 px-2">
+                                <a href="{{ route('administrator.booking.proof', $booking->id) }}" class="btn btn-primary">
+                                    {{ $payment ? 'Edit' : 'Add' }}
+                                </a>
+                            </div>
+                            @endif
+                        </div>
                         @if($payment)
                         <div class="form-group">
                             <label for="payment_method">Payment Method</label>

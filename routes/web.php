@@ -34,6 +34,9 @@ Route::namespace("Administrator")
 
       Route::get('/migration/{booking_code}/i/{investor_id}/p/{package_id}', [App\Http\Controllers\Administrator\ClosingController::class, 'migration'])->name('admin.migration');
 
+      Route::get('/investor/profiles', [App\Http\Controllers\Administrator\UserController::class, 'index'])->name('admin.investor.profile');
+      Route::get('/investor/profiles/{id}', [App\Http\Controllers\Administrator\UserController::class, 'show'])->name('administrator.investor.profile.show');
+
       Route::get('/bookings', [App\Http\Controllers\Administrator\BookingController::class, 'index'])->name('administrator.booking.index');
       Route::get('/bookings/create/{investor_id}', [App\Http\Controllers\Administrator\BookingController::class, 'create'])->name('administrator.booking.create');
       Route::post('/bookings', [App\Http\Controllers\Administrator\BookingController::class, 'store'])->name('administrator.booking.store');
@@ -41,8 +44,8 @@ Route::namespace("Administrator")
       Route::get('/bookings/edit/{id}', [App\Http\Controllers\Administrator\BookingController::class, 'edit'])->name('administrator.booking.edit');
       Route::put('/bookings/edit/{id}', [App\Http\Controllers\Administrator\BookingController::class, 'update'])->name('administrator.booking.update');
 
-      Route::get('/investor/profiles', [App\Http\Controllers\Administrator\UserController::class, 'index'])->name('admin.investor.profile');
-      Route::get('/investor/profiles/{id}', [App\Http\Controllers\Administrator\UserController::class, 'show'])->name('administrator.investor.profile.show');
+      Route::get('/bookings/{id}/proof', [App\Http\Controllers\Administrator\PaymentController::class, 'proof'])->name('administrator.booking.proof');
+      Route::post('/bookings/{id}/proof', [App\Http\Controllers\Administrator\PaymentController::class, 'proof_store'])->name('administrator.booking.proof.store');
 
       Route::get('/closing/{code}/edit', [App\Http\Controllers\Administrator\ClosingController::class, 'edit'])->name('administrator.closing.edit');
       Route::post('/closing/{code}/edit', [App\Http\Controllers\Administrator\ClosingController::class, 'update'])->name('administrator.closing.update');

@@ -1,5 +1,6 @@
 /node_modules
 /public/hot
+/public/error_log
 /public/storage
 /public/uploads/*
 /storage/*.key
@@ -15,3 +16,4 @@ yarn-error.log
 /.idea
 /.vscode
 .ftpquota
+error_log
