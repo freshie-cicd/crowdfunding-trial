@@ -50,7 +50,34 @@ class DashboardController extends Controller
       }
     }
 
+    $paymentGraph = $this->paymentGraph();
 
-    return view('administrator.dashboard', compact('packages', 'bookingStats', 'statuses'));
+    // dd($paymentGraph);
+
+
+    return view('administrator.dashboard.index', compact('packages', 'bookingStats', 'statuses', 'paymentGraph'));
+  }
+
+  private function paymentGraph()
+  {
+    $data = Booking::select(
+      DB::raw('COUNT(*) as total_bookings'),
+      DB::raw('SUM(booking_quantity * packages.value) as total_value'),
+      DB::raw('DATE_FORMAT(bookings.created_at, "%Y-%m-%d") as date')
+    )
+      ->leftJoin('packages', 'bookings.package_id', '=', 'packages.id')
+      ->groupBy('date')
+      ->get();
+
+    $labels = $data->pluck('date');
+    $series = $data->pluck('total_value');
+    $count = $data->pluck('total_bookings');
+
+
+    return [
+      'labels' => $labels,
+      'series' => $series,
+      'count' => $count
+    ];
   }
 }
