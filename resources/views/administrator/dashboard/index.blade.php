@@ -2,11 +2,9 @@
 
 @section('content')
 
-<div class="flex flex-row">
-    <div>
-        @include('administrator.dashboard.stats')
-        @include('administrator.dashboard.payment-graph')
-    </div>
+<div>
+    @include('administrator.dashboard.stats')
+    @include('administrator.dashboard.payment-graph')
 </div>
 
 @endsection
