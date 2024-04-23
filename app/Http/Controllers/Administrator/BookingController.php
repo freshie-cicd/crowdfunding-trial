@@ -411,7 +411,7 @@ class BookingController extends Controller
                 'format' => [209.55, 336.55],
             ]);
         } else {
-            $pdf = PDF::loadView('agreement.paper_greenify', $data, [], [
+            $pdf = PDF::loadView('administrator.agreement.hardcopy_greenify', $data, [], [
                 'format' => [209.55, 336.55],
             ]);
         }
