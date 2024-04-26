@@ -76,8 +76,26 @@ class HomeController extends Controller
         $bookings = Booking::where('bookings.user_id', auth()->user()->id)
             ->where('bookings.status', '!=', 'rejected')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->join('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
-            ->select('bookings.code', 'packages.code as pcode', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.batch_id', 'facebook_groups.url')
+            ->leftJoin('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
+            ->leftJoin('closing_requests', 'closing_requests.booking_code', '=', 'bookings.code')
+            ->select(
+                'bookings.code',
+                'packages.code as pcode',
+                'packages.value',
+                'bookings.booking_quantity',
+                'bookings.status',
+                'bookings.id',
+                'packages.batch_id',
+                'facebook_groups.url',
+                'packages.maturity',
+                'packages.name as package_name',
+                'packages.return_amount',
+                'closing_requests.id as closing_id',
+                'closing_requests.capital_withdrawal_amount as withdraw',
+                'closing_requests.after_withdrawal_amount as reinvest',
+                'closing_requests.profit_withdrawal_amount as total_profit',
+
+            )
             ->orderByRaw("CASE WHEN bookings.status = 'complete' THEN 1 WHEN bookings.status = 'pending' THEN 2 WHEN bookings.status = 'pending_approval' THEN 3 ELSE 4 END, bookings.id DESC")
             ->get();
 
@@ -93,7 +111,12 @@ class HomeController extends Controller
 
         $checkPendingApproval = Booking::where('user_id', auth()->user()->id)->where('status', 'pending_approval')->count();
 
-        return view('dashboard', compact('bookings', 'packages', 'total_investment', 'checkPendingApproval'));
+        $bank = DB::table('investor_bank_details')
+            ->join('banks', 'banks.id', '=', 'investor_bank_details.bank_name')
+            ->where('investor_bank_details.user_id', auth()->user()->id)
+            ->first();
+
+        return view('dashboard', compact('bookings', 'packages', 'total_investment', 'checkPendingApproval', 'bank'));
     }
 
 

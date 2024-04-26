@@ -219,7 +219,11 @@
                             <h1 class="text-2xl font-semibold">Closing Details</h1>
 
                             <div class="flex items center space-x-2 px-2">
+                                @if($booking->maturity)
                                 <a href="{{ route('administrator.closing.edit', $booking->code) }}" class="btn btn-primary">Edit</a>
+                                @else
+                                <button class="btn btn-primary" disabled>Not Mature</button>
+                                @endif
                             </div>
                         </div>
                         @if($closing)
@@ -261,7 +265,7 @@
                         </div>
                         @if($closing->status == 'requested' || $closing->status == 'processing')
                         <div class="form-group mt-4">
-                            <a href="{{ url('administrator/migration') }}/{{ $booking->code }}/i/{{ $booking->user_id }}/p/5" class="btn btn-success btn-sm">Settle the investment</a>
+                            <a href="{{ url('administrator/migration') }}/{{ $booking->code }}/i/{{ $booking->user_id }}/p/{{ $booking->migration_package_id }}" class="btn btn-success btn-sm">Settle the investment</a>
                         </div>
                         @endif
                         @else

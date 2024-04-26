@@ -24,23 +24,6 @@ class ClosingController extends Controller
     }
 
 
-    public function index()
-    {
-        $data = DB::table('closing_requests')
-            ->join('bookings', 'bookings.code', '=', 'closing_requests.booking_code')
-            ->join('packages', 'bookings.package_id', '=', 'packages.id')
-            ->join('closing_init', 'bookings.package_id', '=', 'closing_init.package_id')
-            ->join('users', 'bookings.user_id', '=', 'users.id')
-            ->leftJoin('investor_bank_details', 'investor_bank_details.user_id', '=', 'users.id')
-            ->leftJoin('districts', 'investor_bank_details.district', '=', 'districts.id')
-            ->leftJoin('banks', 'investor_bank_details.bank_name', '=', 'banks.id')
-            ->where('closing_requests.status', 'requested')
-            ->select('closing_requests.*', 'closing_init.profit_value', 'packages.name as package_name', 'packages.value as package_value', 'bookings.booking_quantity', 'bookings.status as booking_status', 'users.name as user_name', 'users.phone as user_phone', 'users.email as user_email', 'investor_bank_details.branch_name', 'investor_bank_details.account_name', 'investor_bank_details.account_number', 'investor_bank_details.routing_number', 'banks.bank_name', 'districts.district')
-            ->get();
-
-        return view('administrator.closing.index', compact('data'));
-    }
-
     public function edit($code)
     {
         $closing = ClosingRequest::where('booking_code', $code)->first();
@@ -48,11 +31,11 @@ class ClosingController extends Controller
             ->where('bookings.code', $code)
             ->select('packages.*')
             ->first();
+        $migrationPackage = Package::where('id', $package->migration_package_id)->first();
 
         $booking = Booking::where('code', $code)->first();
-        $closingInit = DB::table('closing_init')->where('package_id', $booking->package_id)->first();
 
-        return view('administrator.closing.edit', compact('closing', 'package', 'booking', 'closingInit'));
+        return view('administrator.closing.edit', compact('closing', 'package', 'booking', 'migrationPackage'));
     }
 
 
@@ -103,48 +86,18 @@ class ClosingController extends Controller
         return  redirect()->route('administrator.booking.show', $booking->id)->with('success', 'Closing Request Updated Successfully');
     }
 
-
-    public function profitReturn()
-    {
-        $data = DB::table('closing_requests')
-            ->join('bookings', 'bookings.code', '=', 'closing_requests.booking_code')
-            ->join('packages', 'bookings.package_id', '=', 'packages.id')
-            ->join('closing_init', 'bookings.package_id', '=', 'closing_init.package_id')
-            ->join('users', 'bookings.user_id', '=', 'users.id')
-            ->join('investor_bank_details', 'investor_bank_details.user_id', '=', 'users.id')
-            ->join('districts', 'investor_bank_details.district', '=', 'districts.id')
-            ->join('banks', 'investor_bank_details.bank_name', '=', 'banks.id')
-            ->where('closing_requests.id', '>', '0')
-            ->select('closing_requests.*', 'closing_init.profit_value', 'packages.name as package_name', 'packages.value as package_value', 'bookings.booking_quantity', 'bookings.status as booking_status', 'users.name as user_name', 'users.phone as user_phone', 'users.email as user_email', 'investor_bank_details.branch_name', 'investor_bank_details.account_name', 'investor_bank_details.account_number', 'investor_bank_details.routing_number', 'banks.bank_name', 'districts.district')
-            ->get();
-
-        return view('administrator.closing.profit_return', compact('data'));
-    }
-
-
-
-
-    public function capital_return_report()
-    {
-        $data = DB::table('closing_requests')
-            ->join('bookings', 'bookings.code', '=', 'closing_requests.booking_code')
-            ->join('packages', 'bookings.package_id', '=', 'packages.id')
-            ->join('closing_init', 'bookings.package_id', '=', 'closing_init.package_id')
-            ->join('users', 'bookings.user_id', '=', 'users.id')
-            ->join('investor_bank_details', 'investor_bank_details.user_id', '=', 'users.id')
-            ->join('districts', 'investor_bank_details.district', '=', 'districts.id')
-            ->join('banks', 'investor_bank_details.bank_name', '=', 'banks.id')
-            ->where('closing_requests.package_to_withdraw', '>', 0)
-            ->select('closing_requests.*', 'closing_init.profit_value', 'packages.name as package_name', 'packages.value as package_value', 'bookings.booking_quantity', 'bookings.status as booking_status', 'users.name as user_name', 'users.phone as user_phone', 'users.email as user_email', 'investor_bank_details.branch_name', 'investor_bank_details.account_name', 'investor_bank_details.account_number', 'investor_bank_details.routing_number', 'banks.bank_name', 'districts.district')
-            ->get();
-
-        return view('administrator.closing.capital', compact('data'));
-    }
-
-
-
     public function migration($booking_code, $investor_id, $package_id)
     {
+
+        $bookingPackage = DB::table('packages')
+            ->join('bookings', 'bookings.package_id', '=', 'packages.id')
+            ->where('bookings.code', $booking_code)
+            ->select('packages.*')
+            ->first();
+        $migrationPackage = DB::table('packages')->where('id', $package_id)->first();
+        $note = 'Migrated from ' . $bookingPackage->name . ' to ' . $migrationPackage->name;
+
+
         $closing_request = DB::table('closing_requests')->where('booking_code', $booking_code)->where('user_id', $investor_id)->where('status', 'requested')->first();
         $user_email = DB::table('users')->where('id', $investor_id)->select('email')->first();
 
@@ -174,18 +127,17 @@ class ClosingController extends Controller
             $book['package_id'] = $package_id;
             $book['booking_quantity'] = $closing_request->package_after_withdrawal;
             $book['status'] = 'approved';
-            $book['note'] = 'Migrated from batch 4 to 6';
+            $book['note'] =  $note;
             $check = $book->save();
 
             if ($check) {
-
                 $previousPaymentId = $previousPayment->id;
 
 
                 $newBookingPayment = BookingPayment::find($previousPaymentId)->replicate();
                 $newBookingPayment->booking_id = $book->id;
                 $newBookingPayment->payment_method = 'migration';
-                $newBookingPayment->deposit_reference = "Previous Payment ID:" . $previousPaymentId . " and Booking ID: " .  $booking_code . " migrated from Batch 4 to Batch 6";
+                $newBookingPayment->deposit_reference = "Previous Payment ID:" . $previousPaymentId . " and Booking ID: " .  $booking_code . ". " . $note;
                 $newBookingPayment->status = 'complete';
                 $newBookingPayment->note = null;
                 $newBookingPayment->save();

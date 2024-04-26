@@ -39,7 +39,7 @@ class UserController extends Controller
 
         $bookings = Booking::where('bookings.user_id', $id)
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->join('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
+            ->leftJoin('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
             ->select('bookings.code', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.batch_id', 'facebook_groups.url', 'packages.status as package_status', 'packages.name as package_name')
             ->get();
 

@@ -81,9 +81,6 @@
             <div class="sub-menu-list">
               <ul>
                 <li class="menu-item"><a href="{{ route('admin.agreement.requests') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Agreement Paper Requests</span></a></li>
-                <li class="menu-item"><a href="{{ route('admin.closing.requests') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Closing Requests</span></a></li>
-                <li class="menu-item"><a href="{{ route('admin.closing.profitReturn') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Profit Return Report</span></a></li>
-                <li class="menu-item"><a href="{{ route('admin.capital_return.report') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Capital Withdrawal Requests</span></a></li>
               </ul>
             </div>
           </li>
@@ -92,10 +89,12 @@
     </div>
 
     <div class="sidebar-footer d-grid gap-2">
+      @if(Auth::user() && Auth::user()->name)
+      <span class="mx-auto">{{ Auth::user()->name }}</span>
+      @endif
+
       <a class="btn btn-sm btn-danger" style="color:white;" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><span class="menu-title"> <i class="fa-solid fa-sign-out"></i> {{ __('Logout') }} </span></a>
       <form id="logout-form" action="{{ route('administrator.logout') }}" method="POST" class="d-none"> @csrf </form>
     </div>
-
   </div>
-
 </aside>

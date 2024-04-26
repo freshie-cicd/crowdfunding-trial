@@ -49,6 +49,75 @@ Route::namespace("Administrator")
 
       Route::get('/closing/{code}/edit', [App\Http\Controllers\Administrator\ClosingController::class, 'edit'])->name('administrator.closing.edit');
       Route::post('/closing/{code}/edit', [App\Http\Controllers\Administrator\ClosingController::class, 'update'])->name('administrator.closing.update');
+
+      Route::get('/projects', [App\Http\Controllers\Administrator\ProjectController::class, 'index'])->name('project.index');
+      Route::get('/project/create', [App\Http\Controllers\Administrator\ProjectController::class, 'create'])->name('project.create');
+      Route::post('/project/store', [App\Http\Controllers\Administrator\ProjectController::class, 'store'])->name('project.store');
+      Route::get('/project/edit/{id}', [App\Http\Controllers\Administrator\ProjectController::class, 'edit'])->name('project.edit');
+      Route::post('/project/update', [App\Http\Controllers\Administrator\ProjectController::class, 'update'])->name('project.update');
+      Route::get('/project/delete/{id}', [App\Http\Controllers\Administrator\ProjectController::class, 'destroy'])->name('project.delete');
+
+      Route::get('/batches', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'index'])->name('batch.index');
+      Route::get('/batch/create', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'create'])->name('batch.create');
+      Route::post('/batch/store', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'store'])->name('batch.store');
+      Route::get('/batch/edit/{id}', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'edit'])->name('batch.edit');
+      Route::post('/batch/update', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'update'])->name('batch.update');
+      Route::get('/batch/delete/{id}', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'destroy'])->name('batch.delete');
+
+      Route::get('/packages', [App\Http\Controllers\Administrator\PackageController::class, 'index'])->name('package.index');
+      Route::get('/package/create', [App\Http\Controllers\Administrator\PackageController::class, 'create'])->name('package.create');
+      Route::post('/package/store', [App\Http\Controllers\Administrator\PackageController::class, 'store'])->name('package.store');
+      Route::get('/package/edit/{id}', [App\Http\Controllers\Administrator\PackageController::class, 'edit'])->name('package.edit');
+      Route::post('/package/update', [App\Http\Controllers\Administrator\PackageController::class, 'update'])->name('package.update');
+      Route::get('/package/delete/{id}', [App\Http\Controllers\Administrator\PackageController::class, 'destroy'])->name('package.delete');
+
+      Route::get('/assets', [App\Http\Controllers\Administrator\AssetController::class, 'index'])->name('asset.index');
+      Route::get('/asset/create', [App\Http\Controllers\Administrator\AssetController::class, 'create'])->name('asset.create');
+      Route::post('/asset/store', [App\Http\Controllers\Administrator\AssetController::class, 'store'])->name('asset.store');
+      Route::get('/asset/edit/{id}', [App\Http\Controllers\Administrator\AssetController::class, 'edit'])->name('asset.edit');
+      Route::post('/asset/update', [App\Http\Controllers\Administrator\AssetController::class, 'update'])->name('asset.update');
+      Route::get('/asset/delete/{id}', [App\Http\Controllers\Administrator\AssetController::class, 'destroy'])->name('asset.delete');
+
+      Route::get('/expense-heads', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_index'])->name('expense_head.index');
+      Route::get('/expense-head/create', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_create'])->name('expense_head.create');
+      Route::post('/expense-head/store', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_store'])->name('expense_head.store');
+      Route::get('/expense-head/edit/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_edit'])->name('expense_head.edit');
+      Route::post('/expense-head/update', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_update'])->name('expense_head.update');
+      Route::get('/expense-head/delete/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_destroy'])->name('expense_head.delete');
+
+      Route::get('/expenses', [App\Http\Controllers\Administrator\ExpenseController::class, 'index'])->name('expense.index');
+      Route::get('/expense/create', [App\Http\Controllers\Administrator\ExpenseController::class, 'create'])->name('expense.create');
+      Route::post('/expense/store', [App\Http\Controllers\Administrator\ExpenseController::class, 'store'])->name('expense.store');
+      Route::get('/expense/edit/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'edit'])->name('expense.edit');
+      Route::post('/expense/update', [App\Http\Controllers\Administrator\ExpenseController::class, 'update'])->name('expense.update');
+      Route::get('/expense/delete/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'destroy'])->name('expense.delete');
+
+      Route::get('/updates', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'index'])->name('update.index');
+      Route::get('/update/create', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'create'])->name('update.create');
+      Route::post('/update/store', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'store'])->name('update.store');
+      Route::get('/update/edit/{id}', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'edit'])->name('update.edit');
+      Route::post('/update/update', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'update'])->name('update.update');
+      Route::get('/update/delete/{id}', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'destroy'])->name('update.delete');
+
+      Route::get('/payment/pending', [App\Http\Controllers\Administrator\BookingController::class, 'payment_pending'])->name('admin.payment.index');
+      Route::get('/payment/approve/{booking_id}', [App\Http\Controllers\Administrator\BookingController::class, 'payment_approve'])->name('admin.payment.approve');
+      Route::get('/payment/reject/{booking_id}', [App\Http\Controllers\Administrator\BookingController::class, 'payment_reject'])->name('admin.payment.reject');
+
+      Route::post('/payment/decision', [App\Http\Controllers\Administrator\BookingController::class, 'decision'])->name('admin.payment.decision');
+
+
+      Route::get('/bookings/info/{id}', [App\Http\Controllers\Administrator\BookingController::class, 'modal_info'])->name('admin.booking.modal_info');
+
+      Route::get('/payment/approved', [App\Http\Controllers\Administrator\BookingController::class, 'paymentProof'])->name('admin.payment.approved');
+      Route::get('/payment/approved/batch', [App\Http\Controllers\Administrator\BookingController::class, 'approved_list_bybatch'])->name('admin.payment.approved_bybatch');
+
+      Route::get('/investor/change_password/{id}', [App\Http\Controllers\Administrator\UserController::class, 'change_password'])->name('admin.investor.change_password');
+      Route::post('/investor/cp/store', [App\Http\Controllers\Administrator\UserController::class, 'store_password'])->name('admin.investor.store_password');
+
+      Route::get('/investor/info/{uid}', [App\Http\Controllers\Administrator\UserController::class, 'investment_activity'])->name('admin.investor.activity');
+
+      Route::get('/agreement/hard-copy-requests', [App\Http\Controllers\Administrator\BookingController::class, 'hard_copy_agreement_requests'])->name('admin.agreement.requests');
+      Route::get('/agreement/hard-copy/{code}/download', [App\Http\Controllers\Administrator\BookingController::class, 'hard_copy_download'])->name('admin.agreement.download');
    });
 
 
@@ -97,95 +166,3 @@ Route::post('/agreement/hard-copy/store', [App\Http\Controllers\AgreementControl
 Route::get('/mature-batches', [App\Http\Controllers\ClosingController::class, 'index'])->name('mature.index');
 Route::get('/mature-batches/request/{code}/withdrawal', [App\Http\Controllers\ClosingController::class, 'withdrawal_request'])->name('withdrawal.request');
 Route::post('/mature-batches/request/store', [App\Http\Controllers\ClosingController::class, 'withdrawal_request_store'])->name('withdrawal.request.store');
-
-
-
-
-Route::get('/administrator/closing/requests', [App\Http\Controllers\Administrator\ClosingController::class, 'index'])->name('admin.closing.requests');
-Route::get('/administrator/closing/profit-return', [App\Http\Controllers\Administrator\ClosingController::class, 'profitReturn'])->name('admin.closing.profitReturn');
-
-
-Route::get('/administrator/closing/capital', [App\Http\Controllers\Administrator\ClosingController::class, 'capital_return_report'])->name('admin.capital_return.report');
-
-Route::get('/administrator/projects', [App\Http\Controllers\Administrator\ProjectController::class, 'index'])->name('project.index');
-Route::get('/administrator/project/create', [App\Http\Controllers\Administrator\ProjectController::class, 'create'])->name('project.create');
-Route::post('/administrator/project/store', [App\Http\Controllers\Administrator\ProjectController::class, 'store'])->name('project.store');
-Route::get('/administrator/project/edit/{id}', [App\Http\Controllers\Administrator\ProjectController::class, 'edit'])->name('project.edit');
-Route::post('/administrator/project/update', [App\Http\Controllers\Administrator\ProjectController::class, 'update'])->name('project.update');
-Route::get('/administrator/project/delete/{id}', [App\Http\Controllers\Administrator\ProjectController::class, 'destroy'])->name('project.delete');
-
-
-Route::get('/administrator/batches', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'index'])->name('batch.index');
-Route::get('/administrator/batch/create', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'create'])->name('batch.create');
-Route::post('/administrator/batch/store', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'store'])->name('batch.store');
-Route::get('/administrator/batch/edit/{id}', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'edit'])->name('batch.edit');
-Route::post('/administrator/batch/update', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'update'])->name('batch.update');
-Route::get('/administrator/batch/delete/{id}', [App\Http\Controllers\Administrator\ProjectBatchController::class, 'destroy'])->name('batch.delete');
-
-
-Route::get('/administrator/packages', [App\Http\Controllers\Administrator\PackageController::class, 'index'])->name('package.index');
-Route::get('/administrator/package/create', [App\Http\Controllers\Administrator\PackageController::class, 'create'])->name('package.create');
-Route::post('/administrator/package/store', [App\Http\Controllers\Administrator\PackageController::class, 'store'])->name('package.store');
-Route::get('/administrator/package/edit/{id}', [App\Http\Controllers\Administrator\PackageController::class, 'edit'])->name('package.edit');
-Route::post('/administrator/package/update', [App\Http\Controllers\Administrator\PackageController::class, 'update'])->name('package.update');
-Route::get('/administrator/package/delete/{id}', [App\Http\Controllers\Administrator\PackageController::class, 'destroy'])->name('package.delete');
-
-
-Route::get('/administrator/assets', [App\Http\Controllers\Administrator\AssetController::class, 'index'])->name('asset.index');
-Route::get('/administrator/asset/create', [App\Http\Controllers\Administrator\AssetController::class, 'create'])->name('asset.create');
-Route::post('/administrator/asset/store', [App\Http\Controllers\Administrator\AssetController::class, 'store'])->name('asset.store');
-Route::get('/administrator/asset/edit/{id}', [App\Http\Controllers\Administrator\AssetController::class, 'edit'])->name('asset.edit');
-Route::post('/administrator/asset/update', [App\Http\Controllers\Administrator\AssetController::class, 'update'])->name('asset.update');
-Route::get('/administrator/asset/delete/{id}', [App\Http\Controllers\Administrator\AssetController::class, 'destroy'])->name('asset.delete');
-
-
-Route::get('/administrator/expense-heads', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_index'])->name('expense_head.index');
-Route::get('/administrator/expense-head/create', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_create'])->name('expense_head.create');
-Route::post('/administrator/expense-head/store', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_store'])->name('expense_head.store');
-Route::get('/administrator/expense-head/edit/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_edit'])->name('expense_head.edit');
-Route::post('/administrator/expense-head/update', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_update'])->name('expense_head.update');
-Route::get('/administrator/expense-head/delete/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_destroy'])->name('expense_head.delete');
-
-
-Route::get('/administrator/expenses', [App\Http\Controllers\Administrator\ExpenseController::class, 'index'])->name('expense.index');
-Route::get('/administrator/expense/create', [App\Http\Controllers\Administrator\ExpenseController::class, 'create'])->name('expense.create');
-Route::post('/administrator/expense/store', [App\Http\Controllers\Administrator\ExpenseController::class, 'store'])->name('expense.store');
-Route::get('/administrator/expense/edit/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'edit'])->name('expense.edit');
-Route::post('/administrator/expense/update', [App\Http\Controllers\Administrator\ExpenseController::class, 'update'])->name('expense.update');
-Route::get('/administrator/expense/delete/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'destroy'])->name('expense.delete');
-
-
-Route::get('/administrator/updates', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'index'])->name('update.index');
-Route::get('/administrator/update/create', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'create'])->name('update.create');
-Route::post('/administrator/update/store', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'store'])->name('update.store');
-Route::get('/administrator/update/edit/{id}', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'edit'])->name('update.edit');
-Route::post('/administrator/update/update', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'update'])->name('update.update');
-Route::get('/administrator/update/delete/{id}', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'destroy'])->name('update.delete');
-
-
-
-
-Route::get('/administrator/payment/pending', [App\Http\Controllers\Administrator\BookingController::class, 'payment_pending'])->name('admin.payment.index');
-Route::get('/administrator/payment/approve/{booking_id}', [App\Http\Controllers\Administrator\BookingController::class, 'payment_approve'])->name('admin.payment.approve');
-Route::get('/administrator/payment/reject/{booking_id}', [App\Http\Controllers\Administrator\BookingController::class, 'payment_reject'])->name('admin.payment.reject');
-
-Route::post('/administrator/payment/decision', [App\Http\Controllers\Administrator\BookingController::class, 'decision'])->name('admin.payment.decision');
-
-
-Route::get('/administrator/bookings/info/{id}', [App\Http\Controllers\Administrator\BookingController::class, 'modal_info'])->name('admin.booking.modal_info');
-
-Route::get('/administrator/payment/approved', [App\Http\Controllers\Administrator\BookingController::class, 'paymentProof'])->name('admin.payment.approved');
-Route::get('/administrator/payment/approved/batch', [App\Http\Controllers\Administrator\BookingController::class, 'approved_list_bybatch'])->name('admin.payment.approved_bybatch');
-
-Route::get('/administrator/investor/change_password/{id}', [App\Http\Controllers\Administrator\UserController::class, 'change_password'])->name('admin.investor.change_password');
-Route::post('/administrator/investor/cp/store', [App\Http\Controllers\Administrator\UserController::class, 'store_password'])->name('admin.investor.store_password');
-
-Route::get('/administrator/investor/info/{uid}', [App\Http\Controllers\Administrator\UserController::class, 'investment_activity'])->name('admin.investor.activity');
-
-Route::get('/administrator/agreement/hard-copy-requests', [App\Http\Controllers\Administrator\BookingController::class, 'hard_copy_agreement_requests'])->name('admin.agreement.requests');
-Route::get('/administrator/agreement/hard-copy/{code}/download', [App\Http\Controllers\Administrator\BookingController::class, 'hard_copy_download'])->name('admin.agreement.download');
-
-
-Route::get('/administrator/borga/cow-profiles', [App\Http\Controllers\Administrator\BorgaController::class, 'cow_profiles'])->name('admin.borga.cow_profile');
-Route::get('/administrator/borga/cow-profile/create', [App\Http\Controllers\Administrator\BorgaController::class, 'cow_profile_create'])->name('admin.borga.cow_profile_create');
-Route::post('/administrator/borga/cow-profile/store', [App\Http\Controllers\Administrator\BorgaController::class, 'cow_profile_store'])->name('admin.borga.cow_profile_store');

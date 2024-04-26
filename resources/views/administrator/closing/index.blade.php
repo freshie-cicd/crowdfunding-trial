@@ -162,15 +162,6 @@
         <div class="col-md-9">
         </div>
         <div class="col-md-3">
-            <form method="get" action="{{ route('admin.borga.cow_profile') }}">
-                <div class="input-group">
-                    <select class="form-select" id="inputGroupSelect04" name="package" aria-label="Example select with button addon">
-                        <option selected>Choose...</option>
-                        <option value="1">Batch 4 Package 1</option>
-                    </select>
-                    <button class="btn btn-outline-secondary" type="submit">Filter</button>
-                </div>
-            </form>
         </div>
     </div>
 
@@ -236,12 +227,7 @@
                                     <a href="{{ url('administrator/migration') }}/{{ $d->booking_code }}/i/{{ $d->user_id }}/p/5" class="btn btn-danger btn-sm">Disbursed</a>
                                     @endif
                                 </th>
-
-
                             </tr>
-
-
-
                             @endforeach
                         </tbody>
                     </table>

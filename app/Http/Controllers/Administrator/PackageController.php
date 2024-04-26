@@ -4,11 +4,17 @@ namespace App\Http\Controllers\Administrator;
 
 use App\Http\Controllers\Controller;
 use App\Models\Package;
+use App\Models\Project;
 use App\Models\ProjectBatch;
 use Illuminate\Http\Request;
 
 class PackageController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:administrator');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -49,6 +55,8 @@ class PackageController extends Controller
         $package['capacity'] = $request->capacity;
         $package['status'] = $request->status;
         $package['note'] = $request->note;
+        $package['start_date'] = $request->start_date;
+        $package['end_date'] = $request->end_date;
 
         $package->save();
 
@@ -76,7 +84,19 @@ class PackageController extends Controller
     {
         $data = Package::where('id', $id)->get();
         $batches = ProjectBatch::all();
-        return view('administrator.package.edit', compact(['data', 'batches']));
+
+        $project = Project::where('packages.id', '=', $id)
+            ->join('project_batches', 'projects.id', '=', 'project_batches.project_id')
+            ->join('packages', 'project_batches.id', '=', 'packages.batch_id')
+            ->select('projects.id', 'projects.name')
+            ->first();
+        $packages = Package::where('projects.id', '=', $project->id)
+            ->join('project_batches', 'packages.batch_id', '=', 'project_batches.id')
+            ->join('projects', 'project_batches.project_id', '=', 'projects.id')
+            ->select('packages.id', 'packages.name')
+            ->get();
+
+        return view('administrator.package.edit', compact(['data', 'batches', 'packages']));
     }
 
     /**
@@ -88,20 +108,25 @@ class PackageController extends Controller
      */
     public function update(Request $request, Package $package)
     {
-      $package = array();
+        $package = array();
 
-      $package['batch_id'] = $request->batch_id;
-      $package['name'] = $request->name;
-      $package['description'] = $request->description;
-      $package['code'] = $request->code;
-      $package['value'] = $request->value;
-      $package['capacity'] = $request->capacity;
-      $package['status'] = $request->status;
-      $package['note'] = $request->note;
+        $package['batch_id'] = $request->batch_id;
+        $package['name'] = $request->name;
+        $package['description'] = $request->description;
+        $package['code'] = $request->code;
+        $package['value'] = $request->value;
+        $package['capacity'] = $request->capacity;
+        $package['status'] = $request->status;
+        $package['note'] = $request->note;
+        $package['maturity'] = $request->maturity;
+        $package['return_amount'] = $request->return_amount;
+        $package['migration_package_id'] = $request->migration_package_id;
+        $package['start_date'] = $request->start_date;
+        $package['end_date'] = $request->end_date;
 
-      Package::where('id', $request->id)->update($package);
+        Package::where('id', $request->id)->update($package);
 
-      return redirect('administrator/packages')->with('success', 'Edited Successfully');
+        return redirect('administrator/packages')->with('success', 'Edited Successfully');
     }
 
     /**

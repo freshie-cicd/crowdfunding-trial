@@ -18,14 +18,34 @@ class ClosingController extends Controller
 
     public function index()
     {
-        $bookings = DB::table('closing_init')->where('closing_init.status', 'initiated')->where('bookings.user_id', auth()->user()->id)->where('bookings.status', 'approved')
-            ->join('bookings', 'bookings.package_id', '=', 'closing_init.package_id')
-            ->join('packages', 'packages.id', '=', 'closing_init.package_id')
-            ->join('closing_requests', 'closing_requests.booking_code', '=', 'bookings.code', 'left outer')
-            ->select('bookings.code', 'packages.code as pcode', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.batch_id', 'closing_init.status as closing_status', 'closing_init.profit_value', 'closing_requests.status as processing_status', 'closing_requests.package_to_withdraw', 'closing_requests.capital_withdrawal_amount', 'closing_requests.package_after_withdrawal', 'closing_requests.after_withdrawal_amount', 'closing_requests.profit_withdrawal_amount',)
+        $bookings = DB::table('bookings')
+            ->where('bookings.status', 'approved')
+            ->where('bookings.user_id', auth()->user()->id)
+            ->where('packages.maturity', 1)
+            ->join('packages', 'packages.id', '=', 'bookings.package_id')
+            ->leftJoin('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
+            ->leftJoin('closing_requests', 'closing_requests.booking_code', '=', 'bookings.code')
+            ->select(
+                'bookings.code',
+                'packages.return_amount',
+                'packages.code as pcode',
+                'packages.value',
+                'bookings.booking_quantity',
+                'bookings.status',
+                'bookings.id',
+                'packages.maturity',
+                'packages.name as package_name',
+                'facebook_groups.url',
+                'closing_requests.id as closing_id',
+                'closing_requests.capital_withdrawal_amount as withdraw',
+                'closing_requests.after_withdrawal_amount as reinvest',
+                'closing_requests.profit_withdrawal_amount as total_profit',
+            )
             ->get();
 
-        return view('closing.index', compact('bookings'));
+        $checkPendingApproval = Booking::where('user_id', auth()->user()->id)->where('status', 'pending_approval')->count();
+
+        return view('closing.index', compact('bookings', 'checkPendingApproval'));
     }
 
 
@@ -44,13 +64,13 @@ class ClosingController extends Controller
 
             $data = Booking::where('bookings.code', $code)->where('bookings.user_id', auth()->user()->id)
                 ->join('packages', 'bookings.package_id', '=', 'packages.id')
-                ->join('closing_init', 'closing_init.package_id', '=', 'bookings.package_id')
-                ->select('bookings.code as booking_code', 'bookings.booking_quantity', 'bookings.status as booking_status', 'packages.id as package_id', 'packages.name as package_name', 'packages.value as package_value', 'packages.status as package_status', 'closing_init.profit_value')
+                ->select('bookings.code as booking_code', 'bookings.booking_quantity', 'bookings.status as booking_status', 'packages.id as package_id', 'packages.name as package_name', 'packages.value as package_value', 'packages.status as package_status', 'packages.return_amount', 'packages.migration_package_id')
                 ->first();
 
+            $migrationPackage = DB::table('packages')->where('id', $data->migration_package_id)->first();
 
             if ($data) {
-                return view('closing.request', compact('data', 'bank'));
+                return view('closing.request', compact('data', 'bank', 'migrationPackage'));
             } else {
                 return "Cheating?";
             }

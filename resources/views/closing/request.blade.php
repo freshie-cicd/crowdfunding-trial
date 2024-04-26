@@ -76,8 +76,8 @@
             <label for="total_profit" class="col-md-4 col-form-label text-md-end">{{ __('Total Profit to Withdraw') }}</label>
 
             <div class="col-md-6">
-              <input id="total_profit" type="text" class="form-control @error('total_profit') is-invalid @enderror" name="total_profit" value="{{ $data->profit_value * $data->booking_quantity }}" disabled>
-              <input type="hidden" name="profit" value="{{ $data->profit_value * $data->booking_quantity }}">
+              <input id="total_profit" type="text" class="form-control @error('total_profit') is-invalid @enderror" name="total_profit" value="{{ $data->return_amount * $data->booking_quantity }}" disabled>
+              <input type="hidden" name="profit" value="{{ $data->return_amount * $data->booking_quantity }}">
               @error('total_profit')
               <span class="invalid-feedback" role="alert">
                 <strong>{{ $message }}</strong>
@@ -87,7 +87,7 @@
           </div>
 
           <div class="row mb-3">
-            <label for="note" class="col-md-4 col-form-label text-md-end">{{ __('Packages to Reinvest in Batch 6') }}</label>
+            <label for="note" class="col-md-4 col-form-label text-md-end text-success">{{ __('Decide Reinvest in '. $migrationPackage->name) }}</label>
             <div class="col-md-6">
               <div class="input-group mb-3">
                 <select id="reinvest_quantity" type="text" class="form-select form-control" placeholder="" name="reinvest_quantity">
@@ -97,7 +97,12 @@
                 </select>
                 <span class="input-group-text">Tk. <b id="total_invest"> {{ $data->booking_quantity * $data->package_value }}</b></span>
               </div>
-
+              <span>
+                <strong>
+                  {{ $migrationPackage->name }} Starting Date: {{ date('d M Y', strtotime($migrationPackage->start_date)) }} <br>
+                  Any investment Before this date will not be considered for profit calculation.
+                </strong>
+              </span>
               @error('reinvest_quantity')
               <span class="invalid-feedback" role="alert">
                 <strong>{{ $message }}</strong>
@@ -106,14 +111,12 @@
             </div>
           </div>
 
-
-
           <div class="row mb-3">
-            <label for="withdraw_quantity" class="col-md-4 col-form-label text-md-end">{{ __('Packages to Withdraw') }}</label>
+            <label for="withdraw_quantity" class="col-md-4 col-form-label text-md-end text-danger">{{ __('Withdrawal Amount') }}</label>
             <div class="col-md-6">
               <div class="input-group mb-3">
                 <input type="text" class="form-control " value="0" id="withdraw_quantity" name="withdraw_quantity" disabled>
-                <span class="input-group-text">Tk. <b id="total_withdraw"> {{ __('00') }}</b></span>
+                <span class="input-group-text">Tk. <b id="total_withdraw"> {{ __('0') }}</b></span>
               </div>
 
               @error('note')

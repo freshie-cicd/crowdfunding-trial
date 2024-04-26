@@ -6,7 +6,7 @@
     packageToWithdraw:  {{ $closing->package_to_withdraw ?? $booking->booking_quantity ?? 0 }},
     packageValue: {{ $package->value }}, 
     totalWithdrawal: 0 , 
-    profit: {{ $closing->profit_withdrawal_amount ?? $closingInit->profit_value *  ($closing->package_to_withdraw ?? $booking->booking_quantity ?? 0) ?? 0 }},
+    profit: {{ $closing->profit_withdrawal_amount ?? $package->return_amount *  ($closing->package_to_withdraw ?? $booking->booking_quantity ?? 0) ?? 0 }},
     
     statuses: ['requested','processing','disbursed','hold'],
     status: '{{ $closing->status ?? 'requested' }}', 
@@ -55,7 +55,7 @@
                         </div>
                         <div class="flex mt-4">
                             <div class="form-group mr-2">
-                                <label for="package_after_withdrawal">Migration to Batch 6</label>
+                                <label for="package_after_withdrawal">Migration to {{$migrationPackage->name}}</label>
                                 <input type="text" class="form-control" name="package_after_withdrawal" x-model="totalPackages-packageToWithdraw" readonly>
                             </div>
                             <div class="form-group">

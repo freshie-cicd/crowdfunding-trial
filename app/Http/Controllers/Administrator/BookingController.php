@@ -101,7 +101,7 @@ class BookingController extends Controller
         $booking = Booking::where('bookings.id', $id)
             ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
             ->leftJoin('users', 'users.id', '=', 'bookings.user_id')
-            ->select('bookings.*', 'packages.name as package_name', 'packages.value as package_value', 'users.name as user_name', 'users.phone as user_phone', 'users.email as user_email')
+            ->select('bookings.*', 'packages.name as package_name', 'packages.value as package_value', 'users.name as user_name', 'users.phone as user_phone', 'users.email as user_email', 'packages.migration_package_id', 'packages.maturity')
             ->first();
 
         $booking->total_value = $this->numberFormatBangladeshi($booking->package_value * $booking->booking_quantity);
