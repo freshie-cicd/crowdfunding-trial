@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class ProjectBatchController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:administrator');
+        $this->middleware('role:superadmin');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -30,7 +36,7 @@ class ProjectBatchController extends Controller
     {
         $projects = Project::all();
 
-        return view('administrator.project_batch.create',compact(['projects']));
+        return view('administrator.project_batch.create', compact(['projects']));
     }
 
     /**
@@ -48,12 +54,12 @@ class ProjectBatchController extends Controller
         $batch['description'] = $request->description;
         $batch['code'] = $request->code;
 
-        if(!empty($request->file('cover_photo'))){
-          $cover_file = $request->file('cover_photo');
-          $cover_file_new_name = rand() . '.' . $request->file('cover_photo')->getClientOriginalExtension();
-          $cover_file->move(public_path('uploads/covers/'), $cover_file_new_name);
+        if (!empty($request->file('cover_photo'))) {
+            $cover_file = $request->file('cover_photo');
+            $cover_file_new_name = rand() . '.' . $request->file('cover_photo')->getClientOriginalExtension();
+            $cover_file->move(public_path('uploads/covers/'), $cover_file_new_name);
 
-          $project['cover_photo'] = "uploads/covers/" . $cover_file_new_name;
+            $project['cover_photo'] = "uploads/covers/" . $cover_file_new_name;
         }
 
         $batch['ending_date'] = $request->ending_date;
@@ -62,7 +68,6 @@ class ProjectBatchController extends Controller
         $batch->save();
 
         return redirect()->back()->with('success', 'Added Successfully');
-
     }
 
     /**
@@ -98,27 +103,27 @@ class ProjectBatchController extends Controller
      */
     public function update(Request $request, ProjectBatch $projectbatch)
     {
-      $batch = array();
+        $batch = array();
 
-      $batch['project_id'] = $request->project_id;
-      $batch['name'] = $request->name;
-      $batch['description'] = $request->description;
-      $batch['code'] = $request->code;
+        $batch['project_id'] = $request->project_id;
+        $batch['name'] = $request->name;
+        $batch['description'] = $request->description;
+        $batch['code'] = $request->code;
 
-      if(!empty($request->file('cover_photo'))){
-        $cover_file = $request->file('cover_photo');
-        $cover_file_new_name = rand() . '.' . $request->file('cover_photo')->getClientOriginalExtension();
-        $cover_file->move(public_path('uploads/covers/'), $cover_file_new_name);
+        if (!empty($request->file('cover_photo'))) {
+            $cover_file = $request->file('cover_photo');
+            $cover_file_new_name = rand() . '.' . $request->file('cover_photo')->getClientOriginalExtension();
+            $cover_file->move(public_path('uploads/covers/'), $cover_file_new_name);
 
-        $project['cover_photo'] = "uploads/covers/" . $cover_file_new_name;
-      }
+            $project['cover_photo'] = "uploads/covers/" . $cover_file_new_name;
+        }
 
-      $batch['ending_date'] = $request->ending_date;
-      $batch['note'] = $request->note;
+        $batch['ending_date'] = $request->ending_date;
+        $batch['note'] = $request->note;
 
-      ProjectBatch::where('id', $request->id)->update($batch);
+        ProjectBatch::where('id', $request->id)->update($batch);
 
-      return redirect('administrator/batches')->with('success', 'Edited Successfully');
+        return redirect('administrator/batches')->with('success', 'Edited Successfully');
     }
 
     /**
@@ -132,6 +137,5 @@ class ProjectBatchController extends Controller
 
         ProjectBatch::where('id', $id)->delete();
         return redirect('administrator/batches')->with('success', 'Edited Successfully');
-
     }
 }

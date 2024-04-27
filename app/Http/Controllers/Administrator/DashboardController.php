@@ -21,6 +21,7 @@ class DashboardController extends Controller
   {
     $this->middleware('auth:administrator');
   }
+
   /**
    * Show the application dashboard.
    *
@@ -28,6 +29,11 @@ class DashboardController extends Controller
    */
   public function index()
   {
+
+    if (!auth()->guard('administrator')->user()->hasRole('superadmin')) {
+      return redirect()->route('admin.agreement.requests');
+    }
+
     $packages = Package::orderBy('id', 'desc')
       ->select('id', 'name', 'status')
       ->get();
@@ -51,9 +57,6 @@ class DashboardController extends Controller
     }
 
     $paymentGraph = $this->paymentGraph();
-
-    // dd($paymentGraph);
-
 
     return view('administrator.dashboard.index', compact('packages', 'bookingStats', 'statuses', 'paymentGraph'));
   }
@@ -79,5 +82,10 @@ class DashboardController extends Controller
       'series' => $series,
       'count' => $count
     ];
+  }
+
+  public function indexUnauthorized()
+  {
+    return view('administrator.dashboard.index-unauthorized');
   }
 }

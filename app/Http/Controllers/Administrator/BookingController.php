@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Administrator;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\AgreementRequest;
 use App\Models\User;
 use App\Models\BookingPayment;
-use App\Http\Controllers\AgreementController;
 use Illuminate\Http\Request;
 use App\Mail\PaymentConfirmationMail;
 use App\Mail\PaymentRejectionMail;
@@ -19,7 +17,6 @@ use App\Models\ClosingRequest;
 use App\Models\InvestorBankDetail;
 use Illuminate\Support\Facades\DB;
 
-use PDF;
 
 class BookingController extends Controller
 {
@@ -28,6 +25,7 @@ class BookingController extends Controller
     public function __construct()
     {
         $this->middleware('auth:administrator');
+        $this->middleware('role:superadmin');
     }
 
     /**
@@ -259,10 +257,6 @@ class BookingController extends Controller
         }
     }
 
-
-
-
-
     public function decision(Request $request)
     {
         if ($request->decision == 'approve') {
@@ -274,10 +268,6 @@ class BookingController extends Controller
             return redirect()->back()->with('success', 'Rejected Successfully');
         }
     }
-
-
-
-
 
     public function modal_info($id)
     {
@@ -314,10 +304,8 @@ class BookingController extends Controller
         return response()->json($information);
     }
 
-
     public function paymentProof(Request $request)
     {
-
         $list = BookingPayment::where('booking_payments.status', 'complete')
             ->join('bookings', 'bookings.id', "=", 'booking_payments.booking_id')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
@@ -328,94 +316,15 @@ class BookingController extends Controller
         return view('administrator.payment.approved', compact('list'));
     }
 
-
-
-
-
     public function approved_list_bybatch(Request $request)
     {
-
         $list = BookingPayment::where('booking_payments.status', 'complete')->where('bookings.package_id', $request->package)
-
             ->join('bookings', 'bookings.id', "=", 'booking_payments.booking_id')
-
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-
             ->join('users', 'users.id', '=', 'bookings.user_id')
-
             ->select('packages.name', 'packages.value', 'bookings.booking_quantity', 'bookings.code', 'booking_payments.payment_document', 'booking_payments.payment_date', 'booking_payments.note', 'booking_payments.status', 'booking_payments.booking_id', 'users.name as investor_name', 'users.phone', 'users.email', 'users.id', 'bookings.updated_by', 'booking_payments.payment_method')
-
             ->get();
-
-
 
         return view('administrator.payment_approved', compact('list'));
-    }
-
-
-
-
-
-    public function hard_copy_agreement_requests()
-    {
-        $dataX = AgreementRequest::where('agreement_requests.status', 'requested')
-            ->join('bookings', 'bookings.code', '=', 'agreement_requests.booking_code')
-            ->join('users', 'users.id', '=', 'bookings.user_id')
-            ->get();
-
-        return view('administrator.agreement.requests', compact('dataX'));
-    }
-
-
-
-    public function hard_copy_download($code)
-    {
-        $booking_info = Booking::where('bookings.code', $code)
-            ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->join('project_batches', 'packages.batch_id', '=', 'project_batches.id')
-            ->join('booking_payments', 'booking_payments.booking_id', '=', 'bookings.id')
-            ->join('users', 'users.id', '=', 'bookings.user_id')
-            ->select('users.*', 'bookings.booking_quantity', 'packages.value', 'packages.note', 'bookings.code', 'project_batches.ending_date', 'project_batches.starting_date', 'bookings.code', 'booking_payments.payment_date', 'project_batches.project_id')
-            ->get();
-
-        $total_value = $booking_info[0]->value * $booking_info[0]->booking_quantity;
-        $ac = new AgreementController;
-        $inWord = $ac->inWords($total_value);
-
-        $data = [
-            'name' => $booking_info[0]->name,
-            'nid' => $booking_info[0]->nid,
-            'father_name' => $booking_info[0]->father_name,
-            'mother_name' => $booking_info[0]->mother_name,
-            'permanent_address' => $booking_info[0]->permanent_address,
-            'present_address' => $booking_info[0]->present_address,
-            'nominee_name' => $booking_info[0]->nominee_name,
-            'nominee_address' => $booking_info[0]->nominee_address,
-            'nominee_relation' => $booking_info[0]->nominee_relation,
-            'booking_id' => $code,
-            'project_ending_date' => $booking_info[0]->ending_date,
-            'project_starting_date' => $booking_info[0]->starting_date,
-            'value' => $booking_info[0]->value,
-            'booking_quantity' => $booking_info[0]->booking_quantity,
-            'booking_code' => $booking_info[0]->code,
-            'inWords' => $inWord,
-            'payment_date' => $booking_info[0]->payment_date,
-        ];
-
-
-        $file_name = $booking_info[0]->name . '_' . $code . '.pdf';
-
-        if ($booking_info[0]->project_id == 1) {
-
-            $pdf = PDF::loadView('administrator.agreement.hardcopy', $data, [], [
-                'format' => [209.55, 336.55],
-            ]);
-        } else {
-            $pdf = PDF::loadView('administrator.agreement.hardcopy_greenify', $data, [], [
-                'format' => [209.55, 336.55],
-            ]);
-        }
-
-        return $pdf->stream($file_name);
     }
 }

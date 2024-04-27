@@ -19,8 +19,8 @@ Auth::routes();
 Route::namespace("Administrator")
    ->prefix('administrator')
    ->group(function () {
-      Route::get('/', [App\Http\Controllers\Administrator\DashboardController::class, 'index'])->name('home');
-      Route::get('/home', [App\Http\Controllers\Administrator\DashboardController::class, 'index'])->name('administrator.home');
+      Route::get('/', [App\Http\Controllers\Administrator\DashboardController::class, 'index'])->name('administrator.home');
+      Route::get('/home-unauthorized', [App\Http\Controllers\Administrator\DashboardController::class, 'indexUnauthorized'])->name('administrator.unauthorized');
 
       Route::get('/team', [App\Http\Controllers\Administrator\AdminController::class, 'index'])->name('team.list');
       Route::get('/team/add', [App\Http\Controllers\Administrator\AdminController::class, 'create'])->name('team.create');
@@ -78,20 +78,6 @@ Route::namespace("Administrator")
       Route::post('/asset/update', [App\Http\Controllers\Administrator\AssetController::class, 'update'])->name('asset.update');
       Route::get('/asset/delete/{id}', [App\Http\Controllers\Administrator\AssetController::class, 'destroy'])->name('asset.delete');
 
-      Route::get('/expense-heads', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_index'])->name('expense_head.index');
-      Route::get('/expense-head/create', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_create'])->name('expense_head.create');
-      Route::post('/expense-head/store', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_store'])->name('expense_head.store');
-      Route::get('/expense-head/edit/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_edit'])->name('expense_head.edit');
-      Route::post('/expense-head/update', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_update'])->name('expense_head.update');
-      Route::get('/expense-head/delete/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'head_destroy'])->name('expense_head.delete');
-
-      Route::get('/expenses', [App\Http\Controllers\Administrator\ExpenseController::class, 'index'])->name('expense.index');
-      Route::get('/expense/create', [App\Http\Controllers\Administrator\ExpenseController::class, 'create'])->name('expense.create');
-      Route::post('/expense/store', [App\Http\Controllers\Administrator\ExpenseController::class, 'store'])->name('expense.store');
-      Route::get('/expense/edit/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'edit'])->name('expense.edit');
-      Route::post('/expense/update', [App\Http\Controllers\Administrator\ExpenseController::class, 'update'])->name('expense.update');
-      Route::get('/expense/delete/{id}', [App\Http\Controllers\Administrator\ExpenseController::class, 'destroy'])->name('expense.delete');
-
       Route::get('/updates', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'index'])->name('update.index');
       Route::get('/update/create', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'create'])->name('update.create');
       Route::post('/update/store', [App\Http\Controllers\Administrator\AssetUpdateController::class, 'store'])->name('update.store');
@@ -102,9 +88,7 @@ Route::namespace("Administrator")
       Route::get('/payment/pending', [App\Http\Controllers\Administrator\BookingController::class, 'payment_pending'])->name('admin.payment.index');
       Route::get('/payment/approve/{booking_id}', [App\Http\Controllers\Administrator\BookingController::class, 'payment_approve'])->name('admin.payment.approve');
       Route::get('/payment/reject/{booking_id}', [App\Http\Controllers\Administrator\BookingController::class, 'payment_reject'])->name('admin.payment.reject');
-
       Route::post('/payment/decision', [App\Http\Controllers\Administrator\BookingController::class, 'decision'])->name('admin.payment.decision');
-
 
       Route::get('/bookings/info/{id}', [App\Http\Controllers\Administrator\BookingController::class, 'modal_info'])->name('admin.booking.modal_info');
 
@@ -113,11 +97,12 @@ Route::namespace("Administrator")
 
       Route::get('/investor/change_password/{id}', [App\Http\Controllers\Administrator\UserController::class, 'change_password'])->name('admin.investor.change_password');
       Route::post('/investor/cp/store', [App\Http\Controllers\Administrator\UserController::class, 'store_password'])->name('admin.investor.store_password');
-
       Route::get('/investor/info/{uid}', [App\Http\Controllers\Administrator\UserController::class, 'investment_activity'])->name('admin.investor.activity');
 
-      Route::get('/agreement/hard-copy-requests', [App\Http\Controllers\Administrator\BookingController::class, 'hard_copy_agreement_requests'])->name('admin.agreement.requests');
-      Route::get('/agreement/hard-copy/{code}/download', [App\Http\Controllers\Administrator\BookingController::class, 'hard_copy_download'])->name('admin.agreement.download');
+      Route::get('/reports/hard-copy-requests', [App\Http\Controllers\Administrator\Reports::class, 'hard_copy_agreement_requests'])->name('admin.agreement.requests');
+      Route::get('/reports/hard-copy/{code}/download', [App\Http\Controllers\Administrator\Reports::class, 'hard_copy_download'])->name('admin.agreement.download');
+
+      Route::get('/reports/closing-investor', [App\Http\Controllers\Administrator\Reports::class, 'closingReport'])->name('reports.closing');
    });
 
 

@@ -9,9 +9,10 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-
     public function __construct()
     {
+        $this->middleware('auth:administrator');
+        $this->middleware('role:superadmin');
     }
 
     public function proof($booking_id)

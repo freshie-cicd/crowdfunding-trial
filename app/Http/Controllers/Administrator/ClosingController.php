@@ -16,13 +16,11 @@ use Illuminate\Support\Facades\Mail;
 
 class ClosingController extends Controller
 {
-
-
     public function __construct()
     {
         $this->middleware('auth:administrator');
+        $this->middleware('role:superadmin');
     }
-
 
     public function edit($code)
     {

@@ -13,6 +13,7 @@ class PackageController extends Controller
     public function __construct()
     {
         $this->middleware('auth:administrator');
+        $this->middleware('role:superadmin');
     }
 
     /**

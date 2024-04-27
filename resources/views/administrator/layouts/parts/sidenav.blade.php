@@ -13,6 +13,8 @@
       <nav class="menu open-current-submenu">
 
         <ul>
+
+          @if(Auth::user() && Auth::user()->role == "superadmin")
           <li class="menu-item">
             <a href="{{ route('administrator.home') }}">
               <span class="menu-icon"><i class="fa-solid fa-house"></i></span><span class="menu-title">Dashboard</span>
@@ -71,8 +73,8 @@
             </div>
             <!--Sub Menu Ends-->
           </li>
-
-          <li class="menu-item sub-menu {{request()->is('administrator/agreement/hard-copy-requests') || request()->is('administrator/closing/requests') || request()->is('administrator/closing/profit-return') || request()->is('administrator/closing/capital' ) ? 'open' : ''}}">
+          @endif
+          <li class="menu-item sub-menu {{request()->is('administrator/reports/*')  ? 'open' : ''}}">
             <a href="#">
               <span class="menu-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="menu-title">Reports</span>
             </a>
@@ -81,6 +83,7 @@
             <div class="sub-menu-list">
               <ul>
                 <li class="menu-item"><a href="{{ route('admin.agreement.requests') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Agreement Paper Requests</span></a></li>
+                <li class="menu-item"><a href="{{ route('reports.closing') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Closing</span></a></li>
               </ul>
             </div>
           </li>
