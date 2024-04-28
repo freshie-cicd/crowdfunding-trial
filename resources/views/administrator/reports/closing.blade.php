@@ -49,11 +49,7 @@ return view('administrator.reports.closing', compact('data')); -->
                                     </td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->phone }}</td>
-                                    <td>
-                                        {{ $item->package_name }}<br>
-                                        {{$item->package_value*$item->booking_quantity}}/{{$item->booking_quantity}}
-
-                                    </td>
+                                    <td>{{ $item->package_name }}: {{$item->package_value*$item->booking_quantity}}/{{$item->booking_quantity}}</td>
                                     <td>{{ $item->account_name }}</td>
                                     @if($role == 'superadmin')
                                     <td>{{ $item->account_number }}</td>
