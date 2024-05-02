@@ -89,7 +89,9 @@ class Reports extends Controller
             ->join('users', 'users.id', '=', 'bookings.user_id')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
             ->leftJoin('investor_bank_details', 'investor_bank_details.user_id', '=', 'bookings.user_id')
+            ->leftJoin('banks', 'banks.id', '=', 'investor_bank_details.bank_name')
             ->leftJoin('closing_requests', 'closing_requests.booking_code', '=', 'bookings.code')
+            ->leftJoin('agreement_requests', 'agreement_requests.booking_code', '=', 'bookings.code')
             ->where('bookings.package_id', '=', 2)
             ->select(
                 'bookings.*',
@@ -97,6 +99,7 @@ class Reports extends Controller
                 'users.name',
                 'users.phone',
                 'packages.name as package_name',
+                'banks.bank_name',
                 'investor_bank_details.account_name',
                 'investor_bank_details.account_number',
                 'investor_bank_details.routing_number',
@@ -104,6 +107,7 @@ class Reports extends Controller
                 'closing_requests.after_withdrawal_amount as reinvestment_amount',
                 'closing_requests.capital_withdrawal_amount as withdrawal_amount',
                 'closing_requests.profit_withdrawal_amount as profit_amount',
+                'agreement_requests.status as agreement_request_status',
             )
             ->orderBy('bookings.user_id', 'asc')
             ->get();

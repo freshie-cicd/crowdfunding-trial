@@ -81,11 +81,9 @@ class AgreementController extends Controller
 
         if ($booking_info->project_id == 1) {
             $pdf = PDF::loadView('agreement.paper', $data);
-        }
-        else if ($booking_info->project_id == 2) {
+        } else if ($booking_info->project_id == 2) {
             $pdf = PDF::loadView('agreement.paper_greenify', $data);
-        }
-        else {
+        } else {
             dd('Invalid Project');
         }
 
@@ -133,24 +131,21 @@ class AgreementController extends Controller
 
     public function hard_copy_request(Request $request, $id)
     {
-        $booking_code_x = Booking::where('id', $id)->select('code')->get();
-        $count = AgreementRequest::where('booking_code', $booking_code_x[0]->code)->count();
+        $booking_code = Booking::where('id', $id)->pluck('code')->first();
+        $count = AgreementRequest::where('booking_code', $booking_code)->count();
 
         if ($count > 0) {
-            return redirect('/agreements')->with('warning', 'You have already requested for hard copy against this booking.');
-        } else {
-
-            $data = Booking::where('bookings.id', $id)->where('bookings.status', 'approved')
-                ->join('packages', 'packages.id', '=', 'bookings.package_id')
-                ->join('project_batches', 'packages.batch_id', '=', 'project_batches.id')
-                ->join('booking_payments', 'booking_payments.booking_id', '=', 'bookings.id')
-                ->select('bookings.booking_quantity', 'packages.value', 'packages.note', 'bookings.code', 'project_batches.ending_date', 'bookings.code', 'booking_payments.payment_date')
-                ->get();
-
-            //dump($data);
-
-            return view('agreement.hardcopy_request', compact('data'));
+            return redirect()->route('agreement.index')->with('warning', 'You have already requested for hard copy against this booking.');
         }
+
+        $data = Booking::where('bookings.id', $id)->where('bookings.status', 'approved')
+            ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
+            ->leftJoin('project_batches', 'packages.batch_id', '=', 'project_batches.id')
+            ->leftJoin('booking_payments', 'booking_payments.booking_id', '=', 'bookings.id')
+            ->select('bookings.booking_quantity', 'packages.value', 'packages.note', 'bookings.code', 'project_batches.ending_date', 'bookings.code', 'booking_payments.payment_date')
+            ->get();
+
+        return view('agreement.hardcopy_request', compact('data'));
     }
 
 

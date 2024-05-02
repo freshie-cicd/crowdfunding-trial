@@ -3,15 +3,6 @@
 
 
 @section('content')
-<!-- $data = Booking::where('bookings.status', 'approved')
-->join('users', 'users.id', '=', 'bookings.user_id')
-->join('packages', 'packages.id', '=', 'bookings.package_id')
-->where('bookings.package_id', '=', 2)
-->select('bookings.*', 'users.name', 'users.phone', 'packages.name as package_name')
-->get();
-
-return view('administrator.reports.closing', compact('data')); -->
-
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -29,11 +20,13 @@ return view('administrator.reports.closing', compact('data')); -->
                                     <th>Investor Name</th>
                                     <th>Investor Phone</th>
                                     <th>Package Name</th>
+                                    <th>Bank Name</th>
                                     <th>AC. Name</th>
                                     @if($role == 'superadmin')
                                     <th>Account</th>
                                     <th>Routing</th>
                                     @endif
+                                    <th>Agreement</th>
                                     <th>Reinvest</th>
                                     <th>Capital</th>
                                     <th>Profit</th>
@@ -50,11 +43,13 @@ return view('administrator.reports.closing', compact('data')); -->
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->phone }}</td>
                                     <td>{{ $item->package_name }}: {{$item->package_value*$item->booking_quantity}}/{{$item->booking_quantity}}</td>
+                                    <td>{{ $item->bank_name }}</td>
                                     <td>{{ $item->account_name }}</td>
                                     @if($role == 'superadmin')
                                     <td>{{ $item->account_number }}</td>
                                     <td>{{ $item->routing_number }}</td>
                                     @endif
+                                    <td>{{ $item->agreement_request_status === "delivered" ? 'Yes' : 'No' }}</td>
                                     <td>{{ $item->reinvestment_amount }}</td>
                                     <td>{{ $item->withdrawal_amount }}</td>
                                     <td>{{ $item->profit_amount }}</td>

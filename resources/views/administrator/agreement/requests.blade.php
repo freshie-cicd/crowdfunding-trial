@@ -1,7 +1,5 @@
 @extends('administrator.layouts.application')
 
-
-
 @section('content')
 
 <style>
@@ -20,10 +18,21 @@
   }
 </style>
 
-<div class="">
+<div class="fixed top-1/2 left-1/2 z-10 hidden">
+  <div class="bg-white p-8 min-w-80 min-h-52 rounded-md shadow-2xl">
+    <div class="flex flex-row gap-4">
+      <div>Status:</div>
+      <select class="w-full" name="status" id="status">
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    </div>
+  </div>
+</div>
 
+<div>
   <div class="row justify-content-center">
-
     <div class="col-md-12">
 
       <div class="card">
@@ -78,7 +87,12 @@
                 <td scope="row">{{ $data->note }}</td>
                 <td scope="row">{{ $data->status }}</td>
                 <td scope="row">{{ $data->created_at }}</td>
-                <td scope="row"> <a href="{{ route('admin.agreement.download', $data->booking_code) }}" class="btn btn-sm btn-primary">Download</a></td>
+                <td scope="row">
+                  <div class="flex flex-row gap-2">
+                    <a href="{{ route('admin.agreement.download', $data->booking_code) }}" class="btn btn-sm btn-primary">Download</a>
+                    <button class="btn btn-sm btn-primary">Change Status</a>
+                  </div>
+                </td>
               </tr>
               @endforeach
 
