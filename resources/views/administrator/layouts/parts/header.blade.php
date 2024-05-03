@@ -50,10 +50,6 @@
 
   <link rel="stylesheet" href="{{ url('/css/main.css') }}" />
 
-
-
-
-
   <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
   <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
@@ -64,7 +60,6 @@
   <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
   <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
   <script src="//unpkg.com/alpinejs" defer></script>
-  <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 

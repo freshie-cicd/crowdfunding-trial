@@ -8,6 +8,7 @@ use App\Models\AgreementRequest;
 use App\Models\Booking;
 use App\Http\Controllers\AgreementController;
 use PDF;
+use Illuminate\Support\Facades\DB;
 
 class Reports extends Controller
 {
@@ -17,16 +18,36 @@ class Reports extends Controller
     }
 
 
-    public function hard_copy_agreement_requests()
+    public function agreementRequests()
     {
-        $dataX = AgreementRequest::where('agreement_requests.status', 'requested')
-            ->join('bookings', 'bookings.code', '=', 'agreement_requests.booking_code')
+        $agreementRequests = AgreementRequest::join('bookings', 'bookings.code', '=', 'agreement_requests.booking_code')
             ->join('users', 'users.id', '=', 'bookings.user_id')
             ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
-            ->select('agreement_requests.*', 'users.*', 'packages.name as package_name', 'agreement_requests.note as note')
+            ->select(
+                'agreement_requests.*',
+                'users.*',
+                'packages.name as package_name',
+                'agreement_requests.note as note',
+                'agreement_requests.id as id'
+            )
             ->get();
 
-        return view('administrator.agreement.requests', compact('dataX'));
+        // get all status of agreement request
+        $query = "SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'agreement_requests' AND COLUMN_NAME = 'status'";
+        $dbName = env('DB_DATABASE');
+        $statusEnum = DB::select($query, [$dbName]);
+        $statuesArray = explode("','", substr($statusEnum[0]->COLUMN_TYPE, 6, -2));
+
+        return view('administrator.agreement.requests', compact('agreementRequests', 'statuesArray'));
+    }
+
+    public function updateAgreementRequestStatus(Request $request)
+    {
+        $agreementRequest = AgreementRequest::find($request->id);
+        $agreementRequest->status = $request->status;
+        $agreementRequest->save();
+
+        return response()->json(['status' => 'success', 'message' => 'Agreement request status updated successfully']);
     }
 
     public function hard_copy_download($code)
@@ -85,7 +106,7 @@ class Reports extends Controller
     {
         $role = auth('administrator')->user()->role;
 
-        $data = Booking::where('bookings.status', 'approved')
+        $data = Booking::whereIn('bookings.status', ['approved', 'withdrawn', 'migrated'])
             ->join('users', 'users.id', '=', 'bookings.user_id')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
             ->leftJoin('investor_bank_details', 'investor_bank_details.user_id', '=', 'bookings.user_id')
@@ -108,6 +129,7 @@ class Reports extends Controller
                 'closing_requests.capital_withdrawal_amount as withdrawal_amount',
                 'closing_requests.profit_withdrawal_amount as profit_amount',
                 'agreement_requests.status as agreement_request_status',
+                'closing_requests.status as closing_request_status',
             )
             ->orderBy('bookings.user_id', 'asc')
             ->get();

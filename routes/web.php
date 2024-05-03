@@ -99,7 +99,8 @@ Route::namespace("Administrator")
       Route::post('/investor/cp/store', [App\Http\Controllers\Administrator\UserController::class, 'store_password'])->name('admin.investor.store_password');
       Route::get('/investor/info/{uid}', [App\Http\Controllers\Administrator\UserController::class, 'investment_activity'])->name('admin.investor.activity');
 
-      Route::get('/reports/hard-copy-requests', [App\Http\Controllers\Administrator\Reports::class, 'hard_copy_agreement_requests'])->name('admin.agreement.requests');
+      Route::get('/reports/hard-copy-requests', [App\Http\Controllers\Administrator\Reports::class, 'agreementRequests'])->name('admin.agreement.requests');
+      Route::put('/reports/agreement-status/update', [App\Http\Controllers\Administrator\Reports::class, 'updateAgreementRequestStatus'])->name('admin.agreement.status-update');
       Route::get('/reports/hard-copy/{code}/download', [App\Http\Controllers\Administrator\Reports::class, 'hard_copy_download'])->name('admin.agreement.download');
 
       Route::get('/reports/closing-investor', [App\Http\Controllers\Administrator\Reports::class, 'closingReport'])->name('reports.closing');

@@ -31,10 +31,15 @@
                                     <th>Capital</th>
                                     <th>Profit</th>
                                     <th>Total</th>
+                                    <th>Paid</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($data as $key => $item)
+                                @php
+                                $isAgreementDelivered = $item->agreement_request_status === "delivered";
+                                $isPaid = $item->closing_request_status === "disbursed";
+                                @endphp
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td>
@@ -49,11 +54,12 @@
                                     <td>{{ $item->account_number }}</td>
                                     <td>{{ $item->routing_number }}</td>
                                     @endif
-                                    <td>{{ $item->agreement_request_status === "delivered" ? 'Yes' : 'No' }}</td>
+                                    <td>{{ $isAgreementDelivered ? 'Yes' : 'No' }}</td>
                                     <td>{{ $item->reinvestment_amount }}</td>
                                     <td>{{ $item->withdrawal_amount }}</td>
                                     <td>{{ $item->profit_amount }}</td>
-                                    <td>{{ $item->withdrawal_amount + $item->profit_amount }}</td>
+                                    <td>{{ $item->withdrawal_amount + $item->profit_amount - ($isAgreementDelivered ? 450 : 0) }}</td>
+                                    <td>{{ $isPaid ? 'Yes' : 'No' }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
