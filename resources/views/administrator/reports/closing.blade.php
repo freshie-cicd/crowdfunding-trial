@@ -22,7 +22,7 @@
                                     <th>Package Name</th>
                                     <th>Bank Name</th>
                                     <th>AC. Name</th>
-                                    @if($role == 'superadmin')
+                                    @if($role == 'superadmin' || $role == 'customersupport')
                                     <th>Account</th>
                                     <th>Routing</th>
                                     @endif
@@ -50,7 +50,7 @@
                                     <td>{{ $item->package_name }}: {{$item->package_value*$item->booking_quantity}}/{{$item->booking_quantity}}</td>
                                     <td>{{ $item->bank_name }}</td>
                                     <td>{{ $item->account_name }}</td>
-                                    @if($role == 'superadmin')
+                                    @if($role == 'superadmin' || $role == 'customersupport')
                                     <td>{{ $item->account_number }}</td>
                                     <td>{{ $item->routing_number }}</td>
                                     @endif
