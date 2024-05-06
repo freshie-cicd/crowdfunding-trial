@@ -91,6 +91,11 @@ class ClosingController extends Controller
             ->select('packages.*')
             ->first();
         $migrationPackage = DB::table('packages')->where('id', $package_id)->first();
+
+        if (!$bookingPackage || !$migrationPackage) {
+            return redirect()->back()->with('info', 'Package not found!');
+        }
+
         $note = 'Migrated from '.$bookingPackage->name.' to '.$migrationPackage->name;
 
         $closing_request = DB::table('closing_requests')->where('booking_code', $booking_code)->where('user_id', $investor_id)->where('status', 'requested')->first();
@@ -139,7 +144,7 @@ class ClosingController extends Controller
                 DB::table('closing_requests')->where('booking_code', $booking_code)->where('user_id', $investor_id)->update(['status' => 'disbursed']);
 
                 $reinvestAmount = $closing_request->after_withdrawal_amount;
-                Mail::to($user_email)->send(new MigrationConfirmationMail($reinvestAmount));
+                Mail::to($user_email)->send(new MigrationConfirmationMail($reinvestAmount, $migrationPackage->name));
 
                 return redirect()->back()->with('success', 'Migrated Successfully, User is informed.');
             }

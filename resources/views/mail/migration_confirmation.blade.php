@@ -164,7 +164,7 @@
                 margin: 0;
                 padding-top: 20px;
               ">
-            You are successfully migrated to batch 6.
+            You are successfully migrated to {{ $batchName }}.
           </h1>
           <div class="text-teal-700 text-center" style="
                 color: #13795b;

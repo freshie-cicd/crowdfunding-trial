@@ -17,8 +17,9 @@ class MigrationConfirmationMail extends Mailable
      * Create a new message instance.
      *
      * @param mixed $reinvestAmount
+     * @param mixed $batchName
      */
-    public function __construct(public $reinvestAmount) {}
+    public function __construct(public $reinvestAmount, public $batchName) {}
 
     /**
      * Get the message envelope.
