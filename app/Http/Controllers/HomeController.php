@@ -68,7 +68,7 @@ class HomeController extends Controller
         $bookings = Booking::where('bookings.user_id', auth()->user()->id)
             ->where('bookings.status', '!=', 'rejected')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->leftJoin('project_batches', 'project_batches.id', '=', 'packages.batch_id')
+            ->leftJoin('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
             ->leftJoin('closing_requests', 'closing_requests.booking_code', '=', 'bookings.code')
             ->select(
                 'bookings.code',
@@ -78,7 +78,7 @@ class HomeController extends Controller
                 'bookings.status',
                 'bookings.id',
                 'packages.batch_id',
-                'project_batches.fb_group_url as url',
+                'facebook_groups.url',
                 'packages.maturity',
                 'packages.name as package_name',
                 'packages.return_amount',

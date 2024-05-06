@@ -24,8 +24,8 @@ class BookingController extends Controller
         $bookings = Booking::where('bookings.user_id', auth()->user()->id)
             ->where('bookings.status', 'pending')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->join('project_batches', 'project_batches.id', '=', 'packages.batch_id')
-            ->select('bookings.code', 'packages.code as pcode', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.batch_id', 'project_batches.fb_group_url as url')
+            ->join('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
+            ->select('bookings.code', 'packages.code as pcode', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.batch_id', 'facebook_groups.url')
             ->get();
 
         $total_investment = 0;
@@ -46,8 +46,8 @@ class BookingController extends Controller
         $bookings = Booking::where('bookings.user_id', auth()->user()->id)
             ->where('bookings.status', $status)
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->join('project_batches', 'project_batches.id', '=', 'packages.batch_id')
-            ->select('bookings.code', 'packages.code as pcode', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.batch_id', 'project_batches.fb_group_url as url', 'packages.status as package_status')
+            ->join('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
+            ->select('bookings.code', 'packages.code as pcode', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.batch_id', 'facebook_groups.url', 'packages.status as package_status')
             ->get();
 
         $total_investment = 0;
