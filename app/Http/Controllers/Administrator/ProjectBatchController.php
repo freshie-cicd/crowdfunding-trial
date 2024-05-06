@@ -62,7 +62,8 @@ class ProjectBatchController extends Controller
             $project['cover_photo'] = 'uploads/covers/'.$cover_file_new_name;
         }
 
-        $batch['ending_date'] = $request->ending_date;
+        $batch['starting_date'] = $request->start_date;
+        $batch['ending_date'] = $request->end_date;
         $batch['note'] = $request->note;
 
         $batch->save();
@@ -116,7 +117,8 @@ class ProjectBatchController extends Controller
             $project['cover_photo'] = 'uploads/covers/'.$cover_file_new_name;
         }
 
-        $batch['ending_date'] = $request->ending_date;
+        $batch['starting_date'] = $request->start_date;
+        $batch['ending_date'] = $request->end_date;
         $batch['note'] = $request->note;
 
         ProjectBatch::where('id', $request->id)->update($batch);
