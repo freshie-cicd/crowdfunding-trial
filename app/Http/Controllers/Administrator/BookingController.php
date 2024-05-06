@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Administrator;
 
 use App\Http\Controllers\Controller;
-use App\Models\Booking;
-use App\Models\User;
-use App\Models\BookingPayment;
-use Illuminate\Http\Request;
 use App\Mail\PaymentConfirmationMail;
 use App\Mail\PaymentRejectionMail;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
-use App\Traits\FormatsNumbers;
-use App\Models\Package;
+use App\Models\Booking;
+use App\Models\BookingPayment;
 use App\Models\ClosingRequest;
 use App\Models\InvestorBankDetail;
+use App\Models\Package;
+use App\Models\User;
+use App\Traits\FormatsNumbers;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Mail;
 
 class BookingController extends Controller
 {
@@ -31,7 +31,7 @@ class BookingController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -49,17 +49,16 @@ class BookingController extends Controller
         $search = $request->query('search', '');
         $migration = $request->query('migration', '');
 
-
         $bookings = Booking::when($status, function ($query, $status) {
             return $query->where('bookings.status', $status);
         })->when($package, function ($query, $package) {
             return $query->where('bookings.package_id', $package);
         })->when($search, function ($query, $search) {
-            return $query->where('bookings.code', 'like', '%' . $search . '%')
-                ->orWhere('users.name', 'like', '%' . $search . '%')
-                ->orWhere('users.phone', 'like', '%' . $search . '%')
-                ->orWhere('users.email', 'like', '%' . $search . '%')
-                ->orWhere('bookings.note', 'like', '%' . $search . '%');
+            return $query->where('bookings.code', 'like', '%'.$search.'%')
+                ->orWhere('users.name', 'like', '%'.$search.'%')
+                ->orWhere('users.phone', 'like', '%'.$search.'%')
+                ->orWhere('users.email', 'like', '%'.$search.'%')
+                ->orWhere('bookings.note', 'like', '%'.$search.'%');
         })
             ->when($migration, function ($query, $migration) {
                 return $query->where('closing_requests.package_after_withdrawal', '>', 0);
@@ -151,8 +150,6 @@ class BookingController extends Controller
 
     public function create($investor_id)
     {
-
-
         $query = "SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'bookings' AND COLUMN_NAME = 'status'";
         $dbName = env('DB_DATABASE');
         $statusEnum = DB::select($query, [$dbName]);
@@ -189,38 +186,13 @@ class BookingController extends Controller
         $booking->user_id = $request->investor_id;
         $booking->save();
 
-
         return redirect()->route('administrator.booking.show', $booking->id)->with('success', 'Booking created successfully');
-    }
-
-    protected function getAvailableBookingCode()
-    {
-        $attemptLimit = 10;
-        $attemptCount = 0;
-
-        while ($attemptCount < $attemptLimit) {
-            $attemptCount++;
-            $codes = collect();
-
-            for ($i = 0; $i < 5; $i++) {
-                $codes->push(random_int(10000000, 99999999));
-            }
-
-            $usedCodes = Booking::whereIn('code', $codes)->pluck('code');
-            $availableCodes = $codes->diff($usedCodes);
-
-            if ($availableCode = $availableCodes->first()) {
-                return $availableCode; // Return the first available code
-            }
-        }
-
-        return null; // Return null if no available code found after attempts
     }
 
     public function payment_pending(Request $request)
     {
         $pendings = BookingPayment::where('bookings.status', 'pending_approval')
-            ->join('bookings', 'bookings.id', "=", 'booking_payments.booking_id')
+            ->join('bookings', 'bookings.id', '=', 'booking_payments.booking_id')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
             ->join('users', 'users.id', '=', 'bookings.user_id')
             ->select('packages.name', 'packages.value', 'bookings.booking_quantity', 'bookings.code', 'booking_payments.payment_document', 'booking_payments.document_two', 'booking_payments.document_three', 'booking_payments.bank', 'booking_payments.branch', 'depositors_name', 'booking_payments.depositors_mobile_number', 'booking_payments.deposit_reference', 'booking_payments.payment_date', 'booking_payments.note', 'booking_payments.status', 'booking_payments.booking_id', 'users.name as investor_name', 'users.phone', 'users.email', 'users.id', 'booking_payments.payment_method')
@@ -237,10 +209,10 @@ class BookingController extends Controller
         if ($check) {
             Booking::where('id', $booking_id)->update(['status' => 'approved', 'note' => $note, 'discount' => $user_id, 'updated_by' => Auth::guard('administrator')->user()->email]);
             Mail::to($email)->send(new PaymentConfirmationMail());
+
             return redirect()->back()->with('success', 'Payment Approved Successfully');
-        } else {
-            echo "error";
         }
+        echo 'error';
     }
 
     public function payment_reject($booking_id, $note, $user_id)
@@ -251,20 +223,22 @@ class BookingController extends Controller
         if ($check) {
             Booking::where('id', $booking_id)->update(['status' => 'rejected', 'note' => $note, 'discount' => $user_id, 'updated_by' => Auth::guard('administrator')->user()->email]);
             Mail::to($email)->send(new PaymentRejectionMail());
+
             return redirect()->back()->with('success', 'Payment Rejected Successfully');
-        } else {
-            echo "error";
         }
+        echo 'error';
     }
 
     public function decision(Request $request)
     {
-        if ($request->decision == 'approve') {
+        if ('approve' == $request->decision) {
             $this->payment_approve($request->booking_id, $request->note, $request->user_id);
+
             return redirect()->back()->with('success', 'Approved Successfully');
-        } else
-        if ($request->decision == 'reject') {
+        }
+        if ('reject' == $request->decision) {
             $this->payment_reject($request->booking_id, $request->note, $request->user_id);
+
             return redirect()->back()->with('success', 'Rejected Successfully');
         }
     }
@@ -307,7 +281,7 @@ class BookingController extends Controller
     public function paymentProof(Request $request)
     {
         $list = BookingPayment::where('booking_payments.status', 'complete')
-            ->join('bookings', 'bookings.id', "=", 'booking_payments.booking_id')
+            ->join('bookings', 'bookings.id', '=', 'booking_payments.booking_id')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
             ->join('users', 'users.id', '=', 'bookings.user_id')
             ->select('packages.name', 'packages.value', 'bookings.booking_quantity', 'bookings.code', 'booking_payments.payment_document', 'booking_payments.payment_date', 'booking_payments.note', 'booking_payments.status', 'booking_payments.booking_id', 'users.name as investor_name', 'users.phone', 'users.email', 'users.id', 'bookings.updated_by', 'booking_payments.payment_method')
@@ -319,12 +293,36 @@ class BookingController extends Controller
     public function approved_list_bybatch(Request $request)
     {
         $list = BookingPayment::where('booking_payments.status', 'complete')->where('bookings.package_id', $request->package)
-            ->join('bookings', 'bookings.id', "=", 'booking_payments.booking_id')
+            ->join('bookings', 'bookings.id', '=', 'booking_payments.booking_id')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
             ->join('users', 'users.id', '=', 'bookings.user_id')
             ->select('packages.name', 'packages.value', 'bookings.booking_quantity', 'bookings.code', 'booking_payments.payment_document', 'booking_payments.payment_date', 'booking_payments.note', 'booking_payments.status', 'booking_payments.booking_id', 'users.name as investor_name', 'users.phone', 'users.email', 'users.id', 'bookings.updated_by', 'booking_payments.payment_method')
             ->get();
 
         return view('administrator.payment_approved', compact('list'));
+    }
+
+    protected function getAvailableBookingCode()
+    {
+        $attemptLimit = 10;
+        $attemptCount = 0;
+
+        while ($attemptCount < $attemptLimit) {
+            ++$attemptCount;
+            $codes = collect();
+
+            for ($i = 0; $i < 5; ++$i) {
+                $codes->push(random_int(10000000, 99999999));
+            }
+
+            $usedCodes = Booking::whereIn('code', $codes)->pluck('code');
+            $availableCodes = $codes->diff($usedCodes);
+
+            if ($availableCode = $availableCodes->first()) {
+                return $availableCode; // Return the first available code
+            }
+        }
+
+        return null; // Return null if no available code found after attempts
     }
 }

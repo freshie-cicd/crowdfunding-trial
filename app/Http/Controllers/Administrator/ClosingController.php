@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\Administrator;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Models\ClosingRequest;
-use App\Models\User;
+use App\Mail\MigrationConfirmationMail;
 use App\Models\Booking;
 use App\Models\BookingPayment;
+use App\Models\ClosingRequest;
 use App\Models\Package;
-use App\Mail\MigrationConfirmationMail;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-
 
 class ClosingController extends Controller
 {
@@ -36,7 +35,6 @@ class ClosingController extends Controller
         return view('administrator.closing.edit', compact('closing', 'package', 'booking', 'migrationPackage'));
     }
 
-
     public function update(Request $request, $code)
     {
         $validated = $request->validate([
@@ -45,7 +43,7 @@ class ClosingController extends Controller
             'profit_withdrawal_amount' => 'required',
             'package_after_withdrawal' => 'required',
             'after_withdrawal_amount' => 'required',
-            'status' => 'required'
+            'status' => 'required',
         ]);
 
         $booking = Booking::where('code', $code)->select('id', 'user_id')->first();
@@ -64,10 +62,11 @@ class ClosingController extends Controller
             $closing->status = $request->status;
 
             $closing->update();
-            return  redirect()->route('administrator.booking.show', $booking->id)->with('success', 'Closing Request Updated Successfully');
+
+            return redirect()->route('administrator.booking.show', $booking->id)->with('success', 'Closing Request Updated Successfully');
         }
 
-        $closing = new ClosingRequest;
+        $closing = new ClosingRequest();
 
         $closing->user_id = $booking->user_id;
         $closing->booking_code = $code;
@@ -81,20 +80,18 @@ class ClosingController extends Controller
 
         $closing->save();
 
-        return  redirect()->route('administrator.booking.show', $booking->id)->with('success', 'Closing Request Updated Successfully');
+        return redirect()->route('administrator.booking.show', $booking->id)->with('success', 'Closing Request Updated Successfully');
     }
 
     public function migration($booking_code, $investor_id, $package_id)
     {
-
         $bookingPackage = DB::table('packages')
             ->join('bookings', 'bookings.package_id', '=', 'packages.id')
             ->where('bookings.code', $booking_code)
             ->select('packages.*')
             ->first();
         $migrationPackage = DB::table('packages')->where('id', $package_id)->first();
-        $note = 'Migrated from ' . $bookingPackage->name . ' to ' . $migrationPackage->name;
-
+        $note = 'Migrated from '.$bookingPackage->name.' to '.$migrationPackage->name;
 
         $closing_request = DB::table('closing_requests')->where('booking_code', $booking_code)->where('user_id', $investor_id)->where('status', 'requested')->first();
         $user_email = DB::table('users')->where('id', $investor_id)->select('email')->first();
@@ -102,7 +99,6 @@ class ClosingController extends Controller
         // if the user has a package to migrate
 
         if ($closing_request && $closing_request->package_after_withdrawal > 0) {
-
             $previousPayment = DB::table('booking_payments')
                 ->join('bookings', 'bookings.id', '=', 'booking_payments.booking_id')
                 ->where('bookings.code', $booking_code)
@@ -113,7 +109,7 @@ class ClosingController extends Controller
                 return redirect()->back()->with('info', 'You don\'t have any previous payment proof!');
             }
 
-            $book = new Booking;
+            $book = new Booking();
 
             do {
                 $randomNumber = random_int(10000000, 99999999);
@@ -125,21 +121,19 @@ class ClosingController extends Controller
             $book['package_id'] = $package_id;
             $book['booking_quantity'] = $closing_request->package_after_withdrawal;
             $book['status'] = 'approved';
-            $book['note'] =  $note;
+            $book['note'] = $note;
             $check = $book->save();
 
             if ($check) {
                 $previousPaymentId = $previousPayment->id;
 
-
                 $newBookingPayment = BookingPayment::find($previousPaymentId)->replicate();
                 $newBookingPayment->booking_id = $book->id;
                 $newBookingPayment->payment_method = 'migration';
-                $newBookingPayment->deposit_reference = "Previous Payment ID:" . $previousPaymentId . " and Booking ID: " .  $booking_code . ". " . $note;
+                $newBookingPayment->deposit_reference = 'Previous Payment ID:'.$previousPaymentId.' and Booking ID: '.$booking_code.'. '.$note;
                 $newBookingPayment->status = 'complete';
                 $newBookingPayment->note = null;
                 $newBookingPayment->save();
-
 
                 DB::table('bookings')->where('code', $booking_code)->where('user_id', $investor_id)->update(['status' => 'migrated']);
                 DB::table('closing_requests')->where('booking_code', $booking_code)->where('user_id', $investor_id)->update(['status' => 'disbursed']);
@@ -147,14 +141,14 @@ class ClosingController extends Controller
                 $reinvestAmount = $closing_request->after_withdrawal_amount;
                 Mail::to($user_email)->send(new MigrationConfirmationMail($reinvestAmount));
 
-                return redirect()->back()->with('success', "Migrated Successfully, User is informed.");
+                return redirect()->back()->with('success', 'Migrated Successfully, User is informed.');
             }
         } else {
             DB::table('bookings')->where('code', $booking_code)->where('user_id', $investor_id)->update(['status' => 'withdrawn']);
             DB::table('closing_requests')->where('booking_code', $booking_code)->where('user_id', $investor_id)->update(['status' => 'disbursed']);
+
             return redirect()->back()->with('success', 'Withdrawal Request Successfully Updated');
         }
-
 
         return redirect()->back()->with('info', 'Something is Wrong!');
     }

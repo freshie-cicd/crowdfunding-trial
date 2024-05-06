@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class() extends Migration {
     /**
      * Run the migrations.
      */
@@ -26,7 +25,7 @@ return new class extends Migration
             $table->string('temparature');
             $table->string('height');
             $table->string('length');
-            $table->enum('health_status',[ 'normal', 'sick', 'pregnent', 'adnormal'])->default('normal');
+            $table->enum('health_status', ['normal', 'sick', 'pregnent', 'adnormal'])->default('normal');
             $table->boolean('doctor_visited')->default(0);
             $table->string('note')->nullable();
             $table->timestamps();

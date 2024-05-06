@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\BookingPayment;
 use Illuminate\Http\Request;
-use App\Mail\PaymentConfirmationMail;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\Response;
 
 class BookingController extends Controller
 {
@@ -15,14 +14,10 @@ class BookingController extends Controller
         $this->middleware('auth');
     }
 
-
-
-
-
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -36,7 +31,7 @@ class BookingController extends Controller
         $total_investment = 0;
 
         foreach ($bookings as $key => $value) {
-            if ($value->status == 'approved') {
+            if ('approved' == $value->status) {
                 $total_investment += $value->value * $value->booking_quantity;
             }
         }
@@ -46,13 +41,8 @@ class BookingController extends Controller
         return view('mybooking', compact('bookings', 'total_investment', 'checkPendingApproval'));
     }
 
-
-
-
-
     public function myBookings($status)
     {
-
         $bookings = Booking::where('bookings.user_id', auth()->user()->id)
             ->where('bookings.status', $status)
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
@@ -63,7 +53,7 @@ class BookingController extends Controller
         $total_investment = 0;
 
         foreach ($bookings as $key => $value) {
-            if ($value->status == 'approved') {
+            if ('approved' == $value->status) {
                 $total_investment += $value->value * $value->booking_quantity;
             }
         }
@@ -73,22 +63,12 @@ class BookingController extends Controller
         return view('mybooking', compact('bookings', 'total_investment', 'checkPendingApproval'));
     }
 
-
-
-
-
-
-
-
-
     public function proof($booking_id)
     {
-
         $checkPendingApproval = Booking::where('user_id', auth()->user()->id)->where('status', 'pending_approval')->count();
         if ($checkPendingApproval > 0) {
             return redirect()->back()->with('warning', 'You have already submitted a payment, please wait until it is approved.');
         }
-
 
         $data = Booking::where('user_id', auth()->user()->id)
             ->join('packages', 'bookings.package_id', '=', 'packages.id')
@@ -98,7 +78,6 @@ class BookingController extends Controller
 
         return view('payment-proof', compact('data', 'booking_id'));
     }
-
 
     public function proof_store(Request $request)
     {
@@ -119,34 +98,31 @@ class BookingController extends Controller
             'deposit_reference' => 'required',
         ]);
 
-
-        $bookingPayment = new BookingPayment;
+        $bookingPayment = new BookingPayment();
         $bookingPayment['booking_id'] = $request->booking_id;
         $bookingPayment['payment_method'] = $request->payment_method;
         $bookingPayment['payment_date'] = $request->payment_date;
 
         $file = $request->file('file');
         if (!empty($file)) {
-            $file_new_name = rand() . '.' . $request->file('file')->getClientOriginalExtension();
+            $file_new_name = rand().'.'.$request->file('file')->getClientOriginalExtension();
             $file->move(public_path('uploads/payment/documents/'), $file_new_name);
-            $bookingPayment['payment_document'] = "/uploads/payment/documents/" . $file_new_name;
+            $bookingPayment['payment_document'] = '/uploads/payment/documents/'.$file_new_name;
         }
 
         $file2 = $request->file('file2');
         if (!empty($file2)) {
-            $file2_new_name = rand() . '.' . $request->file('file2')->getClientOriginalExtension();
+            $file2_new_name = rand().'.'.$request->file('file2')->getClientOriginalExtension();
             $file2->move(public_path('uploads/payment/documents/'), $file2_new_name);
-            $bookingPayment['document_two'] = "/uploads/payment/documents/" . $file2_new_name;
+            $bookingPayment['document_two'] = '/uploads/payment/documents/'.$file2_new_name;
         }
-
 
         $file3 = $request->file('file3');
         if (!empty($file3)) {
-            $file3_new_name = rand() . '.' . $request->file('file3')->getClientOriginalExtension();
+            $file3_new_name = rand().'.'.$request->file('file3')->getClientOriginalExtension();
             $file3->move(public_path('uploads/payment/documents/'), $file3_new_name);
-            $bookingPayment['document_three'] = "/uploads/payment/documents/" . $file3_new_name;
+            $bookingPayment['document_three'] = '/uploads/payment/documents/'.$file3_new_name;
         }
-
 
         $bookingPayment['bank'] = $request->bank_name;
         $bookingPayment['branch'] = $request->branch;

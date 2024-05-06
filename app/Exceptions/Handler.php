@@ -2,21 +2,18 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
-
 use Illuminate\Auth\AuthenticationException;
-use Auth;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Session\TokenMismatchException;
 
 class Handler extends ExceptionHandler
 {
     /**
      * A list of the exception types that are not reported.
      *
-     * @var array<int, class-string<Throwable>>
+     * @var array<int, class-string<\Throwable>>
      */
     protected $dontReport = [
-        //
     ];
 
     /**
@@ -32,33 +29,29 @@ class Handler extends ExceptionHandler
 
     /**
      * Register the exception handling callbacks for the application.
-     *
-     * @return void
      */
     public function register()
     {
-
         $this->renderable(function (\Exception $e) {
-            if ($e->getPrevious() instanceof \Illuminate\Session\TokenMismatchException) {
+            if ($e->getPrevious() instanceof TokenMismatchException) {
                 return redirect()->route('login');
-            };
+            }
         });
     }
-
 
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         if (in_array('administrator', $exception->guards())) {
             return $request->expectsJson()
                 ? response()->json([
-                    'message' => $exception->getMessage()
+                    'message' => $exception->getMessage(),
                 ], 401)
                 : redirect()->guest(route('administrator.login'));
         }
 
         return $request->expectsJson()
             ? response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], 401)
             : redirect()->guest(route('login'));
     }

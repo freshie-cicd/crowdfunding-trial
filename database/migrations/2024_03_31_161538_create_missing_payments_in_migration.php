@@ -1,11 +1,9 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
-return new class extends Migration
-{
+return new class() extends Migration {
     /**
      * Run the migrations.
      */
@@ -19,7 +17,7 @@ return new class extends Migration
         ];
 
         foreach ($previousCodeToNewCode as $previousCode => $newCode) {
-            $previousPayment =  DB::table('booking_payments')
+            $previousPayment = DB::table('booking_payments')
                 ->where('code', $previousCode)
                 ->join('bookings', 'bookings.id', '=', 'booking_payments.booking_id')
                 ->select('booking_payments.*')
@@ -50,7 +48,7 @@ return new class extends Migration
                         'depositors_mobile_number' => $previousPayment->depositors_mobile_number,
                         'booking_id' => $newBooking->id,
                         'payment_method' => 'migration',
-                        'deposit_reference' => "Previous Payment ID:" . $previousPayment->id . " and Booking ID: " .  $previousCode . " migrated from Batch 4 to Batch 6",
+                        'deposit_reference' => 'Previous Payment ID:'.$previousPayment->id.' and Booking ID: '.$previousCode.' migrated from Batch 4 to Batch 6',
                         'status' => 'complete',
                     ]);
             } else {
@@ -66,7 +64,7 @@ return new class extends Migration
                         'depositors_name' => $previousPayment->depositors_name,
                         'depositors_mobile_number' => $previousPayment->depositors_mobile_number,
                         'payment_method' => 'migration',
-                        'deposit_reference' => "Previous Payment ID:" . $previousPayment->id . " and Booking ID: " .  $previousCode . " migrated from Batch 4 to Batch 6",
+                        'deposit_reference' => 'Previous Payment ID:'.$previousPayment->id.' and Booking ID: '.$previousCode.' migrated from Batch 4 to Batch 6',
                         'status' => 'complete',
                     ]);
             }

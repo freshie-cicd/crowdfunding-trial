@@ -9,10 +9,10 @@ class ExpenseHead extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
-      'parent',
-      'name',
-      'status',
-      'note',
+    protected $fillable = [
+        'parent',
+        'name',
+        'status',
+        'note',
     ];
 }

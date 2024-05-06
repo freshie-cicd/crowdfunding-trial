@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Administrator;
 
 use App\Http\Controllers\Controller;
-use App\Models\ProjectBatch;
 use App\Models\Project;
+use App\Models\ProjectBatch;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ProjectBatchController extends Controller
 {
@@ -18,7 +19,7 @@ class ProjectBatchController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -30,7 +31,7 @@ class ProjectBatchController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -42,12 +43,11 @@ class ProjectBatchController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
     {
-        $batch = new ProjectBatch;
+        $batch = new ProjectBatch();
 
         $batch['project_id'] = $request->project_id;
         $batch['name'] = $request->name;
@@ -56,10 +56,10 @@ class ProjectBatchController extends Controller
 
         if (!empty($request->file('cover_photo'))) {
             $cover_file = $request->file('cover_photo');
-            $cover_file_new_name = rand() . '.' . $request->file('cover_photo')->getClientOriginalExtension();
+            $cover_file_new_name = rand().'.'.$request->file('cover_photo')->getClientOriginalExtension();
             $cover_file->move(public_path('uploads/covers/'), $cover_file_new_name);
 
-            $project['cover_photo'] = "uploads/covers/" . $cover_file_new_name;
+            $project['cover_photo'] = 'uploads/covers/'.$cover_file_new_name;
         }
 
         $batch['ending_date'] = $request->ending_date;
@@ -73,37 +73,35 @@ class ProjectBatchController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Batch  $batch
-     * @return \Illuminate\Http\Response
+     * @param \App\Models\Batch $batch
+     *
+     * @return Response
      */
-    public function show(Batch $batch)
-    {
-        //
-    }
+    public function show(Batch $batch) {}
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Batch  $batch
-     * @return \Illuminate\Http\Response
+     * @param mixed $id
+     *
+     * @return Response
      */
     public function edit($id)
     {
         $data = ProjectBatch::where('id', $id)->get();
         $projects = Project::all();
+
         return view('administrator.project_batch.edit', compact(['data', 'projects']));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Batch  $batch
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, ProjectBatch $projectbatch)
     {
-        $batch = array();
+        $batch = [];
 
         $batch['project_id'] = $request->project_id;
         $batch['name'] = $request->name;
@@ -112,10 +110,10 @@ class ProjectBatchController extends Controller
 
         if (!empty($request->file('cover_photo'))) {
             $cover_file = $request->file('cover_photo');
-            $cover_file_new_name = rand() . '.' . $request->file('cover_photo')->getClientOriginalExtension();
+            $cover_file_new_name = rand().'.'.$request->file('cover_photo')->getClientOriginalExtension();
             $cover_file->move(public_path('uploads/covers/'), $cover_file_new_name);
 
-            $project['cover_photo'] = "uploads/covers/" . $cover_file_new_name;
+            $project['cover_photo'] = 'uploads/covers/'.$cover_file_new_name;
         }
 
         $batch['ending_date'] = $request->ending_date;
@@ -129,13 +127,14 @@ class ProjectBatchController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Batch  $batch
-     * @return \Illuminate\Http\Response
+     * @param mixed $id
+     *
+     * @return Response
      */
     public function destroy($id)
     {
-
         ProjectBatch::where('id', $id)->delete();
+
         return redirect('administrator/batches')->with('success', 'Edited Successfully');
     }
 }

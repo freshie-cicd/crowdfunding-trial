@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Administrator;
 
+use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\AgreementRequest;
 use App\Models\Booking;
-use App\Http\Controllers\AgreementController;
-use PDF;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class Reports extends Controller
@@ -16,7 +15,6 @@ class Reports extends Controller
     {
         $this->middleware('auth:administrator');
     }
-
 
     public function agreementRequests()
     {
@@ -61,7 +59,7 @@ class Reports extends Controller
             ->get();
 
         $total_value = $booking_info[0]->value * $booking_info[0]->booking_quantity;
-        $ac = new AgreementController;
+        $ac = new AgreementController();
         $inWord = $ac->inWords($total_value);
 
         $data = [
@@ -84,16 +82,14 @@ class Reports extends Controller
             'payment_date' => $booking_info[0]->payment_date,
         ];
 
+        $file_name = $booking_info[0]->name.'_'.$code.'.pdf';
 
-        $file_name = $booking_info[0]->name . '_' . $code . '.pdf';
-
-        if ($booking_info[0]->project_id == 1) {
-
-            $pdf = PDF::loadView('administrator.agreement.hardcopy', $data, [], [
+        if (1 == $booking_info[0]->project_id) {
+            $pdf = \PDF::loadView('administrator.agreement.hardcopy', $data, [], [
                 'format' => [209.55, 336.55],
             ]);
         } else {
-            $pdf = PDF::loadView('administrator.agreement.hardcopy_greenify', $data, [], [
+            $pdf = \PDF::loadView('administrator.agreement.hardcopy_greenify', $data, [], [
                 'format' => [209.55, 336.55],
             ]);
         }

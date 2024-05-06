@@ -1,7 +1,9 @@
 <?php
 
-return [
+use App\Models\Administrator;
+use App\Models\User;
 
+return [
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -42,8 +44,7 @@ return [
         ],
         'administrator' => [
             'driver' => 'session',
-            'provider' => 'administrators'
-
+            'provider' => 'administrators',
         ],
     ],
 
@@ -67,11 +68,11 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => User::class,
         ],
         'administrators' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Administrator::class,
+            'model' => Administrator::class,
         ],
     ],
 
@@ -111,5 +112,4 @@ return [
     */
 
     'password_timeout' => 10800,
-
 ];

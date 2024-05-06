@@ -3,20 +3,19 @@
 namespace App\Http\Controllers\Administrator;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
+use App\Models\InvestorBankDetail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
-use App\Models\InvestorBankDetail;
-use App\Models\Booking;
 
 class UserController extends Controller
-
 {
-
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function __construct()
     {
@@ -26,6 +25,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
+
         return view('administrator.investor.index', compact('users'));
     }
 
@@ -53,7 +53,6 @@ class UserController extends Controller
         return view('administrator.investor.change_password', compact('data'));
     }
 
-
     public function store_password(Request $request)
     {
         $validated = $request->validate([
@@ -62,7 +61,6 @@ class UserController extends Controller
 
         $check = User::where('id', $request->id)->update(['password' => Hash::make($request->password)]);
         if ($check) {
-
             return redirect()->back()->with('success', 'Password Changed Successfully');
         }
     }

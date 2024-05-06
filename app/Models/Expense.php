@@ -10,15 +10,15 @@ class Expense extends Model
     use HasFactory;
 
     protected $fillable = [
-      'head',
-      'amount',
-      'submitted_by',
-      'memo',
-      'date',
-      'is_approved',
-      'approved_by',
-      'type',
-      'asset_id',
-      'note',
+        'head',
+        'amount',
+        'submitted_by',
+        'memo',
+        'date',
+        'is_approved',
+        'approved_by',
+        'type',
+        'asset_id',
+        'note',
     ];
 }

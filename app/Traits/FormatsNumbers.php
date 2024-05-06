@@ -4,11 +4,10 @@ namespace App\Traits;
 
 trait FormatsNumbers
 {
-
     public function numberFormatBangladeshi($number)
     {
         // Ensure the number is a string for manipulation
-        $number = (string)$number;
+        $number = (string) $number;
 
         // Check if the number length is more than 3 to start processing
         if (strlen($number) > 3) {
@@ -18,7 +17,7 @@ trait FormatsNumbers
             // Insert commas every two digits for the rest
             $rest = preg_replace('/\B(?=(\d{2})+(?!\d))/', ',', $rest);
 
-            return $rest . ',' . $lastThree;
+            return $rest.','.$lastThree;
         }
 
         // If the number is 3 digits or less, no formatting needed

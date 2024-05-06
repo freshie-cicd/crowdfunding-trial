@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class() extends Migration {
     /**
      * Run the migrations.
      */
@@ -25,7 +24,7 @@ return new class extends Migration
             $table->string('from');
             $table->string('to');
             $table->string('supervisor');
-            $table->enum('status',[ 'active', 'closed', 'maintenance'])->default('active');
+            $table->enum('status', ['active', 'closed', 'maintenance'])->default('active');
             $table->timestamps();
         });
     }

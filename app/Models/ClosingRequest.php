@@ -19,6 +19,6 @@ class ClosingRequest extends Model
         'profit_withdrawal_amount',
         'is_bank_detail_correct',
         'note',
-        'status'
+        'status',
     ];
 }

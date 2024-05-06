@@ -2,19 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Booking;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ClosingController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
     }
-
 
     public function index()
     {
@@ -48,10 +45,8 @@ class ClosingController extends Controller
         return view('closing.index', compact('bookings', 'checkPendingApproval'));
     }
 
-
     public function withdrawal_request($code)
     {
-
         $bank = DB::table('investor_bank_details')->join('banks', 'banks.id', '=', 'investor_bank_details.bank_name')->where('investor_bank_details.user_id', auth()->user()->id)->first();
 
         if (!$bank) {
@@ -61,7 +56,6 @@ class ClosingController extends Controller
         $check = DB::table('closing_requests')->where('booking_code', $code)->count();
 
         if (!$check) {
-
             $data = Booking::where('bookings.code', $code)->where('bookings.user_id', auth()->user()->id)
                 ->join('packages', 'bookings.package_id', '=', 'packages.id')
                 ->select('bookings.code as booking_code', 'bookings.booking_quantity', 'bookings.status as booking_status', 'packages.id as package_id', 'packages.name as package_name', 'packages.value as package_value', 'packages.status as package_status', 'packages.return_amount', 'packages.migration_package_id')
@@ -71,19 +65,16 @@ class ClosingController extends Controller
 
             if ($data) {
                 return view('closing.request', compact('data', 'bank', 'migrationPackage'));
-            } else {
-                return "Cheating?";
             }
-        } else {
-            return redirect()->back()->with('warning', 'You already have a request pending for this booking code.');
+
+            return 'Cheating?';
         }
+
+        return redirect()->back()->with('warning', 'You already have a request pending for this booking code.');
     }
-
-
 
     public function withdrawal_request_store(Request $request)
     {
-
         $validated = $request->validate([
             'booking_code' => 'required',
             'reinvest_quantity' => 'required',
@@ -101,8 +92,8 @@ class ClosingController extends Controller
 
         if ($check) {
             return redirect('mature-batches')->with('success', 'Withdrawal Request Submitted Successfully');
-        } else {
-            return redirect()->back()->with('warning', 'Please try again.');
         }
+
+        return redirect()->back()->with('warning', 'Please try again.');
     }
 }

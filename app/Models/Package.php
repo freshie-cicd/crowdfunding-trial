@@ -10,14 +10,13 @@ class Package extends Model
     use HasFactory;
 
     protected $fillable = [
-      'batch_id',
-      'name',
-      'description',
-      'code',
-      'value',
-      'capacity',
-      'status',
-      'note',
-
+        'batch_id',
+        'name',
+        'description',
+        'code',
+        'value',
+        'capacity',
+        'status',
+        'note',
     ];
 }

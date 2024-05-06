@@ -2,90 +2,84 @@
 
 namespace App\Http\Controllers\Administrator;
 
-
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Package;
 use App\Models\Booking;
+use App\Models\Package;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-
-  /**
-   * Create a new controller instance.
-   *
-   * @return void
-   */
-  public function __construct()
-  {
-    $this->middleware('auth:administrator');
-  }
-
-  /**
-   * Show the application dashboard.
-   *
-   * @return \Illuminate\Http\Response
-   */
-  public function index()
-  {
-
-    if (!auth()->guard('administrator')->user()->hasRole('superadmin')) {
-      return redirect()->route('admin.agreement.requests');
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:administrator');
     }
 
-    $packages = Package::orderBy('id', 'desc')
-      ->select('id', 'name', 'status')
-      ->get();
+    /**
+     * Show the application dashboard.
+     *
+     * @return Response
+     */
+    public function index()
+    {
+        if (!auth()->guard('administrator')->user()->hasRole('superadmin')) {
+            return redirect()->route('admin.agreement.requests');
+        }
 
-    $bookingStats = Booking::select(
-      'bookings.status',
-      DB::raw('SUM(booking_quantity * packages.value) as total_value'),
-      'packages.name as package_name'
-    )
-      ->leftJoin('packages', 'bookings.package_id', '=', 'packages.id')
-      ->groupBy('packages.name', 'bookings.status')
-      ->get();
+        $packages = Package::orderBy('id', 'desc')
+            ->select('id', 'name', 'status')
+            ->get();
 
-    $statuses = ['pending', 'approved', 'rejected', 'pending_approval', 'migrated', 'withdrawn'];
+        $bookingStats = Booking::select(
+            'bookings.status',
+            DB::raw('SUM(booking_quantity * packages.value) as total_value'),
+            'packages.name as package_name'
+        )
+            ->leftJoin('packages', 'bookings.package_id', '=', 'packages.id')
+            ->groupBy('packages.name', 'bookings.status')
+            ->get();
 
-    foreach ($packages as $package) {
-      $package->total_value = $bookingStats->where('package_name', $package->name)->sum('total_value');
-      foreach ($statuses as $status) {
-        $package->{$status} = $bookingStats->where('package_name', $package->name)->where('status', $status)->sum('total_value');
-      }
+        $statuses = ['pending', 'approved', 'rejected', 'pending_approval', 'migrated', 'withdrawn'];
+
+        foreach ($packages as $package) {
+            $package->total_value = $bookingStats->where('package_name', $package->name)->sum('total_value');
+            foreach ($statuses as $status) {
+                $package->{$status} = $bookingStats->where('package_name', $package->name)->where('status', $status)->sum('total_value');
+            }
+        }
+
+        $paymentGraph = $this->paymentGraph();
+
+        return view('administrator.dashboard.index', compact('packages', 'bookingStats', 'statuses', 'paymentGraph'));
     }
 
-    $paymentGraph = $this->paymentGraph();
+    public function indexUnauthorized()
+    {
+        return view('administrator.dashboard.index-unauthorized');
+    }
 
-    return view('administrator.dashboard.index', compact('packages', 'bookingStats', 'statuses', 'paymentGraph'));
-  }
+    private function paymentGraph()
+    {
+        $data = Booking::select(
+            DB::raw('COUNT(*) as total_bookings'),
+            DB::raw('SUM(booking_quantity * packages.value) as total_value'),
+            DB::raw('DATE_FORMAT(bookings.created_at, "%Y-%m-%d") as date')
+        )
+            ->leftJoin('packages', 'bookings.package_id', '=', 'packages.id')
+            ->groupBy('date')
+            ->get();
 
-  private function paymentGraph()
-  {
-    $data = Booking::select(
-      DB::raw('COUNT(*) as total_bookings'),
-      DB::raw('SUM(booking_quantity * packages.value) as total_value'),
-      DB::raw('DATE_FORMAT(bookings.created_at, "%Y-%m-%d") as date')
-    )
-      ->leftJoin('packages', 'bookings.package_id', '=', 'packages.id')
-      ->groupBy('date')
-      ->get();
+        $labels = $data->pluck('date');
+        $series = $data->pluck('total_value');
+        $count = $data->pluck('total_bookings');
 
-    $labels = $data->pluck('date');
-    $series = $data->pluck('total_value');
-    $count = $data->pluck('total_bookings');
-
-
-    return [
-      'labels' => $labels,
-      'series' => $series,
-      'count' => $count
-    ];
-  }
-
-  public function indexUnauthorized()
-  {
-    return view('administrator.dashboard.index-unauthorized');
-  }
+        return [
+            'labels' => $labels,
+            'series' => $series,
+            'count' => $count,
+        ];
+    }
 }
