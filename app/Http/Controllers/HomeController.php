@@ -47,7 +47,6 @@ class HomeController extends Controller
         $book = new Booking();
         do {
             $randomNumber = random_int(10000000, 99999999);
-
             $check = Booking::where('code', $randomNumber)->count();
         } while ($check);
 
@@ -58,7 +57,10 @@ class HomeController extends Controller
         $book['note'] = $request->note;
         $book->save();
 
-        Mail::to(auth()->user()->email)->send(new BookingConfirmationMail());
+        $code = $book['code'];
+
+
+        Mail::to(auth()->user()->email)->send(new BookingConfirmationMail($code));
 
         return redirect('/bookings')->with('success', 'Booking Successfully Submitted. A confirmation mail has been sent to your email address.');
     }
