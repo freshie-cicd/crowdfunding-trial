@@ -103,7 +103,7 @@ class Reports extends Controller
         $role = auth('administrator')->user()->role;
         $packages = DB::table('packages')->where('maturity', 1)->get();
 
-        $data = Booking::whereIn('bookings.status', ['approved', 'withdrawn', 'migrated'])
+        $data = Booking::whereIn('bookings.status', ['approved', 'withdrawn', 'migrated'])->where('packages.maturity', 1)
             ->join('users', 'users.id', '=', 'bookings.user_id')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
             ->leftJoin('investor_bank_details', 'investor_bank_details.user_id', '=', 'bookings.user_id')

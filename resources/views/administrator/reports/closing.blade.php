@@ -51,13 +51,16 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php
+                                    $keyX=1;
+                                @endphp
                                 @foreach($data as $key => $item)
                                 @php
                                 $isAgreementDelivered = $item->agreement_request_status === "delivered";
                                 $isPaid = $item->closing_request_status === "disbursed";
                                 @endphp
                                 <tr>
-                                    <td>{{ $key + 1 }}</td>
+                                    <td>{{ $keyX++}}</td>
                                     <td>
                                         {{ $item->code }}
                                     </td>
