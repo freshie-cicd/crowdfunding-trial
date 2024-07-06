@@ -200,4 +200,9 @@ class HomeController extends Controller
             echo 'error';
         }
     }
+
+    public function profile_blocked()
+    {
+        return view('profile_blocked');
+    }
 }

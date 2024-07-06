@@ -105,8 +105,8 @@
                             <input type="text" class="form-control" id="nominee_address" name="nominee_address" value="{{ $user->nominee_address }}" readonly>
                         </div>
                         <div class="form-group">
-                            <label for="is_active">Status</label>
-                            <input type="text" class="form-control" id="is_active" name="is_active" value="{{ $user->is_active ? 'Active' : 'Inactive' }}" readonly>
+                            <label for="status">Status</label>
+                            <input type="text" class="form-control" id="status" name="status" value="{{ $user->status }}" readonly>
                         </div>
                         <div class="form-group">
                             <label for="created_at">Member Since</label>

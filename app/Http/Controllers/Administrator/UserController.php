@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Administrator;
 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\InvestorBankDetail;
@@ -22,9 +23,13 @@ class UserController extends Controller
         $this->middleware('auth:administrator');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+        $status = $request->status;
+
+        $users = User::when($status, function($query, $status){
+            $query->where('status', $status);
+        })->get();
 
         return view('administrator.investor.index', compact('users'));
     }
@@ -64,4 +69,29 @@ class UserController extends Controller
             return redirect()->back()->with('success', 'Password Changed Successfully');
         }
     }
+
+
+    public function block($userId)
+    {
+        $check = User::where('id', $userId)->update(['status' =>'blocked']);
+
+        if($check){
+            return redirect()->back()->with('success', 'Blocked Successfully.');
+        }
+
+        return redirect()->back()->with('warning', 'Blocking Unccessful.');
+    }
+
+    public function unblock($userId)
+    {
+        $check = User::where('id', $userId)->update(['status' =>'active']);
+
+        if($check){
+            return redirect()->back()->with('success', 'Unblocked Successfully.');
+        }
+
+        return redirect()->back()->with('warning', 'Unblocking Unccessful.');
+    }
+
+
 }

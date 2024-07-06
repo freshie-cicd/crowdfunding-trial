@@ -36,7 +36,7 @@ class User extends Authenticatable
         'nominee_address',
         'nominee_relation',
         'nominee_nid',
-        'is_active',
+        'status',
         'password',
     ];
 
