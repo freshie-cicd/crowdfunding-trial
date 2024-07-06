@@ -98,9 +98,10 @@ class Reports extends Controller
     }
 
     // for customer support
-    public function closingReport()
+    public function closingReport(Request $request)
     {
         $role = auth('administrator')->user()->role;
+        $packages = DB::table('packages')->where('maturity', 1)->get();
 
         $data = Booking::whereIn('bookings.status', ['approved', 'withdrawn', 'migrated'])
             ->join('users', 'users.id', '=', 'bookings.user_id')
@@ -109,7 +110,6 @@ class Reports extends Controller
             ->leftJoin('banks', 'banks.id', '=', 'investor_bank_details.bank_name')
             ->leftJoin('closing_requests', 'closing_requests.booking_code', '=', 'bookings.code')
             ->leftJoin('agreement_requests', 'agreement_requests.booking_code', '=', 'bookings.code')
-            ->where('bookings.package_id', '=', 2)
             ->select(
                 'bookings.*',
                 'packages.value as package_value',
@@ -130,6 +130,10 @@ class Reports extends Controller
             ->orderBy('bookings.user_id', 'asc')
             ->get();
 
-        return view('administrator.reports.closing', compact('data', 'role'));
+        if (!empty($request->package_id)) {
+            $data = $data->where('package_id', '=', $request->package_id);
+        }
+
+        return view('administrator.reports.closing', compact('data', 'role', 'packages'));
     }
 }

@@ -4,13 +4,29 @@
 
 @section('content')
 <div class="container-fluid">
+
+
     <div class="row">
         <div class="col-12">
+            <div class="row justify-content-end">
+            <div class="col-3 mb-2">
+                <form method="get" action="" class="form-control">
+                    <select class="form-control form-select" name='package_id' id="package_id" onchange='updateFilter()'>
+                         <option value=''>Please Select</option>
+                        @foreach ($packages as $package)
+                            <option value='{{ $package->id }}' {{ request()->package_id == $package->id ? 'selected' : '' }}>{{ $package->name }}</option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
+        </div>
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Closing Reports</h4>
                 </div>
+
                 <div class="card-body">
+
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered">
                             <thead>
@@ -70,4 +86,18 @@
         </div>
     </div>
 </div>
+
+
+
+<script>
+    function updateFilter() {
+        let package_id = document.getElementById('package_id').value;
+
+        let url = new URL(window.location.href);
+        url.searchParams.set('package_id', package_id);
+
+        window.location.href = url.toString();
+    }
+</script>
+
 @endsection
