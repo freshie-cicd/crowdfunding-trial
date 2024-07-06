@@ -15,4 +15,5 @@ mix.js("resources/js/app.js", "public/js")
     .sass("resources/sass/app.scss", "public/css")
     .postCss("resources/css/app.css", "public/css", [require("tailwindcss")])
     .browserSync("127.0.0.1:80")
-    .disableNotifications();
+    .disableNotifications()
+    .version();

@@ -1,137 +1,33 @@
-<!doctype html>
-
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
-<head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="refresh" content="{{ config('session.lifetime') * 60 }}">
-
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- fav icon -->
-    <link href="https://www.freshie.farm/wp-content/uploads/2021/04/cropped-fre-270x270.png" rel="icon">
-
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-
-    <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/main.css') }}" rel="stylesheet">
-</head>
-
-<body>
-
-    <div id="app">
-
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm">
-
-            <div class="container">
-
-                <a class="navbar-brand" href="{{ url('/') }}">
-
-                    <img src="https://www.freshie.farm/wp-content/uploads/2021/04/freshi_light.png" width="100px" />
-
+<nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand ml-4" href="{{ url('/') }}">
+            <img src="https://www.freshie.farm/wp-content/uploads/2021/04/freshi_light.png" width="100px" />
+        </a>
+        <div>
+            <!-- Authentication Links -->
+            @guest
+            <!-- Add any guest-specific links here -->
+            @else
+            <div>
+                <a class="text-white" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <div class="flex flex-row mr-4 p-2 rounded-md border-1 border-solid border-white">
+                        <span>{{ __('Logout') }} </span>
+                        <svg class="w-6 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path d="M21 12L13 12" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M18 15L20.913 12.087V12.087C20.961 12.039 20.961 11.961 20.913 11.913V11.913L18 9" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M16 5V4.5V4.5C16 3.67157 15.3284 3 14.5 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H14.5C15.3284 21 16 20.3284 16 19.5V19.5V19" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </g>
+                        </svg>
+                    </div>
                 </a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-
-                    <span class="navbar-toggler-icon"></span>
-
-                </button>
-
-
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-
-                    <!-- Left Side Of Navbar -->
-
-                    <ul class="navbar-nav me-auto">
-
-
-
-                    </ul>
-
-
-
-                    <!-- Right Side Of Navbar -->
-
-                    <ul class="navbar-nav ms-auto">
-
-                        <!-- Authentication Links -->
-
-                        @guest
-
-                        @if (Route::has('login'))
-
-                        <li class="nav-item">
-
-                            <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-
-                        </li>
-
-                        @endif
-
-
-
-                        @if (Route::has('register'))
-
-                        <li class="nav-item">
-
-                            <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-
-                        </li>
-
-                        @endif
-
-                        @else
-
-                        <li class="nav-item dropdown">
-
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-
-                                {{ Auth::user()->name }}
-
-                            </a>
-
-
-
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-
-                                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-
-                                                     document.getElementById('logout-form').submit();">
-
-                                    {{ __('Logout') }}
-
-                                </a>
-
-
-
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-
-                                    @csrf
-
-                                </form>
-
-                            </div>
-
-                        </li>
-
-                        @endguest
-
-                    </ul>
-
-                </div>
-
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
             </div>
-
-        </nav>
+            @endguest
+        </div>
+    </div>
+</nav>
