@@ -10,7 +10,7 @@
             @else
             <div>
                 <a class="text-white" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <div class="flex flex-row mr-4 p-2 rounded-md border-1 border-solid border-white">
+                    <div class="flex flex-row mr-4 pr-0 pl-2 py-2 rounded-md border-1 border-solid border-white">
                         <span>{{ __('Logout') }} </span>
                         <svg class="w-6 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
