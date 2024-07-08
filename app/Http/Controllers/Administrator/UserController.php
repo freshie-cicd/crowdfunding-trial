@@ -51,6 +51,18 @@ class UserController extends Controller
         return view('administrator.investor.show', compact('user', 'bankDetails', 'bookings'));
     }
 
+    public function update(Request $request)
+    {
+        $check = User::where('id', $request->user_id)->update(['status' => $request->status]);
+
+        if($check){
+            return redirect()->back()->with('success', 'Status Update Successful');
+        }
+
+        return redirect()->back()->with('warning', 'Status Update Failed');
+
+    }
+
     public function change_password($id)
     {
         $data = User::where('id', $id)->get();

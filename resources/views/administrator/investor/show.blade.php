@@ -32,6 +32,7 @@
                             <h1 class="text-2xl font-semibold">Investor Details</h1>
 
                         </div>
+                    <form action="{{ route('admin.investor.profile.update') }}" method="get">
                         <div class="form-group">
                             <label for="code">Name</label>
                             <input type="text" class="form-control" id="code" name="code" value="{{ $user->name }}" readonly>
@@ -106,7 +107,12 @@
                         </div>
                         <div class="form-group">
                             <label for="status">Status</label>
-                            <input type="text" class="form-control" id="status" name="status" value="{{ $user->status }}" readonly>
+                            <select type="text" class="form-select form-control" id="status" name="status">
+                                <option value="active" {{ $user->status=="active" ? "selected" : "" }}>Active</option>
+                                <option value="blocked" {{ $user->status=="blocked" ? "selected" : "" }}>Blocked</option>
+                                <option value="verification_pending" {{ $user->status=="verification_pending" ? "selected" : "" }}>Verification Pending</option>
+                                <option value="suspecious" {{ $user->status=="suspecious" ? "selected" : "" }}>Suspecious</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="created_at">Member Since</label>
@@ -114,6 +120,9 @@
                         </div>
                     </div>
                 </div>
+                <input type="hidden" value="{{ $user->id }}" name="user_id">
+                <button class="btn btn-md btn-primary mt-4 " type="submit">Update</button>
+            </form>
             </div>
         </div>
 

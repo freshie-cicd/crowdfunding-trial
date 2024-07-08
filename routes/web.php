@@ -50,6 +50,7 @@ Route::namespace('Administrator')
 
         Route::get('/investor/profiles', [UserController::class, 'index'])->name('admin.investor.profile');
         Route::get('/investor/profiles/{id}', [UserController::class, 'show'])->name('administrator.investor.profile.show');
+        Route::get('/investor/profile/update', [UserController::class, 'update'])->name('admin.investor.profile.update');
 
         Route::get('/bookings', [App\Http\Controllers\Administrator\BookingController::class, 'index'])->name('administrator.booking.index');
         Route::get('/bookings/create/{investor_id}', [App\Http\Controllers\Administrator\BookingController::class, 'create'])->name('administrator.booking.create');
