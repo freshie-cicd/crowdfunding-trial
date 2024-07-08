@@ -100,7 +100,7 @@
               <span>
                 <strong>
                   {{ $migrationPackage->name }} Starting Date: {{ date('d M Y', strtotime($migrationPackage->start_date)) }} <br>
-                  Any investment Before this date will not be considered for profit calculation.
+                  Investments made before this date will not be included in the profit calculation. Thank you for your understanding.
                 </strong>
               </span>
               @error('reinvest_quantity')
@@ -133,11 +133,11 @@
           <hr>
 
           <div class="offset-md-4 pb-4">
-            <p style="line-height: 10px;">Bank Name: <b>{{ $bank->bank_name ?? '' }}</b></p>
-            <p style="line-height: 10px">Branch Name: <b>{{ $bank->branch_name ?? '' }}</b></p>
-            <p style="line-height: 10px">Account Name: <b>{{ $bank->account_name ?? '' }}</b></p>
-            <p style="line-height: 10px">Account Number: <b>{{ $bank->account_number ?? '' }}</b></p>
-            <p style="line-height: 10px">Routing Number: <b>{{ $bank->routing_number ?? '' }}</b></p>
+            <p>Bank Name: <b>{{ $bank->bank_name ?? '' }}</b></p>
+            <p>Branch Name: <b>{{ $bank->branch_name ?? '' }}</b></p>
+            <p>Account Name: <b>{{ $bank->account_name ?? '' }}</b></p>
+            <p>Account Number: <b>{{ $bank->account_number ?? '' }}</b></p>
+            <p>Routing Number: <b>{{ $bank->routing_number ?? '' }}</b></p>
           </div>
 
 
