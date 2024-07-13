@@ -123,6 +123,7 @@ Route::namespace('Administrator')
         Route::get('/reports/hard-copy/{code}/download', [Reports::class, 'hard_copy_download'])->name('admin.agreement.download');
 
         Route::get('/reports/closing-investor', [Reports::class, 'closingReport'])->name('reports.closing');
+        Route::get('/reports/closing-sheet', [Reports::class, 'closingSheet'])->name('reports.closing.sheet');
     });
 
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');

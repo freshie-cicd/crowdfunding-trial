@@ -9,6 +9,7 @@ use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+
 class Reports extends Controller
 {
     public function __construct()
@@ -135,5 +136,54 @@ class Reports extends Controller
         }
 
         return view('administrator.reports.closing', compact('data', 'role', 'packages'));
+    }
+
+    public function closingSheet(Request $request)
+    {
+        $filterPackage = $request->package_id;
+
+        $closingInfo = DB::table('closing_requests')
+                    ->leftJoin('bookings', 'bookings.code', '=', 'closing_requests.booking_code')
+                    ->leftJoin('investor_bank_details', 'investor_bank_details.user_id', '=', 'bookings.user_id')
+                    ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
+                    ->leftJoin('agreement_requests', 'agreement_requests.booking_code', '=', 'bookings.code')
+                    ->leftJoin('users', 'users.id', '=', 'bookings.user_id')
+                    ->select(
+                        'bookings.id',
+                        'bookings.code as booking_code',
+                        'bookings.booking_quantity as booking_quantity',
+                        'bookings.status',
+                        'investor_bank_details.account_name',
+                        'investor_bank_details.account_number',
+                        'investor_bank_details.routing_number',
+                        'closing_requests.capital_withdrawal_amount',
+                        'closing_requests.profit_withdrawal_amount',
+                        'users.phone',
+                        'closing_requests.user_id'
+                    )
+                    ->when($filterPackage, function($query, $filterPackage){
+                        $query->where('bookings.package_id', $filterPackage);
+                    })
+                    ->orderBy('closing_requests.id')->get();
+
+
+        $counter = 1;
+        $check = [' ', '.', '-', '+'];
+
+        $packages = DB::table('packages')->where('maturity', 1)->get();
+
+
+        if($request->shortlist){
+            $users = DB::table('users')->join('bookings', 'bookings.user_id', '=', 'users.id')->join('closing_requests', 'closing_requests.booking_code', '=', 'bookings.code')
+                    ->when($filterPackage, function($query, $filterPackage){
+                         $query->where('bookings.package_id', $filterPackage);
+                      })->distinct()->select('users.id')->orderBy('closing_requests.id')->get();
+
+            return view('administrator.reports.bank_sheet_shortlist', compact('closingInfo', 'counter', 'check', 'packages', 'users'));
+        }
+
+        return view('administrator.reports.bank_sheet', compact('closingInfo', 'counter', 'check', 'packages'));
+
+
     }
 }

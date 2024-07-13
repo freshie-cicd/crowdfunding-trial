@@ -83,7 +83,8 @@
             <div class="sub-menu-list">
               <ul>
                 <li class="menu-item"><a href="{{ route('admin.agreement.requests') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Agreement Paper Requests</span></a></li>
-                <li class="menu-item"><a href="{{ route('reports.closing') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Closing</span></a></li>
+                <li class="menu-item"><a href="{{ route('reports.closing') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Closing  Report</span></a></li>
+                <li class="menu-item"><a href="{{ route('reports.closing.sheet') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Closing Bank Sheet</span></a></li>
               </ul>
             </div>
           </li>
