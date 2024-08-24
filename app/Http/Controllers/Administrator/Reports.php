@@ -24,10 +24,11 @@ class Reports extends Controller
             ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
             ->select(
                 'agreement_requests.*',
-                'users.*',
+                'users.name',
                 'packages.name as package_name',
                 'agreement_requests.note as note',
                 'agreement_requests.id as id'
+
             )
             ->get();
 
