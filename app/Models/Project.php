@@ -14,6 +14,11 @@ class Project extends Model
         'description',
         'code',
         'status',
-        'cover',
+        'cover_photo',
     ];
+
+    public function packages()
+    {
+        return $this->hasMany(Package::class);
+    }
 }

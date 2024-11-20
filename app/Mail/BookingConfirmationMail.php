@@ -11,13 +11,15 @@ class BookingConfirmationMail extends Mailable
     use Queueable;
     use SerializesModels;
 
-
     public $code;
 
     /**
      * Create a new message instance.
+     *
+     * @param mixed $code
      */
-    public function __construct($code) {
+    public function __construct($code)
+    {
         $this->code = $code;
     }
 

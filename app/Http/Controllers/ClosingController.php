@@ -20,7 +20,7 @@ class ClosingController extends Controller
             ->where('bookings.user_id', auth()->user()->id)
             ->where('packages.maturity', 1)
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->leftJoin('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
+            ->leftJoin('facebook_groups', 'facebook_groups.project_id', '=', 'packages.project_id')
             ->leftJoin('closing_requests', 'closing_requests.booking_code', '=', 'bookings.code')
             ->select(
                 'bookings.code',

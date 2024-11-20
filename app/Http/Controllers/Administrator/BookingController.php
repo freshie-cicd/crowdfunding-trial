@@ -249,8 +249,7 @@ class BookingController extends Controller
             ->join('bookings', 'users.id', '=', 'bookings.user_id')
             ->join('booking_payments', 'bookings.id', '=', 'booking_payments.booking_id')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->join('project_batches', 'project_batches.id', '=', 'packages.batch_id')
-            ->join('projects', 'projects.id', '=', 'project_batches.project_id')
+            ->join('projects', 'projects.id', '=', 'packages.project_id')
             ->select(
                 'users.id as user_id',
                 'users.name as user_name',

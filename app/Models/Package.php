@@ -10,7 +10,7 @@ class Package extends Model
     use HasFactory;
 
     protected $fillable = [
-        'batch_id',
+        'project_id',
         'name',
         'description',
         'code',
@@ -18,5 +18,16 @@ class Package extends Model
         'capacity',
         'status',
         'note',
+        'maturity',
+        'return_amount',
+        'migration_package_id',
+        'start_date',
+        'end_date',
+        'cover_url',
     ];
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
 }

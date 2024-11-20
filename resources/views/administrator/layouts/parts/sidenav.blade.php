@@ -27,7 +27,13 @@
             </a>
           </li>
 
-          <li class="menu-item sub-menu {{request()->is('administrator/projects') || request()->is('administrator/batches') ? 'open' : ''}}">
+          <li class="menu-item">
+            <a href="{{ route('project.index') }}">
+              <span class="menu-icon"><i class="fa-solid fa-calendar-day"></i></span><span class="menu-title">Projects</span>
+            </a>
+          </li>
+
+          {{-- <li class="menu-item sub-menu {{request()->is('administrator/projects') || request()->is('administrator/batches') ? 'open' : ''}}">
 
             <a href="#">
               <span class="menu-icon"><i class="fa-solid fa-gear"></i></span><span class="menu-title">Projects</span>
@@ -39,7 +45,7 @@
                 <li class="menu-item"><a href="{{ route('batch.index') }}"><span class="menu-icon"><i class="fa-solid fa-caret-right"></i></span><span class="menu-title">Batches</span></a></li>
               </ul>
             </div>
-          </li>
+          </li> --}}
 
           <li class="menu-item">
             <a href="{{ route('package.index') }}">

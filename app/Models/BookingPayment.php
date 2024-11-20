@@ -18,4 +18,9 @@ class BookingPayment extends Model
         'document_three',
         'note',
     ];
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
+    }
 }

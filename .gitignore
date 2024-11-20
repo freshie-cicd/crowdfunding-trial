@@ -18,3 +18,5 @@ yarn-error.log
 .ftpquota
 error_log
 .php-cs-fixer.cache
+package-lock.json
+composer.lock

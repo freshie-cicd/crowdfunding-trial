@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Administrator;
 
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\InvestorBankDetail;
@@ -27,7 +26,7 @@ class UserController extends Controller
     {
         $status = $request->status;
 
-        $users = User::when($status, function($query, $status){
+        $users = User::when($status, function ($query, $status) {
             $query->where('status', $status);
         })->get();
 
@@ -44,8 +43,8 @@ class UserController extends Controller
 
         $bookings = Booking::where('bookings.user_id', $id)
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->leftJoin('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
-            ->select('bookings.code', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.batch_id', 'facebook_groups.url', 'packages.status as package_status', 'packages.name as package_name')
+            ->leftJoin('facebook_groups', 'facebook_groups.project_id', '=', 'packages.project_id')
+            ->select('bookings.code', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.project_id', 'facebook_groups.url', 'packages.status as package_status', 'packages.name as package_name')
             ->get();
 
         return view('administrator.investor.show', compact('user', 'bankDetails', 'bookings'));
@@ -55,12 +54,11 @@ class UserController extends Controller
     {
         $check = User::where('id', $request->user_id)->update(['status' => $request->status]);
 
-        if($check){
+        if ($check) {
             return redirect()->back()->with('success', 'Status Update Successful');
         }
 
         return redirect()->back()->with('warning', 'Status Update Failed');
-
     }
 
     public function change_password($id)
@@ -82,12 +80,11 @@ class UserController extends Controller
         }
     }
 
-
     public function block($userId)
     {
-        $check = User::where('id', $userId)->update(['status' =>'blocked']);
+        $check = User::where('id', $userId)->update(['status' => 'blocked']);
 
-        if($check){
+        if ($check) {
             return redirect()->back()->with('success', 'Blocked Successfully.');
         }
 
@@ -96,14 +93,12 @@ class UserController extends Controller
 
     public function unblock($userId)
     {
-        $check = User::where('id', $userId)->update(['status' =>'active']);
+        $check = User::where('id', $userId)->update(['status' => 'active']);
 
-        if($check){
+        if ($check) {
             return redirect()->back()->with('success', 'Unblocked Successfully.');
         }
 
         return redirect()->back()->with('warning', 'Unblocking Unccessful.');
     }
-
-
 }

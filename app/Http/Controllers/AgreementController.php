@@ -36,41 +36,37 @@ class AgreementController extends Controller
 
     public function download($booking_id)
     {
-        $booking_info = Booking::where('bookings.id', $booking_id)
-            ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->join('project_batches', 'packages.batch_id', '=', 'project_batches.id')
-            ->join('booking_payments', 'booking_payments.booking_id', '=', 'bookings.id')
-            ->select('bookings.booking_quantity', 'packages.value', 'packages.note', 'bookings.code', 'project_batches.starting_date', 'project_batches.ending_date', 'bookings.code', 'booking_payments.payment_date', 'project_batches.project_id')
-            ->first();
+        $booking_info = Booking::with('package', 'bookingPayment', 'user')->whereId($booking_id)->first();
 
-        $total_value = $booking_info->value * $booking_info->booking_quantity;
+        $total_value = $booking_info->package->value * $booking_info->booking_quantity;
+
         $inWord = $this->inWords($total_value);
 
         $data = [
-            'name' => auth()->user()->name,
-            'nid' => auth()->user()->nid,
-            'father_name' => auth()->user()->father_name,
-            'mother_name' => auth()->user()->mother_name,
-            'permanent_address' => auth()->user()->permanent_address,
-            'present_address' => auth()->user()->present_address,
-            'nominee_name' => auth()->user()->nominee_name,
-            'nominee_address' => auth()->user()->nominee_address,
-            'nominee_relation' => auth()->user()->nominee_relation,
+            'name' => $booking_info->user->name,
+            'nid' => $booking_info->user->nid,
+            'father_name' => $booking_info->user->father_name,
+            'mother_name' => $booking_info->user->mother_name,
+            'permanent_address' => $booking_info->user->permanent_address,
+            'present_address' => $booking_info->user->present_address,
+            'nominee_name' => $booking_info->user->nominee_name,
+            'nominee_address' => $booking_info->user->nominee_address,
+            'nominee_relation' => $booking_info->user->nominee_relation,
             'booking_id' => $booking_id,
-            'project_ending_date' => $booking_info->ending_date,
-            'project_starting_date' => $booking_info->starting_date,
-            'value' => $booking_info->value,
+            'project_ending_date' => $booking_info->package->end_date,
+            'project_starting_date' => $booking_info->package->start_date,
+            'value' => $booking_info->package->value,
             'booking_quantity' => $booking_info->booking_quantity,
             'booking_code' => $booking_info->code,
             'inWords' => $inWord,
-            'payment_date' => $booking_info->payment_date,
+            'payment_date' => $booking_info->bookingPayment->payment_date,
         ];
 
-        $file_name = auth()->user()->name.'_'.$booking_id.'.pdf';
+        $file_name = $booking_info->user->name.'_'.$booking_id.'.pdf';
 
-        if (1 == $booking_info->project_id) {
+        if (1 == $booking_info->package->project_id) {
             $pdf = \PDF::loadView('agreement.paper', $data);
-        } elseif (2 == $booking_info->project_id) {
+        } elseif (2 == $booking_info->package->project_id) {
             $pdf = \PDF::loadView('agreement.paper_greenify', $data);
         } else {
             dd('Invalid Project');
@@ -87,15 +83,34 @@ class AgreementController extends Controller
         $i = 0;
         $str = [];
         $words = [
-            0 => '', 1 => 'One', 2 => 'Two',
-            3 => 'Three', 4 => 'Four', 5 => 'Five', 6 => 'Six',
-            7 => 'Seven', 8 => 'Eight', 9 => 'Nine',
-            10 => 'Ten', 11 => 'eleven', 12 => 'twelve',
-            13 => 'thirteen', 14 => 'fourteen', 15 => 'fifteen',
-            16 => 'sixteen', 17 => 'seventeen', 18 => 'eighteen',
-            19 => 'nineteen', 20 => 'twenty', 30 => 'thirty',
-            40 => 'forty', 50 => 'fifty', 60 => 'sixty',
-            70 => 'seventy', 80 => 'eighty', 90 => 'ninety',
+            0 => '',
+            1 => 'One',
+            2 => 'Two',
+            3 => 'Three',
+            4 => 'Four',
+            5 => 'Five',
+            6 => 'Six',
+            7 => 'Seven',
+            8 => 'Eight',
+            9 => 'Nine',
+            10 => 'Ten',
+            11 => 'eleven',
+            12 => 'twelve',
+            13 => 'thirteen',
+            14 => 'fourteen',
+            15 => 'fifteen',
+            16 => 'sixteen',
+            17 => 'seventeen',
+            18 => 'eighteen',
+            19 => 'nineteen',
+            20 => 'twenty',
+            30 => 'thirty',
+            40 => 'forty',
+            50 => 'fifty',
+            60 => 'sixty',
+            70 => 'seventy',
+            80 => 'eighty',
+            90 => 'ninety',
         ];
         $digits = ['', 'hundred', 'thousand', 'lakh', 'crore'];
         while ($i < $digits_length) {
@@ -128,9 +143,8 @@ class AgreementController extends Controller
 
         $data = Booking::where('bookings.id', $id)->where('bookings.status', 'approved')
             ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
-            ->leftJoin('project_batches', 'packages.batch_id', '=', 'project_batches.id')
             ->leftJoin('booking_payments', 'booking_payments.booking_id', '=', 'bookings.id')
-            ->select('bookings.booking_quantity', 'packages.value', 'packages.note', 'bookings.code', 'project_batches.ending_date', 'bookings.code', 'booking_payments.payment_date')
+            ->select('bookings.booking_quantity', 'packages.value', 'packages.note', 'bookings.code', 'packages.end_date', 'bookings.code', 'booking_payments.payment_date')
             ->get();
 
         return view('agreement.hardcopy_request', compact('data'));

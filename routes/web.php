@@ -7,7 +7,6 @@ use App\Http\Controllers\Administrator\Auth\LoginController;
 use App\Http\Controllers\Administrator\DashboardController;
 use App\Http\Controllers\Administrator\PackageController;
 use App\Http\Controllers\Administrator\PaymentController;
-use App\Http\Controllers\Administrator\ProjectBatchController;
 use App\Http\Controllers\Administrator\ProjectController;
 use App\Http\Controllers\Administrator\Reports;
 use App\Http\Controllers\Administrator\UserController;
@@ -15,6 +14,7 @@ use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ClosingController;
 use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -72,17 +72,11 @@ Route::namespace('Administrator')
         Route::post('/project/update', [ProjectController::class, 'update'])->name('project.update');
         Route::get('/project/delete/{id}', [ProjectController::class, 'destroy'])->name('project.delete');
 
-        Route::get('/batches', [ProjectBatchController::class, 'index'])->name('batch.index');
-        Route::get('/batch/create', [ProjectBatchController::class, 'create'])->name('batch.create');
-        Route::post('/batch/store', [ProjectBatchController::class, 'store'])->name('batch.store');
-        Route::get('/batch/edit/{id}', [ProjectBatchController::class, 'edit'])->name('batch.edit');
-        Route::post('/batch/update', [ProjectBatchController::class, 'update'])->name('batch.update');
-        Route::get('/batch/delete/{id}', [ProjectBatchController::class, 'destroy'])->name('batch.delete');
-
         Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
         Route::get('/package/create', [PackageController::class, 'create'])->name('package.create');
         Route::post('/package/store', [PackageController::class, 'store'])->name('package.store');
-        Route::get('/package/edit/{id}', [PackageController::class, 'edit'])->name('package.edit');
+        Route::get('/package/edit/{package}', [PackageController::class, 'edit'])->name('package.edit');
+
         Route::post('/package/update', [PackageController::class, 'update'])->name('package.update');
         Route::get('/package/delete/{id}', [PackageController::class, 'destroy'])->name('package.delete');
 
@@ -126,44 +120,40 @@ Route::namespace('Administrator')
         Route::get('/reports/closing-sheet', [Reports::class, 'closingSheet'])->name('reports.closing.sheet');
     });
 
-    Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
-    Route::get('/profile/edit', [HomeController::class, 'profile_edit'])->name('profile.edit');
-    Route::post('/profile/update', [HomeController::class, 'profile_update'])->name('profile.update');
-    Route::get('/profile/blocked', [HomeController::class, 'profile_blocked'])->name('profile.blocked');
+Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
+Route::get('/profile/edit', [HomeController::class, 'profile_edit'])->name('profile.edit');
+Route::post('/profile/update', [HomeController::class, 'profile_update'])->name('profile.update');
+Route::get('/profile/blocked', [HomeController::class, 'profile_blocked'])->name('profile.blocked');
 
-    Route::middleware(['verification'])->group(function(){
+Route::middleware(['verification'])->group(function () {
+    Route::get('/', [HomeController::class, 'dashboard'])->name('index');
+    Route::get('/home', [HomeController::class, 'dashboard'])->name('home');
+    Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 
-        Route::get('/', [HomeController::class, 'dashboard'])->name('index');
-        Route::get('/home', [HomeController::class, 'dashboard'])->name('home');
-        Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+    Route::get('/packages', [HomeController::class, 'index'])->name('packages');
 
-        Route::get('/packages', [HomeController::class, 'index'])->name('packages');
+    Route::get('profile/change_password', [HomeController::class, 'change_password'])->name('change_password');
+    Route::post('profile/change_password/update', [HomeController::class, 'change_password_update'])->name('change_password.update');
 
-        Route::get('profile/change_password', [HomeController::class, 'change_password'])->name('change_password');
-        Route::post('profile/change_password/update', [HomeController::class, 'change_password_update'])->name('change_password.update');
+    Route::get('/investor/bank', [HomeController::class, 'bank_details'])->name('investor.bank.details');
+    Route::post('/investor/update', [HomeController::class, 'bank_details_update'])->name('investor.bank.details.update');
 
-        Route::get('/investor/bank', [HomeController::class, 'bank_details'])->name('investor.bank.details');
-        Route::post('/investor/update', [HomeController::class, 'bank_details_update'])->name('investor.bank.details.update');
+    Route::get('/book/{id}/package', [HomeController::class, 'book'])->name('book');
+    Route::post('/book/store', [HomeController::class, 'store'])->name('book.store');
 
-        Route::get('/book/{id}/package', [HomeController::class, 'book'])->name('book');
-        Route::post('/book/store', [HomeController::class, 'store'])->name('book.store');
+    Route::get('/bookings', [BookingController::class, 'index'])->name('mybookings');
+    Route::get('/bookings/{status}', [BookingController::class, 'myBookings'])->name('mybookings_');
 
-        Route::get('/bookings', [BookingController::class, 'index'])->name('mybookings');
-        Route::get('/bookings/{status}', [BookingController::class, 'myBookings'])->name('mybookings_');
+    Route::get('/payment-proof/{booking_id}/submit', [BookingController::class, 'proof'])->name('paymentProof');
+    Route::post('/payment-proof/store', [BookingController::class, 'proof_store'])->name('paymentProofStore');
 
-        Route::get('/payment-proof/{booking_id}/submit', [BookingController::class, 'proof'])->name('paymentProof');
-        Route::post('/payment-proof/store', [BookingController::class, 'proof_store'])->name('paymentProofStore');
+    Route::get('/agreements', [AgreementController::class, 'index'])->name('agreement.index');
+    Route::get('/agreement/{booking_id}/download', [AgreementController::class, 'download'])->name('agreement.download');
 
-        Route::get('/agreements', [AgreementController::class, 'index'])->name('agreement.index');
-        Route::get('/agreement/{booking_id}/download', [AgreementController::class, 'download'])->name('agreement.download');
+    Route::get('/agreement/hard-copy/request/{id}', [AgreementController::class, 'hard_copy_request'])->name('agreement.hard_copy');
+    Route::post('/agreement/hard-copy/store', [AgreementController::class, 'hard_copy_request_store'])->name('agreement.hard_copy.store');
 
-        Route::get('/agreement/hard-copy/request/{id}', [AgreementController::class, 'hard_copy_request'])->name('agreement.hard_copy');
-        Route::post('/agreement/hard-copy/store', [AgreementController::class, 'hard_copy_request_store'])->name('agreement.hard_copy.store');
-
-        Route::get('/mature-batches', [ClosingController::class, 'index'])->name('mature.index');
-        Route::get('/mature-batches/request/{code}/withdrawal', [ClosingController::class, 'withdrawal_request'])->name('withdrawal.request');
-        Route::post('/mature-batches/request/store', [ClosingController::class, 'withdrawal_request_store'])->name('withdrawal.request.store');
-
-    });
-
-
+    Route::get('/mature-batches', [ClosingController::class, 'index'])->name('mature.index');
+    Route::get('/mature-batches/request/{code}/withdrawal', [ClosingController::class, 'withdrawal_request'])->name('withdrawal.request');
+    Route::post('/mature-batches/request/store', [ClosingController::class, 'withdrawal_request_store'])->name('withdrawal.request.store');
+});

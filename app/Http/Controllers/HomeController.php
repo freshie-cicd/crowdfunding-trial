@@ -59,7 +59,6 @@ class HomeController extends Controller
 
         $code = $book['code'];
 
-
         Mail::to(auth()->user()->email)->send(new BookingConfirmationMail($code));
 
         return redirect('/bookings')->with('success', 'Booking Successfully Submitted. A confirmation mail has been sent to your email address.');
@@ -70,7 +69,7 @@ class HomeController extends Controller
         $bookings = Booking::where('bookings.user_id', auth()->user()->id)
             ->where('bookings.status', '!=', 'rejected')
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->leftJoin('facebook_groups', 'facebook_groups.batch_id', '=', 'packages.batch_id')
+            ->leftJoin('facebook_groups', 'facebook_groups.project_id', '=', 'packages.project_id')
             ->leftJoin('closing_requests', 'closing_requests.booking_code', '=', 'bookings.code')
             ->select(
                 'bookings.code',
@@ -79,7 +78,7 @@ class HomeController extends Controller
                 'bookings.booking_quantity',
                 'bookings.status',
                 'bookings.id',
-                'packages.batch_id',
+                'packages.project_id',
                 'facebook_groups.url',
                 'packages.maturity',
                 'packages.name as package_name',

@@ -96,8 +96,8 @@
                                 <th scope="row">{{ __('11100007771') }}</th>
                                 <th scope="row">{{ __('0001555105') }}</th>
                                 <th scope="row">{{ __('Freshie Farm') }}</th>
-                                <th scope="row">{{ $info->capital_withdrawal_amount == 0 ? _('Profit') : __('Capital + Profit') }}</th>
-                                <th scope="row">{{ _('July 14, 2024') }}</th>
+                                <th scope="row">{{ $info->capital_withdrawal_amount == 0 ? __('Profit') : __('Capital + Profit') }}</th>
+                                <th scope="row">{{ __('July 14, 2024') }}</th>
                                 <th scope="row">{{ $info->booking_code }}</th>
                                 <th scope="row"> {{ Str::limit($info->account_name, 15, '') }} </th>
                                 <th scope="row">'{{ Str::replace($check, '', $info->account_number) }}</th>

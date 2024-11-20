@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Administrator;
 use App\Http\Controllers\Controller;
 use App\Models\Package;
 use App\Models\Project;
-use App\Models\ProjectBatch;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\View\View;
 
 class PackageController extends Controller
 {
@@ -36,9 +36,9 @@ class PackageController extends Controller
      */
     public function create()
     {
-        $batches = ProjectBatch::all();
+        $projects = Project::all();
 
-        return view('administrator.package.create', compact(['batches']));
+        return view('administrator.package.create', compact(['projects']));
     }
 
     /**
@@ -50,7 +50,7 @@ class PackageController extends Controller
     {
         $package = new Package();
 
-        $package['batch_id'] = $request->batch_id;
+        $package['project_id'] = $request->project_id;
         $package['name'] = $request->name;
         $package['description'] = $request->description;
         $package['code'] = $request->code;
@@ -75,28 +75,13 @@ class PackageController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param mixed $id
-     *
-     * @return Response
      */
-    public function edit($id)
+    public function edit(Package $package): View
     {
-        $data = Package::where('id', $id)->get();
-        $batches = ProjectBatch::all();
+        $packages = Package::whereNot('id', $package->id)->get(['id', 'name']);
+        $projects = Project::get(['id', 'name']);
 
-        $project = Project::where('packages.id', '=', $id)
-            ->join('project_batches', 'projects.id', '=', 'project_batches.project_id')
-            ->join('packages', 'project_batches.id', '=', 'packages.batch_id')
-            ->select('projects.id', 'projects.name')
-            ->first();
-        $packages = Package::where('projects.id', '=', $project->id)
-            ->join('project_batches', 'packages.batch_id', '=', 'project_batches.id')
-            ->join('projects', 'project_batches.project_id', '=', 'projects.id')
-            ->select('packages.id', 'packages.name')
-            ->get();
-
-        return view('administrator.package.edit', compact(['data', 'batches', 'packages']));
+        return view('administrator.package.edit', compact('package', 'packages', 'projects'));
     }
 
     /**
@@ -108,7 +93,7 @@ class PackageController extends Controller
     {
         $package = [];
 
-        $package['batch_id'] = $request->batch_id;
+        $package['project_id'] = $request->project_id;
         $package['name'] = $request->name;
         $package['description'] = $request->description;
         $package['code'] = $request->code;

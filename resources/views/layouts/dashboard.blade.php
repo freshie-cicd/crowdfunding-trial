@@ -48,7 +48,7 @@
               <a href="{{ url('/profile') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-bars-staggered"></i> My Profile</a>
               <a href="{{ url('/profile/edit') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-id-card"></i> Edit Profile</a>
               <a href="{{ url('/investor/bank') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-leaf"></i> Add Bank Information</a>
-              <a href="{{ url('/mature-batches') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-cube"></i> My Mature Batches</a>
+              <a href="{{ url('/mature-batches') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-cube"></i> My Mature Packages</a>
               <a href="{{ url('/profile/change_password') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-key"></i> Change Password</a>
               <a href="{{ url('/packages') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-bars-staggered"></i> Open Packages</a>
               <a class="btn btn-secondary dropdown-toggle list-group-item list-group-item-action" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-align: start;background: transparent; color: black;border-bottom:1px solid #ddd">
