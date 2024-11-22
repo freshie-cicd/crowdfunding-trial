@@ -24,11 +24,31 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $status = $request->status;
+        $query = User::query();
 
-        $users = User::when($status, function ($query, $status) {
-            $query->where('status', $status);
-        })->get();
+        // Handle status filter
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        // Handle search
+        if ($request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('phone', 'LIKE', "%{$search}%")
+                    ->orWhere('nid', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Handle sorting
+        $sortField = $request->input('sort_by', 'created_at');
+        $sortDirection = $request->input('sort_direction', 'desc');
+        $query->orderBy($sortField, $sortDirection);
+
+        // Paginate results
+        $users = $query->paginate($request->per_page)->withQueryString();
 
         return view('administrator.investor.index', compact('users'));
     }
