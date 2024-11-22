@@ -46,20 +46,9 @@
             <ul class="list-group list-group-flush">
               <a href="{{ url('/dashboard') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-home"></i> Home</a>
               <a href="{{ url('/profile') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-bars-staggered"></i> My Profile</a>
-              <a href="{{ url('/profile/edit') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-id-card"></i> Edit Profile</a>
-              <a href="{{ url('/investor/bank') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-leaf"></i> Add Bank Information</a>
-              <a href="{{ url('/mature-batches') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-cube"></i> My Mature Packages</a>
-              <a href="{{ url('/profile/change_password') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-key"></i> Change Password</a>
-              <a href="{{ url('/packages') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-bars-staggered"></i> Open Packages</a>
-              <a class="btn btn-secondary dropdown-toggle list-group-item list-group-item-action" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-align: start;background: transparent; color: black;border-bottom:1px solid #ddd">
-                <i class="fa-solid fa-list"></i> My Packages
-              </a>
-
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{{ url('bookings/approved') }}">Approved Packages</a></li>
-                <li><a class="dropdown-item" href="{{ url('bookings/pending_approval') }}">Pending for Approval</a></li>
-                <li><a class="dropdown-item" href="{{ url('bookings/pending') }}">Pending for Payment</a></li>
-              </ul>
+              <a href="{{ url('/investor/bank') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-leaf"></i>  Update  Bank Information</a>
+              <a href="{{ url('/mature-batches') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-cube"></i> My Mature Batches</a>
+              <a href="{{ url('/packages') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-bars-staggered"></i> New Investment</a>
               <a href="{{ url('/agreements') }}" class="list-group-item list-group-item-action"> <i class="fa-solid fa-bars-staggered"></i> My Agreement Papers</a>
             </ul>
           </div>

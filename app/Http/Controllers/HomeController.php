@@ -140,14 +140,26 @@ class HomeController extends Controller
     public function change_password_update(Request $request)
     {
         $validated = $request->validate([
+            'old_password' => ['required'],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
-        $check = User::where('id', auth()->user()->id)->update(['password' => Hash::make($request->password)]);
+        $user = auth()->user();
 
-        if ($check) {
-            return redirect()->back()->with('success', 'Password Changed Successfully');
+        // Check if the old password is correct
+        if (!Hash::check($request->old_password, $user->password)) {
+            return redirect()->back()->with('error', 'Old Password is incorrect');
         }
+
+        // Check if the new password is the same as the old password
+        if (Hash::check($request->password, $user->password)) {
+            return redirect()->back()->with('error', 'New Password cannot be the same as the old password');
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return redirect()->back()->with('success', 'Password Changed Successfully');
     }
 
     public function bank_details(Request $request)
@@ -171,6 +183,10 @@ class HomeController extends Controller
 
         $data = InvestorBankDetail::where('user_id', auth()->user()->id)->first();
 
+        if ($data && 1 == $data->is_protected) {
+            return redirect()->back()->with('error', 'You are not allowed to change bank details. Please contact with Freshie Farm support.');
+        }
+
         // dd($data);
         if (empty($data)) {
             $bank = new InvestorBankDetail();
@@ -183,6 +199,7 @@ class HomeController extends Controller
             $bank['account_number'] = $request->account_number;
             $bank['routing_number'] = $request->routing_number;
             $bank['note'] = $request->note;
+            $bank['is_protected'] = 1;
 
             $check = $bank->save();
 
@@ -191,7 +208,7 @@ class HomeController extends Controller
             }
             echo 'error';
         } else {
-            $check = InvestorBankDetail::where('user_id', auth()->user()->id)->update(['bank_name' => $request->bank_name, 'district' => $request->district, 'branch_name' => $request->branch_name, 'account_name' => $request->account_name, 'account_number' => $request->account_number, 'routing_number' => $request->routing_number, 'note' => $request->note, 'updated_at' => now()]);
+            $check = InvestorBankDetail::where('user_id', auth()->user()->id)->update(['bank_name' => $request->bank_name, 'district' => $request->district, 'branch_name' => $request->branch_name, 'account_name' => $request->account_name, 'account_number' => $request->account_number, 'routing_number' => $request->routing_number, 'note' => $request->note, 'is_protected' => 1, 'updated_at' => now()]);
 
             if ($check) {
                 return redirect()->back()->with('success', 'Bank Details Changed Successfully');

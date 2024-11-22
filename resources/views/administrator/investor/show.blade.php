@@ -18,7 +18,7 @@
     @endif
 
     @if (\Session::has('info'))
-    <div class="alert alert-info">
+    <div class="alert alert-warning">
         {!! \Session::get('info') !!}
     </div>
     @endif
@@ -159,6 +159,21 @@
                         <div class="form-group">
                             <label for="note">Note</label>
                             <input type="text" class="form-control" id="note" name="note" value="{{ $bankDetails->note }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <form action="{{ route('admin.investor.bank.update') }}" method="post">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" value="{{ $user->id }}" name="user_id">
+                                
+                                <label for="is_protected">Allow Investor to Update Bank Info</label>
+                                <select class="form-select form-control" id="is_protected" name="is_protected">
+                                    <option value="1" {{ $bankDetails->is_protected == 1 ? "selected" : "" }}>No</option>
+                                    <option value="0" {{ $bankDetails->is_protected == 0 ? "selected" : "" }}>Yes</option>
+                                </select>
+                                <button class="btn btn-md btn-primary mt-4" type="submit">Update Bank Info</button>
+                            </form>
                         </div>
 
                         @else

@@ -51,6 +51,7 @@ Route::namespace('Administrator')
         Route::get('/investor/profiles', [UserController::class, 'index'])->name('admin.investor.profile');
         Route::get('/investor/profiles/{id}', [UserController::class, 'show'])->name('administrator.investor.profile.show');
         Route::get('/investor/profile/update', [UserController::class, 'update'])->name('admin.investor.profile.update');
+        Route::put('/investor/bank/update', [UserController::class, 'bank_update'])->name('admin.investor.bank.update');
 
         Route::get('/bookings', [App\Http\Controllers\Administrator\BookingController::class, 'index'])->name('administrator.booking.index');
         Route::get('/bookings/create/{investor_id}', [App\Http\Controllers\Administrator\BookingController::class, 'create'])->name('administrator.booking.create');
@@ -120,15 +121,15 @@ Route::namespace('Administrator')
         Route::get('/reports/closing-sheet', [Reports::class, 'closingSheet'])->name('reports.closing.sheet');
     });
 
-Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
-Route::get('/profile/edit', [HomeController::class, 'profile_edit'])->name('profile.edit');
-Route::post('/profile/update', [HomeController::class, 'profile_update'])->name('profile.update');
-Route::get('/profile/blocked', [HomeController::class, 'profile_blocked'])->name('profile.blocked');
-
 Route::middleware(['verification'])->group(function () {
     Route::get('/', [HomeController::class, 'dashboard'])->name('index');
     Route::get('/home', [HomeController::class, 'dashboard'])->name('home');
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
+    Route::get('/profile/edit', [HomeController::class, 'profile_edit'])->name('profile.edit');
+    Route::post('/profile/update', [HomeController::class, 'profile_update'])->name('profile.update');
+    Route::get('/profile/blocked', [HomeController::class, 'profile_blocked'])->name('profile.blocked');
 
     Route::get('/packages', [HomeController::class, 'index'])->name('packages');
 

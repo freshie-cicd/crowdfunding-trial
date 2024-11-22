@@ -23,6 +23,12 @@
 
         @endif
 
+        @if (\Session::has('error'))
+        <div class="alert alert-danger">
+            {!! \Session::get('error') !!}
+        </div>
+        @endif
+
 
 
 
@@ -30,7 +36,7 @@
 
         <form method="POST" action="{{ route('investor.bank.details.update') }}" enctype="multipart/form-data" x-data="{ accountNumber: '{{ $data->account_number ?? '' }}', 
         routingNumber: '{{ $data->routing_number ?? '' }}',
-        bank: '{{ $data->bank_name ?? 'asdf' }}',
+        bank: '{{ $data->bank_name ?? '' }}',
         accountNumberIsValid() { return ['62','63','64'].includes(this.bank) ? true: this.accountNumber.length >= 13 ; },
         routingNumberIsValid() {  return ['62','63','64'].includes(this.bank) ? true: this.routingNumber.length >= 9;  },
         }">
@@ -201,13 +207,19 @@
                     @endif
                 </div>
             </div>
-
+            @if (isset($data->is_protected) && $data->is_protected == true)
+            <div class="row mb-3 mt-4">
+                <p class="text-info text-center">You can't modify your bank details after updating them. For assistance, please contact {{ env('APP_NAME') }} support.</p>
+            </div>
+            @else
             <div class="row mb-3">
                 <label for="Confirm" class="col-md-4 col-form-label text-md-end"></label>
                 <div class="col-md-6">
-                    <button type="submit" name="" class="btn btn-md btn-success" :disabled="!accountNumberIsValid() || !routingNumberIsValid()">Update</button>
+                    <button type="submit" name="" class="btn btn-md btn-success"
+                        :disabled="!accountNumberIsValid() || !routingNumberIsValid()">Update</button>
                 </div>
             </div>
+            @endif
 
 
 

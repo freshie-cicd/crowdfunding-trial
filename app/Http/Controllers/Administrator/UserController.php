@@ -101,4 +101,17 @@ class UserController extends Controller
 
         return redirect()->back()->with('warning', 'Unblocking Unccessful.');
     }
+
+    public function bank_update(Request $request)
+    {
+        $data = $request->only('user_id', 'is_protected');
+
+        $check = InvestorBankDetail::where('user_id', $request->user_id)->update(['is_protected' => $data['is_protected']]);
+
+        if ($check) {
+            return redirect()->back()->with('success', 'Bank Details Updated Successfully');
+        }
+
+        return redirect()->back()->with('info', 'Bank Details Update Failed');
+    }
 }
