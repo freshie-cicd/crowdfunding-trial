@@ -16,25 +16,47 @@ class Reports extends Controller
         $this->middleware('auth:administrator');
     }
 
-    public function agreementRequests()
+    public function agreementRequests(Request $request)
     {
-        $agreementRequests = AgreementRequest::join('bookings', 'bookings.code', '=', 'agreement_requests.booking_code')
-            ->join('users', 'users.id', '=', 'bookings.user_id')
-            ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
-            ->select(
-                'agreement_requests.*',
-                'users.name',
-                'packages.name as package_name',
-                'agreement_requests.note as note',
-                'agreement_requests.id as id'
-            )
-            ->get();
+        $query = AgreementRequest::query()
+            ->with(['booking.user' => function ($query) {
+                $query->select('id', 'name');
+            }, 'booking.package' => function ($query) {
+                $query->select('id', 'name');
+            }]);
 
-        // get all status of agreement request
-        $query = "SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'agreement_requests' AND COLUMN_NAME = 'status'";
-        $dbName = env('DB_DATABASE');
-        $statusEnum = DB::select($query, [$dbName]);
-        $statuesArray = explode("','", substr($statusEnum[0]->COLUMN_TYPE, 6, -2));
+        // Handle status filter
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        // Handle search
+        if ($request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('booking_code', 'LIKE', "%{$search}%")
+                    ->orWhere('phone', 'LIKE', "%{$search}%")
+                    ->orWhere('courier_service', 'LIKE', "%{$search}%")
+                    ->orWhere('courier_branch', 'LIKE', "%{$search}%")
+                    ->orWhereHas('booking.package', function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('booking.user', function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        // Handle sorting
+        $sortField = $request->input('sort_by', 'status');
+        $sortDirection = $request->input('sort_direction', 'asc');
+        $query->orderBy($sortField, $sortDirection);
+
+        // Paginate results
+        $agreementRequests = $query->paginate($request->per_page ?? 10)->appends($request->query());
+
+        // Define the statuses array
+        $statuesArray = ['requested', 'processing', 'shipped', 'delivered', 'hold', 'rejected'];
 
         return view('administrator.agreement.requests', compact('agreementRequests', 'statuesArray'));
     }
@@ -56,6 +78,7 @@ class Reports extends Controller
             ->join('users', 'users.id', '=', 'bookings.user_id')
             ->select('users.*', 'bookings.booking_quantity', 'packages.value', 'packages.note', 'bookings.code', 'packages.end_date', 'packages.start_date', 'bookings.code', 'booking_payments.payment_date', 'packages.project_id')
             ->get();
+        // dd($booking_info);
 
         $total_value = $booking_info[0]->value * $booking_info[0]->booking_quantity;
         $ac = new AgreementController();

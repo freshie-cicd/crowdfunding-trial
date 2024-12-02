@@ -18,4 +18,9 @@ class AgreementRequest extends Model
         'status',
         'note',
     ];
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class, 'booking_code', 'code');
+    }
 }
