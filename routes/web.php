@@ -59,6 +59,7 @@ Route::namespace('Administrator')
         Route::get('/bookings/{id}', [App\Http\Controllers\Administrator\BookingController::class, 'show'])->name('administrator.booking.show');
         Route::get('/bookings/edit/{id}', [App\Http\Controllers\Administrator\BookingController::class, 'edit'])->name('administrator.booking.edit');
         Route::put('/bookings/edit/{id}', [App\Http\Controllers\Administrator\BookingController::class, 'update'])->name('administrator.booking.update');
+        Route::delete('/bookings/{booking}/payment/{payment}/delete', [App\Http\Controllers\Administrator\BookingController::class, 'payment_delete'])->name('administrator.booking.payment.delete');
 
         Route::get('/bookings/{id}/proof', [PaymentController::class, 'proof'])->name('administrator.booking.proof');
         Route::post('/bookings/{id}/proof', [PaymentController::class, 'proof_store'])->name('administrator.booking.proof.store');

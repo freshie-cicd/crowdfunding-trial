@@ -17,6 +17,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class BookingController extends Controller
 {
@@ -227,6 +228,36 @@ class BookingController extends Controller
             return redirect()->back()->with('success', 'Payment Rejected Successfully');
         }
         echo 'error';
+    }
+
+    public function payment_delete(Booking $booking, BookingPayment $payment)
+    {
+        try {
+            if (!empty($payment->document_one) && Storage::disk('public')->exists($payment->payment_document)) {
+                Storage::disk('public')->delete($payment->payment_document);
+            }
+
+            if (!empty($payment->document_one) && Storage::disk('public')->exists($payment->document_two)) {
+                Storage::disk('public')->delete($payment->document_two);
+            }
+
+            if (!empty($payment->document_one) && Storage::disk('public')->exists($payment->document_three)) {
+                Storage::disk('public')->delete($payment->document_three);
+            }
+
+            DB::beginTransaction();
+
+            $payment->delete();
+            $booking->update(['status' => 'pending']);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Payment Deleted Successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()->with('error', 'Failed to delete payment');
+        }
     }
 
     public function decision(Request $request)

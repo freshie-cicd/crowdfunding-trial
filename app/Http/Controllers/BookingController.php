@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\BookingPayment;
+use App\Services\FileStorageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class BookingController extends Controller
 {
-    public function __construct()
+    private const DOCUMENT_PATHS = [
+        'file' => ['path' => 'uploads/payment/documents', 'key' => 'payment_document'],
+        'file2' => ['path' => 'uploads/payment/documents', 'key' => 'document_two'],
+        'file3' => ['path' => 'uploads/payment/documents', 'key' => 'document_three'],
+    ];
+
+    public function __construct(private FileStorageService $fileStorage)
     {
         $this->middleware('auth');
     }
@@ -99,31 +106,17 @@ class BookingController extends Controller
         ]);
 
         $bookingPayment = new BookingPayment();
+
+        foreach (self::DOCUMENT_PATHS as $inputName => $config) {
+            $file = $request->file($inputName);
+            if (!empty($file)) {
+                $bookingPayment[$config['key']] = $this->fileStorage->uploadFile($file, $config['path']);
+            }
+        }
+
         $bookingPayment['booking_id'] = $request->booking_id;
         $bookingPayment['payment_method'] = $request->payment_method;
         $bookingPayment['payment_date'] = $request->payment_date;
-
-        $file = $request->file('file');
-        if (!empty($file)) {
-            $file_new_name = rand().'.'.$request->file('file')->getClientOriginalExtension();
-            $file->move(public_path('uploads/payment/documents/'), $file_new_name);
-            $bookingPayment['payment_document'] = '/uploads/payment/documents/'.$file_new_name;
-        }
-
-        $file2 = $request->file('file2');
-        if (!empty($file2)) {
-            $file2_new_name = rand().'.'.$request->file('file2')->getClientOriginalExtension();
-            $file2->move(public_path('uploads/payment/documents/'), $file2_new_name);
-            $bookingPayment['document_two'] = '/uploads/payment/documents/'.$file2_new_name;
-        }
-
-        $file3 = $request->file('file3');
-        if (!empty($file3)) {
-            $file3_new_name = rand().'.'.$request->file('file3')->getClientOriginalExtension();
-            $file3->move(public_path('uploads/payment/documents/'), $file3_new_name);
-            $bookingPayment['document_three'] = '/uploads/payment/documents/'.$file3_new_name;
-        }
-
         $bookingPayment['bank'] = $request->bank_name;
         $bookingPayment['branch'] = $request->branch;
         $bookingPayment['depositors_name'] = $request->depositors_name;
