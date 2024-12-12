@@ -6,6 +6,7 @@ use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\Controller;
 use App\Models\AgreementRequest;
 use App\Models\Booking;
+use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -123,7 +124,8 @@ class Reports extends Controller
     public function closingReport(Request $request)
     {
         $role = auth('administrator')->user()->role;
-        $packages = DB::table('packages')->where('maturity', 1)->get();
+        $packages = Package::where('maturity', 1)->get();
+        $latestPackage = $packages->last()->id ?? 0;
 
         $data = Booking::whereIn('bookings.status', ['approved', 'withdrawn', 'migrated'])->where('packages.maturity', 1)
             ->join('users', 'users.id', '=', 'bookings.user_id')
@@ -154,9 +156,11 @@ class Reports extends Controller
 
         if (!empty($request->package_id)) {
             $data = $data->where('package_id', '=', $request->package_id);
+        } else {
+            $data = $data->where('package_id', '=', $latestPackage);
         }
 
-        return view('administrator.reports.closing', compact('data', 'role', 'packages'));
+        return view('administrator.reports.closing', compact('data', 'role', 'packages', 'latestPackage'));
     }
 
     public function closingSheet(Request $request)
