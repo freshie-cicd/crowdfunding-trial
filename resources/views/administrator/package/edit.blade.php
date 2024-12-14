@@ -14,7 +14,7 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('package.update') }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('package.update', $package->id) }}" enctype="multipart/form-data">
                             @csrf
                             <div class="row mb-3">
                                 <label for='project_id'
@@ -112,6 +112,22 @@
                                         value="{{ $package->capacity }}" required autocomplete='capacity'>
 
                                     @error('capacity')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for='fb_group_url'
+                                    class="col-md-4 col-form-label text-md-end">{{ __('FB Group URL') }}</label>
+                                <div class="col-md-4">
+                                    <input id='fb_group_url' type="text"
+                                        class="form-control @error('fb_group_url') is-invalid @enderror" name='fb_group_url'
+                                        value="{{ $package->fb_group_url }}" required autocomplete='fb_group_url'>
+
+                                    @error('fb_group_url')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>

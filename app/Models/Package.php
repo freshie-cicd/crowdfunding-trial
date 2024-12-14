@@ -16,6 +16,7 @@ class Package extends Model
         'code',
         'value',
         'capacity',
+        'fb_group_url',
         'status',
         'note',
         'maturity',

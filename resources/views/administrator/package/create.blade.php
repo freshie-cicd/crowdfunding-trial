@@ -121,6 +121,23 @@
                             </div>
 
                             <div class="row mb-3">
+                                <label for='fb_group_url'
+                                    class="col-md-4 col-form-label text-md-end">{{ __('FB Group URL') }}</label>
+
+                                <div class="col-md-4">
+                                    <input id='fb_group_url' type="text"
+                                        class="form-control @error('fb_group_url') is-invalid @enderror" name='fb_group_url'
+                                        value="{{ old('fb_group_url') }}" required autocomplete='fb_group_url' autofocus>
+
+                                    @error('fb_group_url')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
                                 <label for='status'
                                     class="col-md-4 col-form-label text-md-end">{{ __('Status') }}</label>
 

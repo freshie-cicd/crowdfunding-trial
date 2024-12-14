@@ -48,20 +48,7 @@ class PackageController extends Controller
      */
     public function store(Request $request)
     {
-        $package = new Package();
-
-        $package['project_id'] = $request->project_id;
-        $package['name'] = $request->name;
-        $package['description'] = $request->description;
-        $package['code'] = $request->code;
-        $package['value'] = $request->value;
-        $package['capacity'] = $request->capacity;
-        $package['status'] = $request->status;
-        $package['note'] = $request->note;
-        $package['start_date'] = $request->start_date;
-        $package['end_date'] = $request->end_date;
-
-        $package->save();
+        Package::create($request->except('_token', '_method'));
 
         return redirect()->back()->with('success', 'Added Successfully');
     }
@@ -91,23 +78,7 @@ class PackageController extends Controller
      */
     public function update(Request $request, Package $package)
     {
-        $package = [];
-
-        $package['project_id'] = $request->project_id;
-        $package['name'] = $request->name;
-        $package['description'] = $request->description;
-        $package['code'] = $request->code;
-        $package['value'] = $request->value;
-        $package['capacity'] = $request->capacity;
-        $package['status'] = $request->status;
-        $package['note'] = $request->note;
-        $package['maturity'] = $request->maturity;
-        $package['return_amount'] = $request->return_amount;
-        $package['migration_package_id'] = $request->migration_package_id;
-        $package['start_date'] = $request->start_date;
-        $package['end_date'] = $request->end_date;
-
-        Package::where('id', $request->id)->update($package);
+        $package->update($request->except('_token', '_method'));
 
         return redirect('administrator/packages')->with('success', 'Edited Successfully');
     }
@@ -115,13 +86,11 @@ class PackageController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param mixed $id
-     *
      * @return Response
      */
-    public function destroy($id)
+    public function destroy(Package $package)
     {
-        Package::where('id', $id)->delete();
+        $package->delete();
 
         return redirect('administrator/packages')->with('success', 'Deleted Successfully');
     }

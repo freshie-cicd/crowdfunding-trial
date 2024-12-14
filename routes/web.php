@@ -79,8 +79,8 @@ Route::namespace('Administrator')
         Route::post('/package/store', [PackageController::class, 'store'])->name('package.store');
         Route::get('/package/edit/{package}', [PackageController::class, 'edit'])->name('package.edit');
 
-        Route::post('/package/update', [PackageController::class, 'update'])->name('package.update');
-        Route::get('/package/delete/{id}', [PackageController::class, 'destroy'])->name('package.delete');
+        Route::post('/package/update/{package}', [PackageController::class, 'update'])->name('package.update');
+        Route::get('/package/delete/{package}', [PackageController::class, 'destroy'])->name('package.delete');
 
         Route::get('/assets', [AssetController::class, 'index'])->name('asset.index');
         Route::get('/asset/create', [AssetController::class, 'create'])->name('asset.create');
