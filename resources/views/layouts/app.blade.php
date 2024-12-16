@@ -14,7 +14,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- fav icon -->
-    <link href="https://www.freshie.farm/wp-content/uploads/2021/04/cropped-fre-270x270.png" rel="icon">
+    <link href="{{ asset('storage/' . config('website-setting.favicon')) }}" rel="icon">
 
     <!-- Scripts -->
     <script src="{{ mix('js/app.js') }}" defer></script>

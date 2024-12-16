@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm">
     <div class="container">
         <a class="navbar-brand ml-4" href="{{ url('/') }}">
-            <img src="https://www.freshie.farm/wp-content/uploads/2021/04/freshi_light.png" width="100px" />
+            <img src="{{ asset('storage/' . config('website-setting.light_logo')) }}" width="100px" />
         </a>
         <div>
             <!-- Authentication Links -->

@@ -10,6 +10,7 @@ use App\Http\Controllers\Administrator\PaymentController;
 use App\Http\Controllers\Administrator\ProjectController;
 use App\Http\Controllers\Administrator\Reports;
 use App\Http\Controllers\Administrator\UserController;
+use App\Http\Controllers\Administrator\WebsiteSettingController;
 use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ClosingController;
@@ -120,6 +121,10 @@ Route::namespace('Administrator')
 
         Route::get('/reports/closing-investor', [Reports::class, 'closingReport'])->name('reports.closing');
         Route::get('/reports/closing-sheet', [Reports::class, 'closingSheet'])->name('reports.closing.sheet');
+
+        Route::get('website-settings', [WebsiteSettingController::class, 'index'])->name('admin.website.settings');
+        Route::get('website-settings/edit', [WebsiteSettingController::class, 'edit'])->name('admin.website.settings.edit');
+        Route::post('website-settings/update', [WebsiteSettingController::class, 'update'])->name('admin.website.settings.update');
     });
 
 Route::middleware(['verification'])->group(function () {
