@@ -39,7 +39,7 @@ services:
       - app_network
       
     command: >
-      bash -c "php artisan migrate --force && php artisan storage:link && apache2-foreground"
+      bash -c "php artisan storage:link && apache2-foreground"
 
   mysql:
     image: mysql:5.7
