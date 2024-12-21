@@ -32,4 +32,9 @@ class Booking extends Model
     {
         return $this->hasOne(BookingPayment::class);
     }
+
+    public function closingRequest()
+    {
+        return $this->hasOne(ClosingRequest::class, 'booking_code', 'code');
+    }
 }

@@ -36,60 +36,85 @@ class BookingController extends Controller
      */
     public function index(Request $request)
     {
-        $dataSize = $request->query('dataSize', 10);
-        $dataSize = filter_var($dataSize, FILTER_VALIDATE_INT, [
-            'options' => [
-                'default' => 10,
-                'min_range' => 1,
-                'max_range' => 100,
-            ],
+        // Sanitize and validate input parameters
+        $dataSize = (int) $request->query('dataSize', 10);
+        $dataSize = min(max($dataSize, 1), 100);
+
+        $status = trim($request->query('status', ''));
+        $packageId = (int) $request->query('package', 0);
+        $search = trim($request->query('search', ''));
+        $migration = (int) $request->query('migration', 0);
+
+        // Build base query with eager loading
+        $query = Booking::with([
+            'package:id,name,value',
+            'user:id,name,phone,email',
+            'bookingPayment:id,booking_id,status',
+            'closingRequest:id,booking_code,status,package_after_withdrawal',
         ]);
 
-        $status = $request->query('status', '');
-        $package = $request->query('package', '');
-        $search = $request->query('search', '');
-        $migration = $request->query('migration', '');
-
-        $bookings = Booking::when($status, function ($query, $status) {
-            return $query->where('bookings.status', $status);
-        })->when($package, function ($query, $package) {
-            return $query->where('bookings.package_id', $package);
-        })->when($search, function ($query, $search) {
-            return $query->where('bookings.code', 'like', '%'.$search.'%')
-                ->orWhere('users.name', 'like', '%'.$search.'%')
-                ->orWhere('users.phone', 'like', '%'.$search.'%')
-                ->orWhere('users.email', 'like', '%'.$search.'%')
-                ->orWhere('bookings.note', 'like', '%'.$search.'%');
-        })
-            ->when($migration, function ($query, $migration) {
-                return $query->where('closing_requests.package_after_withdrawal', '>', 0);
-            })
-            ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
-            ->leftJoin('users', 'users.id', '=', 'bookings.user_id')
-            ->leftJoin('booking_payments', 'booking_payments.booking_id', '=', 'bookings.id')
-            ->leftJoin('closing_requests', 'closing_requests.booking_code', '=', 'bookings.code')
-            ->select(
-                'bookings.*',
-                'packages.name as package_name',
-                'packages.value as package_value',
-                'users.name as user_name',
-                'users.phone as user_phone',
-                'users.email as user_email',
-                'booking_payments.status as payment_status',
-                'booking_payments.id as payment_id',
-                'closing_requests.status as closing_status',
-                'closing_requests.id as closing_id'
-            )
-            ->latest()->paginate($dataSize);
-        $distinctStatus = Booking::select('status')->distinct()->get();
-
-        $packagesData = Package::select('id', 'name')->latest()->get();
-
-        foreach ($bookings as $booking) {
-            $booking->total_value = $this->numberFormatBangladeshi($booking->package_value * $booking->booking_quantity);
+        // Apply filters
+        if ($status) {
+            $query->where('bookings.status', $status);
         }
 
-        $bookings->appends(['dataSize' => $dataSize, 'status' => $status, 'package' => $package, 'search' => $search, 'migration' => $migration]);
+        if ($packageId) {
+            $query->where('bookings.package_id', $packageId);
+        }
+
+        // Search functionality
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('bookings.code', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('phone', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    })
+                    ->orWhere('bookings.note', 'like', "%{$search}%");
+            });
+        }
+
+        // Migration filter
+        if ($migration) {
+            $query->join('closing_requests', 'bookings.code', '=', 'closing_requests.booking_code')
+                ->where('closing_requests.package_after_withdrawal', '>', 0);
+        }
+
+        $query->select([
+            'bookings.id',
+            'bookings.code',
+            'bookings.status',
+            'bookings.package_id',
+            'bookings.user_id',
+            'bookings.booking_quantity',
+            'bookings.note',
+            'bookings.created_at',
+        ]);
+
+        // Get paginated results and calculate total value
+        $bookings = $query->latest()
+            ->paginate($dataSize)
+            ->through(function ($booking) {
+                $booking->total_value = $this->numberFormatBangladeshi(
+                    $booking->package->value * $booking->booking_quantity
+                );
+
+                return $booking;
+            });
+
+        // Get distinct statuses and packages
+        $distinctStatus = Booking::select('status')->distinct()->get();
+        $packagesData = Package::select('id', 'name')->latest()->get();
+
+        // Append query parameters to pagination
+        $bookings->appends([
+            'dataSize' => $dataSize,
+            'status' => $status,
+            'package' => $packageId,
+            'search' => $search,
+            'migration' => $migration,
+        ]);
 
         return view('administrator.booking.index', compact('bookings', 'distinctStatus', 'packagesData'));
     }
