@@ -1,36 +1,34 @@
 @extends('administrator.layouts.application')
 
 @section('content')
-    <div class="">
-        <div class="row justify-content-center">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="">
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2 bg-white shadow-md">
-                            <input type="text" id="search" name="search" placeholder="Search"
-                                value="{{ request()->search }}"
-                                class="block w-full sm:w-auto flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3">
-                            <button onclick="updateFilter()"
-                                class="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md">Search</button>
-                            <select name="package" id="package" onchange="updateFilter()"
-                                class="block w-full sm:w-auto flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3">
-                                <option value="">All</option>
-                                @foreach ($packagesData as $package)
-                                    <option value="{{ $package->id }}"
-                                        {{ request()->package == $package->id ? 'selected' : '' }}>{{ $package->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <select name="status" id="status" onchange="updateFilter()"
-                                class="block w-full sm:w-auto flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 mr-2">
-                                <option value="">All</option>
-                                @foreach ($distinctStatus as $status)
-                                    <option value="{{ $status->status }}"
-                                        {{ request()->status == $status->status ? 'selected' : '' }}>{{ $status->status }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <!-- toggle button -->
+
+<div class="">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card">
+                @if (\Session::has('error'))
+                <div class="alert alert-warning">
+                    {!! \Session::get('error') !!}
+                </div>
+                @endif
+                <div class="">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2 bg-white shadow-md">
+                        <input type="text" id="search" name="search" placeholder="Search" value="{{ request()->search }}" class="block w-full sm:w-auto flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3">
+                        <button onclick="updateFilter()" class="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md">Search</button>
+                        <select name="package" id="package" onchange="updateFilter()" class="block w-full sm:w-auto flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3">
+                            <option value="">All</option>
+                            @foreach ($packagesData as $package)
+                            <option value="{{ $package->id }}" {{ request()->package == $package->id ? 'selected' : '' }}>{{ $package->name }}</option>
+                            @endforeach
+                        </select>
+                        <select name="status" id="status" onchange="updateFilter()" class="block w-full sm:w-auto flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 mr-2">
+                            <option value="">All</option>
+                            @foreach ($distinctStatus as $status)
+                            <option value="{{ $status->status }}" {{ request()->status == $status->status ? 'selected' : '' }}>{{ $status->status }}</option>
+                            @endforeach
+                        </select>
+                        <!-- toggle button -->
+                        <div class="flex items center">
                             <div class="flex items center">
                                 <div class="flex items center">
                                     <label for="toggle" class="flex items-center cursor-pointer">

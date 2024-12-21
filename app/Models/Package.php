@@ -25,6 +25,8 @@ class Package extends Model
         'start_date',
         'end_date',
         'cover_url',
+        'terms_and_conditions',
+        'instructions',
     ];
 
     public function project()

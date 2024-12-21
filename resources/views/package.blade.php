@@ -19,7 +19,11 @@
                                     <p class="card-text">Purchase Price: {{ $package->value }}</p>
                                     <p class="card-text">Total Capacity: {{ $package->capacity }}</p>
                                     <a href="{{ url('book/') }}/{{ $package->id }}/package"
-                                        class="btn btn-primary">Request for Purchase</a>
+                                        class="btn btn-primary @if ($checkPendingBooking > 0) disabled @endif">Request
+                                        for Purchase</a>
+                                    @if ($checkPendingBooking > 0)
+                                        <p class="text-danger">You have a pending booking. Please wait for approval.</p>
+                                    @endif
                                 </div>
                             </div>
                         </div>

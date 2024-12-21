@@ -148,9 +148,6 @@ Route::middleware(['verification'])->group(function () {
     Route::get('/book/{id}/package', [HomeController::class, 'book'])->name('book');
     Route::post('/book/store', [HomeController::class, 'store'])->name('book.store');
 
-    Route::get('/bookings', [BookingController::class, 'index'])->name('mybookings');
-    Route::get('/bookings/{status}', [BookingController::class, 'myBookings'])->name('mybookings_');
-
     Route::get('/payment-proof/{booking_id}/submit', [BookingController::class, 'proof'])->name('paymentProof');
     Route::post('/payment-proof/store', [BookingController::class, 'proof_store'])->name('paymentProofStore');
 

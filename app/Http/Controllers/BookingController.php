@@ -6,7 +6,6 @@ use App\Models\Booking;
 use App\Models\BookingPayment;
 use App\Services\FileStorageService;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class BookingController extends Controller
 {
@@ -19,53 +18,6 @@ class BookingController extends Controller
     public function __construct(private FileStorageService $fileStorage)
     {
         $this->middleware('auth');
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        $bookings = Booking::where('bookings.user_id', auth()->user()->id)
-            ->where('bookings.status', 'pending')
-            ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
-            ->select('bookings.code', 'packages.code as pcode', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.project_id', 'packages.project_id')
-            ->get();
-
-        $total_investment = 0;
-
-        foreach ($bookings as $key => $value) {
-            if ('approved' == $value->status) {
-                $total_investment += $value->value * $value->booking_quantity;
-            }
-        }
-
-        $checkPendingApproval = Booking::where('user_id', auth()->user()->id)->where('status', 'pending_approval')->count();
-
-        return view('mybooking', compact('bookings', 'total_investment', 'checkPendingApproval'));
-    }
-
-    public function myBookings($status)
-    {
-        $bookings = Booking::where('bookings.user_id', auth()->user()->id)
-            ->where('bookings.status', $status)
-            ->leftJoin('packages', 'packages.id', '=', 'bookings.package_id')
-            ->select('bookings.code', 'packages.code as pcode', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.project_id', 'packages.project_id', 'packages.status as package_status')
-            ->get();
-
-        $total_investment = 0;
-
-        foreach ($bookings as $key => $value) {
-            if ('approved' == $value->status) {
-                $total_investment += $value->value * $value->booking_quantity;
-            }
-        }
-
-        $checkPendingApproval = Booking::where('user_id', auth()->user()->id)->where('status', 'pending_approval')->count();
-
-        return view('mybooking', compact('bookings', 'total_investment', 'checkPendingApproval'));
     }
 
     public function proof($booking_id)
@@ -105,10 +57,18 @@ class BookingController extends Controller
 
         $bookingPayment = new BookingPayment();
 
+        // Fill all non-file inputs
+        $nonFileInputs = collect(self::DOCUMENT_PATHS)->keys()->toArray();
+        $bookingPayment->fill($request->except($nonFileInputs));
+
+        // Process each file input based on DOCUMENT_PATHS configuration
         foreach (self::DOCUMENT_PATHS as $inputName => $config) {
-            $file = $request->file($inputName);
-            if (!empty($file)) {
-                $bookingPayment[$config['key']] = $this->fileStorage->uploadFile($file, $config['path']);
+            if ($request->hasFile($inputName)) {
+                $bookingPayment->{$config['key']} = $this->fileStorage->replaceFile(
+                    $bookingPayment->{$config['key']},
+                    $request->file($inputName),
+                    $config['path']
+                );
             }
         }
 

@@ -5,11 +5,17 @@ namespace App\Http\Controllers\Administrator;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WebsiteSettingRequest;
 use App\Models\Models\Administrator\WebsiteSetting;
-use Illuminate\Support\Facades\Cache;
+use App\Services\FileStorageService;
 
 class WebsiteSettingController extends Controller
 {
-    public function __construct()
+    private const DOCUMENT_PATHS = [
+        'light_logo' => ['path' => 'uploads/logos', 'key' => 'light_logo'],
+        'dark_logo' => ['path' => 'uploads/logos', 'key' => 'dark_logo'],
+        'favicon' => ['path' => 'uploads/logos', 'key' => 'favicon'],
+    ];
+
+    public function __construct(private FileStorageService $fileStorage)
     {
         $this->middleware('auth:administrator');
         $this->middleware('role:superadmin');
@@ -26,7 +32,7 @@ class WebsiteSettingController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Show the form for editing the resource.
      */
     public function edit()
     {
@@ -35,28 +41,29 @@ class WebsiteSettingController extends Controller
         return view('administrator.website_setting.edit', compact('settings'));
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(WebsiteSettingRequest $request)
     {
         $settings = WebsiteSetting::firstOrNew();
-        $settings->fill($request->except(['light_logo', 'dark_logo', 'favicon']));
 
-        // Handle logo uploads
-        if ($request->hasFile('light_logo')) {
-            $settings->light_logo = $request->file('light_logo')->store('logos', 'public');
-        }
-        if ($request->hasFile('dark_logo')) {
-            $settings->dark_logo = $request->file('dark_logo')->store('logos', 'public');
-        }
-        if ($request->hasFile('favicon')) {
-            $settings->favicon = $request->file('favicon')->store('logos', 'public');
+        // Fill all non-file inputs
+        $nonFileInputs = collect(self::DOCUMENT_PATHS)->keys()->toArray();
+        $settings->fill($request->except($nonFileInputs));
+
+        // Process each file input based on DOCUMENT_PATHS configuration
+        foreach (self::DOCUMENT_PATHS as $inputName => $config) {
+            if ($request->hasFile($inputName)) {
+                $settings->{$config['key']} = $this->fileStorage->replaceFile(
+                    $settings->{$config['key']},
+                    $request->file($inputName),
+                    $config['path']
+                );
+            }
         }
 
         $settings->save();
-
-        Cache::forget('website_settings');
-        Cache::remember('website_settings', 3600, function () use ($settings) {
-            return $settings->refresh();
-        });
 
         return redirect()->route('admin.website.settings')->with('success', 'Website settings updated successfully.');
     }

@@ -9,6 +9,7 @@ use App\Models\Package;
 use App\Models\User;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -32,18 +33,39 @@ class HomeController extends Controller
     {
         $packages = Package::where('status', 1)->get();
 
-        return view('package', compact('packages'));
+        $checkPendingBooking = Booking::where('user_id', auth()->user()->id)->where('status', 'pending')->count();
+
+        return view('package', compact('packages', 'checkPendingBooking'));
     }
 
     public function book($id)
     {
-        $data = Package::where('id', $id)->get();
+        $checkPendingBooking = Booking::where('user_id', auth()->user()->id)->where('status', 'pending')->count();
 
-        return view('book', compact(['data']));
+        if ($checkPendingBooking > 0) {
+            return redirect()->back()->with('error', 'You have a pending booking. Please wait for approval.');
+        }
+        $package = Package::where('id', $id)->first();
+
+        return view('book', compact('package'));
     }
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'user_id' => ['required'],
+            'package_id' => ['required'],
+            'booking_quantity' => ['required'],
+            'note' => ['nullable'],
+            'terms' => ['required'],
+        ]);
+
+        $checkPendingBooking = Booking::where('user_id', auth()->user()->id)->where('status', 'pending')->count();
+
+        if ($checkPendingBooking > 0) {
+            return redirect()->back()->with('error', 'You have a pending booking. Please wait for approval.');
+        }
+
         $book = new Booking();
         do {
             $randomNumber = random_int(10000000, 99999999);
@@ -61,7 +83,7 @@ class HomeController extends Controller
 
         Mail::to(auth()->user()->email)->send(new BookingConfirmationMail($code));
 
-        return redirect('/bookings')->with('success', 'Booking Successfully Submitted. A confirmation mail has been sent to your email address.');
+        return redirect('/dashboard')->with('success', 'Booking Successfully Submitted. A confirmation mail has been sent to your email address.');
     }
 
     public function dashboard()
@@ -82,6 +104,7 @@ class HomeController extends Controller
                 'packages.maturity',
                 'packages.name as package_name',
                 'packages.return_amount',
+                'packages.instructions as package_instructions',
                 'closing_requests.id as closing_id',
                 'closing_requests.capital_withdrawal_amount as withdraw',
                 'closing_requests.after_withdrawal_amount as reinvest',
@@ -91,6 +114,8 @@ class HomeController extends Controller
             ->get();
 
         $packages = Package::where('status', 1)->get();
+
+        $checkPendingBooking = Booking::where('user_id', auth()->user()->id)->where('status', 'pending')->count();
 
         $total_investment = 0;
 
@@ -107,7 +132,7 @@ class HomeController extends Controller
             ->where('investor_bank_details.user_id', auth()->user()->id)
             ->first();
 
-        return view('dashboard', compact('bookings', 'packages', 'total_investment', 'checkPendingApproval', 'bank'));
+        return view('dashboard', compact('bookings', 'packages', 'total_investment', 'checkPendingApproval', 'bank', 'checkPendingBooking'));
     }
 
     public function profile()
@@ -124,9 +149,9 @@ class HomeController extends Controller
 
     public function profile_update(Request $request)
     {
-        User::where('id', auth()->user()->id)
+        User::where('id', Auth::user()->id)
 
-            ->update(['name' => $request->name, 'permanent_address' => $request->permanent_address, 'present_address' => $request->present_address, 'father_name' => $request->father_name, 'mother_name' => $request->mother_name, 'nid' => $request->nid, 'date_of_birth' => $request->date_of_birth, 'nominee_name' => $request->nominee_name, 'nominee_phone' => $request->nominee_phone, 'nominee_address' => $request->nominee_address, 'nominee_relation' => $request->nominee_relation, 'nominee_nid' => $request->nominee_nid]);
+            ->update($request->except('_token', 'method', 'password', 'email', 'phone', 'status'));
 
         return redirect()->back()->with('success', 'Profile Edited Successfully');
     }

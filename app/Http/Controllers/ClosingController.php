@@ -31,7 +31,7 @@ class ClosingController extends Controller
                 'bookings.id',
                 'packages.maturity',
                 'packages.name as package_name',
-                'packages.project_id',
+                'packages.fb_group_url',
                 'closing_requests.id as closing_id',
                 'closing_requests.capital_withdrawal_amount as withdraw',
                 'closing_requests.after_withdrawal_amount as reinvest',

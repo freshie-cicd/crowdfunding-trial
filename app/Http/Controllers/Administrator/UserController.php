@@ -63,7 +63,7 @@ class UserController extends Controller
 
         $bookings = Booking::where('bookings.user_id', $id)
             ->join('packages', 'packages.id', '=', 'bookings.package_id')
-            ->select('bookings.code', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.project_id', 'package.fb_group_url', 'packages.status as package_status', 'packages.name as package_name')
+            ->select('bookings.code', 'packages.value', 'bookings.booking_quantity', 'bookings.status', 'bookings.id', 'packages.project_id', 'packages.fb_group_url', 'packages.status as package_status', 'packages.name as package_name')
             ->get();
 
         return view('administrator.investor.show', compact('user', 'bankDetails', 'bookings'));

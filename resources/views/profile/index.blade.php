@@ -64,6 +64,10 @@
                     <td>{{ $data->nominee_phone }}</td>
                 </tr>
                 <tr>
+                    <th scope="row">Nominee Email</th>
+                    <td>{{ $data->nominee_email }}</td>
+                </tr>
+                <tr>
                     <th scope="row">Nominee Address</th>
                     <td>{{ $data->nominee_address }}</td>
                 </tr>

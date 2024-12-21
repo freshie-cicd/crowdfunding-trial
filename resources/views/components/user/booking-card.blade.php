@@ -66,12 +66,29 @@
                     @endif
                 @else
                     <div class="d-grid gap-2">
-                        <a href="{{ $booking->url }}" class="btn btn-primary" target="__blank"><i
+                        <a href="{{ @$booking->fb_group_url }}" class="btn btn-primary" target="__blank"><i
                                 class="fa-brands fa-facebook"></i> JOIN FACEBOOK GROUP</a>
                     </div>
                 @endif
-
             @endif
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="instructionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width:60%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Payment Instruction</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {!! $booking->package_instructions !!}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>

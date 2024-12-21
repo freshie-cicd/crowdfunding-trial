@@ -265,6 +265,30 @@
                                 </div>
                             </div>
 
+                            <div class="row mb-3">
+                                <label for="terms_editor"
+                                    class="col-md-12 col-form-label text-md-start">{{ __('Terms and Condition') }}</label>
+                                <div class="col-md-12">
+                                    <div id="terms_editor" style="height: 300px;"></div>
+                                    <textarea class="d-none" name="terms_and_conditions" id="terms_editor_area">{{ $package->terms_and_conditions }}</textarea>
+                                    @error('terms_and_conditions')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for="instructions_editor"
+                                    class="col-md-12 col-form-label text-md-start">{{ __('Instructions') }}</label>
+                                <div class="col-md-12">
+                                    <div id="instructions_editor" style="height: 300px;"></div>
+                                    <textarea class="d-none" name="instructions" id="instructions_editor_area">{{ $package->instructions }}</textarea>
+                                    @error('instructions')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
                             <input type="hidden" name="id" value="{{ $package->id }}">
 
                             <div class="row mb-0">
@@ -280,4 +304,70 @@
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Define editor configurations
+            const editorConfigs = [{
+                    editorId: 'terms_editor',
+                    areaId: 'terms_editor_area',
+                    content: {!! json_encode($package->terms_and_conditions) !!}
+                },
+                {
+                    editorId: 'instructions_editor',
+                    areaId: 'instructions_editor_area',
+                    content: {!! json_encode($package->instructions) !!}
+                }
+            ];
+
+            // Common toolbar configuration
+            const toolbarOptions = [
+                [{
+                    'header': [1, 2, 3, 4, 5, 6, false]
+                }],
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                ['link', 'image', 'video'],
+                [{
+                    'list': 'ordered'
+                }, {
+                    'list': 'bullet'
+                }],
+                [{
+                    'color': []
+                }, {
+                    'background': []
+                }],
+                [{
+                    'align': []
+                }],
+                ['clean']
+            ];
+
+            // Initialize each editor
+            editorConfigs.forEach(config => {
+                const editorArea = document.getElementById(config.areaId);
+
+                if (editorArea) {
+                    const editor = new Quill(`#${config.editorId}`, {
+                        theme: 'snow',
+                        modules: {
+                            toolbar: toolbarOptions
+                        }
+                    });
+
+                    // Set initial content
+                    if (config.content) {
+                        editor.root.innerHTML = config.content;
+                        editorArea.value = config.content;
+                    }
+
+                    // Add text change listener
+                    editor.on('text-change', function() {
+                        editorArea.value = editor.root.innerHTML;
+                    });
+                }
+            });
+        });
+    </script>
 @endsection

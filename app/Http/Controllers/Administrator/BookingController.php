@@ -258,16 +258,16 @@ class BookingController extends Controller
     public function payment_delete(Booking $booking, BookingPayment $payment)
     {
         try {
-            if (!empty($payment->document_one) && Storage::disk('public')->exists($payment->payment_document)) {
-                Storage::disk('public')->delete($payment->payment_document);
-            }
+            $documents = [
+                $payment->payment_document,
+                $payment->document_two,
+                $payment->document_three,
+            ];
 
-            if (!empty($payment->document_one) && Storage::disk('public')->exists($payment->document_two)) {
-                Storage::disk('public')->delete($payment->document_two);
-            }
-
-            if (!empty($payment->document_one) && Storage::disk('public')->exists($payment->document_three)) {
-                Storage::disk('public')->delete($payment->document_three);
+            foreach ($documents as $document) {
+                if (!empty($document) && Storage::disk('public')->exists($document)) {
+                    Storage::disk('public')->delete($document);
+                }
             }
 
             DB::beginTransaction();
