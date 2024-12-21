@@ -46,7 +46,7 @@ class ClosingController extends Controller
 
     public function withdrawal_request($code)
     {
-        $bank = DB::table('investor_bank_details')->join('banks', 'banks.id', '=', 'investor_bank_details.bank_name')->where('investor_bank_details.user_id', auth()->user()->id)->first();
+        $bank = DB::table('investor_bank_details')->where('investor_bank_details.user_id', auth()->user()->id)->first();
 
         if (!$bank) {
             return redirect('investor/bank')->with('warning', 'You have to fillup bank information before requesting for withdrawal.');

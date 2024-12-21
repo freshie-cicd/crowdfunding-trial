@@ -416,18 +416,18 @@
 
                                 <td>
                                     @if($data->payment_document)
-                                    <img class="lightbox" src="{{ url($data->payment_document) }}" alt="" />
+                                    <img class="lightbox" src="{{ url('storage/' . $data->payment_document) }}" alt="" />
                                     @endif
                                 </td>
                                 <td>
                                     @if(!empty($data->document_two))
-                                    <img class="lightbox" src="{{ url($data->document_two) }}" alt="" />
+                                    <img class="lightbox" src="{{ url('storage/' . $data->document_two) }}" alt="" />
                                     @endif
                                 </td>
 
                                 <td>
                                     @if(!empty($data->document_three))
-                                    <img class="lightbox" src="{{ url($data->document_three) }}" alt="">
+                                    <img class="lightbox" src="{{ url('storage/' . $data->document_three) }}" alt="">
                                     @endif
                                 </td>
 

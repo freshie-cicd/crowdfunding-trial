@@ -35,6 +35,8 @@ services:
       MAIL_FROM_ADDRESS: "hello@example.com"
       MAIL_FROM_NAME: "${APP_NAME}"
 
+      IGNITION_EDITOR: ${EDITOR:-vscode}
+      IGNITION_LOCAL_SITES_PATH: ${IGNITION_LOCAL_SITES_PATH:-./}
     networks:
       - app_network
       

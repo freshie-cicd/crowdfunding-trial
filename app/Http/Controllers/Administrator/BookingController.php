@@ -133,8 +133,6 @@ class BookingController extends Controller
 
         $closing = ClosingRequest::where('booking_code', $booking->code)->first();
         $bankDetails = InvestorBankDetail::where('user_id', $booking->user_id)
-            ->leftJoin('banks', 'banks.id', '=', 'investor_bank_details.bank_name')
-            ->leftJoin('districts', 'districts.id', '=', 'investor_bank_details.district')
             ->first();
 
         return view('administrator.booking.show', compact('booking', 'payment', 'closing', 'bankDetails'));

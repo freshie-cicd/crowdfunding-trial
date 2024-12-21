@@ -35,6 +35,11 @@ Route::namespace('Administrator')
     ->prefix('administrator')
     ->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('administrator.home');
+        Route::get('/routingNumbers', [DashboardController::class, 'showRouteForm'])->name('administrator.routingNumbers');
+        Route::post('/storeRoutingNums', [DashboardController::class, 'storeRoute'])->name('administrator.storeRoutingNums');
+        Route::get('/viewRoutingNums', [DashboardController::class, 'viewRoutingNums'])->name('administrator.viewRoutingNums');
+        Route::get('/viewRoutingNums/edit/{id}', [DashboardController::class, 'editRoutingNums'])->name('administrator.editRoutingNums');
+        Route::put('/updateRoutingNums/update/{id}', [DashboardController::class, 'updateRoutingNums'])->name('administrator.updateRoutingNums');
         Route::get('/home-unauthorized', [DashboardController::class, 'indexUnauthorized'])->name('administrator.unauthorized');
 
         Route::get('/team', [AdminController::class, 'index'])->name('team.list');

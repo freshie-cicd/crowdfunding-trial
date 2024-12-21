@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
@@ -128,11 +131,11 @@ class HomeController extends Controller
         $checkPendingApproval = Booking::where('user_id', auth()->user()->id)->where('status', 'pending_approval')->count();
 
         $bank = DB::table('investor_bank_details')
-            ->join('banks', 'banks.id', '=', 'investor_bank_details.bank_name')
             ->where('investor_bank_details.user_id', auth()->user()->id)
             ->first();
+        $status = User::where('id', auth()->user()->id)->value('status');
 
-        return view('dashboard', compact('bookings', 'packages', 'total_investment', 'checkPendingApproval', 'bank', 'checkPendingBooking'));
+        return view('dashboard', compact('bookings', 'packages', 'total_investment', 'checkPendingApproval', 'bank', 'status', 'checkPendingBooking'));
     }
 
     public function profile()
@@ -189,30 +192,41 @@ class HomeController extends Controller
     public function bank_details(Request $request)
     {
         $data = InvestorBankDetail::where('user_id', auth()->user()->id)->first();
-        $banks = DB::table('banks')->orderBy('bank_name')->get();
-        $districts = DB::table('districts')->orderBy('district')->get();
 
-        return view('investor.bank_details', compact('data', 'banks', 'districts'));
+        $routInfo = DB::table('routing_numbers')->get();
+
+        return view('investor.bank_details', compact('data', 'routInfo'));
     }
 
     public function bank_details_update(Request $request)
     {
-        $validated = $request->validate([
-            'bank_name' => ['required'],
-            'branch_name' => ['required'],
-            'account_name' => ['required'],
-            'account_number' => ['required'],
-            'routing_number' => ['required'],
-        ]);
+        $routingDetails = DB::table('routing_numbers')->where('routing_number', $request->routing_number)->first();
+
+        if (empty($routingDetails)) {
+            return redirect()->back()->with('warning', 'Routing Number Not Found!');
+        }
 
         $data = InvestorBankDetail::where('user_id', auth()->user()->id)->first();
 
         if ($data && 1 == $data->is_protected) {
-            return redirect()->back()->with('error', 'You are not allowed to change bank details. Please contact with Freshie Farm support.');
+            return redirect()->back()->with('error', 'You are not allowed to change bank details. Please contact with '.env('APP_NAME').' support.');
         }
 
         // dd($data);
         if (empty($data)) {
+            $validator = Validator::make($request->all(), [
+                'account_name' => ['required', 'string'],
+                'account_number' => ['required', 'string'],
+                'routing_number' => ['required', 'max:9', 'min:9'],
+                'file' => ['required'],
+            ]);
+
+            if ($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+
             $bank = new InvestorBankDetail();
 
             $bank['user_id'] = auth()->user()->id;
@@ -223,21 +237,66 @@ class HomeController extends Controller
             $bank['account_number'] = $request->account_number;
             $bank['routing_number'] = $request->routing_number;
             $bank['note'] = $request->note;
-            $bank['is_protected'] = 1;
+            $bank['is_protected'] = 1; // Set is_protected to 1 for new bank details
 
-            $check = $bank->save();
+            $file = $request->file('file');
+            $givenName = $request->user_id;
+            $filename = $givenName.'_'.Str::random(40).'.'.$file->getClientOriginalExtension();
+            $path = Storage::disk('public')->putFileAs('checkleafs', $file, $filename);
+            // $path = Storage::putFileAs('checkleafs', $file, $filename);
+
+            $check = InvestorBankDetail::create([
+                'user_id' => $request->user_id,
+                'bank_name' => $routingDetails->bank,
+                'branch_name' => $routingDetails->branch,
+                'district' => $routingDetails->district,
+                'account_name' => $request->account_name,
+                'account_number' => $request->account_number,
+                'routing_number' => $routingDetails->routing_number,
+                'checkbook_url' => $path,
+                'is_protected' => 1, // Ensure is_protected is set for new entries
+            ]);
 
             if ($check) {
-                return redirect()->back()->with('success', 'Updated Successfully');
+                return redirect()->back()->with('success', 'Bank Details created Successfully');
             }
-            echo 'error';
         } else {
-            $check = InvestorBankDetail::where('user_id', auth()->user()->id)->update(['bank_name' => $request->bank_name, 'district' => $request->district, 'branch_name' => $request->branch_name, 'account_name' => $request->account_name, 'account_number' => $request->account_number, 'routing_number' => $request->routing_number, 'note' => $request->note, 'is_protected' => 1, 'updated_at' => now()]);
+            $validator = Validator::make($request->all(), [
+                'account_name' => ['required', 'string'],
+                'account_number' => ['required', 'string'],
+                'routing_number' => ['required', 'max:9', 'min:9'],
+            ]);
+
+            if ($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+
+            $file = $request->file('file');
+
+            if (!empty($file)) {
+                $givenName = $request->user_id;
+                $filename = $givenName.'_'.Str::random(40).'.'.$file->getClientOriginalExtension();
+                $path = Storage::disk('public')->putFileAs('checkleafs', $file, $filename);
+            } else {
+                $path = $data->checkbook_url;
+            }
+
+            $check = InvestorBankDetail::where('user_id', $request->user_id)->update([
+                'bank_name' => $routingDetails->bank,
+                'branch_name' => $routingDetails->branch,
+                'district' => $routingDetails->district,
+                'account_name' => $request->account_name,
+                'account_number' => $request->account_number,
+                'routing_number' => $routingDetails->routing_number,
+                'checkbook_url' => $path,
+                'is_protected' => 1, // Ensure is_protected is maintained during updates
+            ]);
 
             if ($check) {
-                return redirect()->back()->with('success', 'Bank Details Changed Successfully');
+                return redirect()->back()->with('success', 'Bank Details Updated Successfully');
             }
-            echo 'error';
         }
     }
 

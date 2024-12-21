@@ -17,9 +17,6 @@ class CheckUserStatus
         if ('verification_pending' == auth()->user()->status) {
             return redirect('profile/edit')->with('message', 'You need to fill-up this form to get access.');
         }
-        if ('blocked' == auth()->user()->status) {
-            return redirect('profile/blocked')->with('message', 'Your Account is Blocked. Please Contact Customer Care');
-        }
 
         return $next($request);
     }

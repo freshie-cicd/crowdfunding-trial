@@ -57,8 +57,6 @@ class UserController extends Controller
     {
         $user = User::where('id', $id)->first();
         $bankDetails = InvestorBankDetail::where('user_id', $id)
-            ->leftJoin('banks', 'banks.id', '=', 'investor_bank_details.bank_name')
-            ->leftJoin('districts', 'districts.id', '=', 'investor_bank_details.district')
             ->first();
 
         $bookings = Booking::where('bookings.user_id', $id)

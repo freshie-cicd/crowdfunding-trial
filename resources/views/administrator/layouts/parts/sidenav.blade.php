@@ -112,6 +112,29 @@
                             </ul>
                         </div>
                     </li>
+                    <li class="menu-item sub-menu ">
+                        <a href="#">
+                            <span class="menu-icon"><i class="fa-solid fa-route"></i></span><span
+                                class="menu-title">Routing Numbers</span>
+                        </a>
+
+                        <!--Sub Menu Starts-->
+                        <div class="sub-menu-list">
+                            <ul>
+                                <li class="menu-item">
+                                    <a href="{{ route('administrator.routingNumbers') }}">
+                                        <span class="menu-icon"><i class="fa-solid fa-add"></i></span><span
+                                            class="menu-title">Add Routing Numbers</span>
+                                    </a>
+                                </li>
+                                <li class="menu-item"><a href="{{ route('administrator.viewRoutingNums') }}"><span
+                                            class="menu-icon"><i class="fa-solid fa-display"></i></span>
+                                        <span class="menu-title">View Routing Numbers</span></a>
+                                </li>
+                               
+                            </ul>
+                        </div>
+                    </li>
 
                     <li class="menu-item">
                         <a href="{{ route('admin.website.settings') }}">  
