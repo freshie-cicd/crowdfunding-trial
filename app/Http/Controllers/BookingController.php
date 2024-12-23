@@ -55,10 +55,9 @@ class BookingController extends Controller
             'deposit_reference' => 'required',
         ]);
 
-
         // Fill all non-file inputs
         $nonFileInputs = collect(self::DOCUMENT_PATHS)->keys()->toArray();
-      
+
         $bookingPayment = new BookingPayment();
         $bookingPayment->fill($request->except($nonFileInputs));
 
@@ -84,13 +83,12 @@ class BookingController extends Controller
         $bookingPayment['note'] = $request->note;
         $check = $bookingPayment->save();
 
-            if ($check) {
-                Booking::where('id', $request->booking_id)->update(['status' => 'pending_approval']);
+        if ($check) {
+            Booking::where('id', $request->booking_id)->update(['status' => 'pending_approval']);
 
-                return redirect('/')->with('success', 'Payment verification request submitted successfully. It may take up to 2-7 Working Days to confirm the payment receiving and activation.');
-            }
-
-            return redirect()->back()->with('failure', 'Something went wrong! Please try again.');
+            return redirect('/')->with('success', 'Payment verification request submitted successfully. It may take up to 2-7 Working Days to confirm the payment receiving and activation.');
         }
+
+        return redirect()->back()->with('failure', 'Something went wrong! Please try again.');
     }
 }

@@ -95,7 +95,7 @@
                 <div class="col-md-6 pt-1">
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="payment_method" id="payment_method" value="Bank" {{ old('payment_method') == 'Bank' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="bank_deposit"> Bank Deposit </label>
+                        <label class="form-check-label" for="payment_method"> Bank Deposit </label>
                     </div>
 
                     <div class="form-check form-check-inline">

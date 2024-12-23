@@ -173,7 +173,7 @@
     let RoutingNumbers = JSON.parse(`@json($routInfo->pluck('routing_number'))`);
     const routingAllData = JSON.parse(`@json($routInfo->keyBy('routing_number'))`);
     const appName = "{{ config('app.name') }}";
-    const facebookPageUrl = "{{ env('FACEBOOK_PAGE_URL') }}";
+    const facebookPageUrl = "{{  config('website-setting.facebook') }}";
     document.addEventListener('DOMContentLoaded', function() {
 
         const routingNumberInput = document.getElementById('routing_number');
