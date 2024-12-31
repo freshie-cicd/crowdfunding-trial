@@ -35,6 +35,9 @@ services:
       MAIL_FROM_ADDRESS: "hello@example.com"
       MAIL_FROM_NAME: "${APP_NAME}"
 
+      QUEUE_CONNECTION: database
+      QUEUE_FAILED_DRIVER: database
+
       IGNITION_EDITOR: ${EDITOR:-vscode}
       IGNITION_LOCAL_SITES_PATH: ${IGNITION_LOCAL_SITES_PATH:-./}
     networks:

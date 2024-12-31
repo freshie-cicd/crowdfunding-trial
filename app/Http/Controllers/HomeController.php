@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmailJob;
 use App\Mail\BookingConfirmationMail;
 use App\Models\Booking;
 use App\Models\InvestorBankDetail;
@@ -12,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -80,13 +80,23 @@ class HomeController extends Controller
         $book['package_id'] = $request->package_id;
         $book['booking_quantity'] = $request->booking_quantity;
         $book['note'] = $request->note;
-        $book->save();
 
-        $code = $book['code'];
+        try {
+            DB::beginTransaction();
+            $book->save();
 
-        Mail::to(auth()->user()->email)->send(new BookingConfirmationMail($code));
+            SendEmailJob::dispatch(auth()->user()->email, new BookingConfirmationMail($book['code']))
+                ->onQueue('high')
+                ->delay(3);
 
-        return redirect('/dashboard')->with('success', 'Booking Successfully Submitted. A confirmation mail has been sent to your email address.');
+            DB::commit();
+
+            return redirect('/dashboard')->with('success', 'Booking Successfully Submitted. A confirmation mail has been sent to your email address.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()->with('error', 'An error occurred while processing your request. Please try again later.');
+        }
     }
 
     public function dashboard()

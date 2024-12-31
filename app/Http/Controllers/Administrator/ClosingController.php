@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Administrator;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendEmailJob;
 use App\Mail\MigrationConfirmationMail;
 use App\Models\Booking;
 use App\Models\BookingPayment;
@@ -11,7 +12,6 @@ use App\Models\Package;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class ClosingController extends Controller
 {
@@ -144,7 +144,10 @@ class ClosingController extends Controller
                 DB::table('closing_requests')->where('booking_code', $booking_code)->where('user_id', $investor_id)->update(['status' => 'disbursed']);
 
                 $reinvestAmount = $closing_request->after_withdrawal_amount;
-                Mail::to($user_email)->send(new MigrationConfirmationMail($reinvestAmount, $migrationPackage->name));
+
+                SendEmailJob::dispatch($user_email, new MigrationConfirmationMail($reinvestAmount, $migrationPackage->name))
+                    ->onQueue('medium')
+                    ->delay(5);
 
                 return redirect()->back()->with('success', 'Migrated Successfully, User is informed.');
             }

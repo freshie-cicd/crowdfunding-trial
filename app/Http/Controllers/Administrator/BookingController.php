@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Administrator;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendEmailJob;
 use App\Mail\PaymentConfirmationMail;
 use App\Mail\PaymentRejectionMail;
 use App\Models\Booking;
@@ -16,7 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class BookingController extends Controller
@@ -232,7 +232,10 @@ class BookingController extends Controller
         $check = BookingPayment::where('booking_id', $booking_id)->update(['status' => 'complete']);
         if ($check) {
             Booking::where('id', $booking_id)->update(['status' => 'approved', 'note' => $note, 'discount' => $user_id, 'updated_by' => Auth::guard('administrator')->user()->email]);
-            Mail::to($email)->send(new PaymentConfirmationMail());
+
+            SendEmailJob::dispatch($email, new PaymentConfirmationMail())
+                ->onQueue('medium')
+                ->delay(5);
 
             return redirect()->back()->with('success', 'Payment Approved Successfully');
         }
@@ -246,7 +249,10 @@ class BookingController extends Controller
         $check = BookingPayment::where('booking_id', $booking_id)->update(['status' => 'rejected']);
         if ($check) {
             Booking::where('id', $booking_id)->update(['status' => 'rejected', 'note' => $note, 'discount' => $user_id, 'updated_by' => Auth::guard('administrator')->user()->email]);
-            Mail::to($email)->send(new PaymentRejectionMail());
+
+            SendEmailJob::dispatch($email, new PaymentRejectionMail())
+                ->onQueue('medium')
+                ->delay(5);
 
             return redirect()->back()->with('success', 'Payment Rejected Successfully');
         }

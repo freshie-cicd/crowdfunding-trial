@@ -6,6 +6,8 @@
     -   Light Logo should be 369x222 pixels
     -   Dark Logo should be 222x133 pixels
     -   Favicon should be 270x270 pixels
+-  Use Queue for sending emails through Laravel Queues
+    -   `php artisan queue:work --queue=high,medium,default`
 
 ### Create Admin
 
