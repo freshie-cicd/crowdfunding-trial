@@ -51,15 +51,24 @@ jobs:
           echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
 
+      - name: Generate Docker tags
+        id: docker_tags
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            # Master branch: latest, commit SHA, and branch name
+            echo "tags=${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:latest,${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.SHORT_SHA }},${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.BRANCH_NAME }}" >> $GITHUB_OUTPUT
+          else
+            # Other branches: commit SHA and branch name only
+            echo "tags=${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.SHORT_SHA }}-${{ steps.meta.outputs.BRANCH_NAME }},${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.BRANCH_NAME }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.SHORT_SHA }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.BRANCH_NAME }}
+          tags: ${{ steps.docker_tags.outputs.tags }}
 
       - name: Install jq
         run: |
