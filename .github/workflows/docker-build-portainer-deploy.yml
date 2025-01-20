@@ -77,7 +77,7 @@ jobs:
 
       - name: Deploy to Portainer
         run: |
-          COMPOSE_CONTENT=$(cat docker-compose.yml)
+          COMPOSE_CONTENT=$(cat docker/docker-compose.yml)
           
           PAYLOAD=$(jq -n \
             --arg name "deploy-stack" \
