@@ -89,40 +89,21 @@ jobs:
 
           # Update existing stack
           echo "Attempting to update stack..."
-          UPDATE_RESPONSE=$(curl -k -s -w "%{http_code}" \
+          RESPONSE=$(curl -k -v -s -o response.json -w "%{http_code}" -X PUT \
             -H "X-API-Key: $PORTAINER_TOKEN" \
             -H "Content-Type: application/json" \
-            --insecure \
-            -X PUT \
-            -o update_response.json \
             "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
             -d "$PAYLOAD")
-
-          if [[ "$UPDATE_RESPONSE" -eq 404 ]]; then
-            echo "Stack does not exist. Creating new stack..."
-            
-            CREATE_RESPONSE=$(curl -k -s -w "%{http_code}" \
-              -H "X-API-Key: $PORTAINER_TOKEN" \
-              -H "Content-Type: application/json" \
-              --insecure \
-              -X POST \
-              -o create_response.json \
-              "$PORTAINER_URL/api/stacks?type=2&method=string&endpointId=$ENDPOINT_ID" \
-              -d "$PAYLOAD")
-
-            if [[ "$CREATE_RESPONSE" -ge 200 && "$CREATE_RESPONSE" -lt 300 ]]; then
-              echo "Successfully created new stack"
-              cat create_response.json
-            else
-              echo "Failed to create stack. Status code: $CREATE_RESPONSE"
-              cat create_response.json
-              exit 1
-            fi
-          elif [[ "$UPDATE_RESPONSE" -ge 200 && "$UPDATE_RESPONSE" -lt 300 ]]; then
-            echo "Successfully updated existing stack"
-            cat update_response.json
+          
+          echo "Response code: $RESPONSE"
+          echo "Response body:"
+          cat response.json
+          
+          if [[ "$RESPONSE" -ge 200 && "$RESPONSE" -lt 300 ]]; then
+            echo "Deployment successful"
           else
-            echo "Failed to update stack. Status code: $UPDATE_RESPONSE"
-            cat update_response.json
+            echo "Deployment failed with status code $RESPONSE"
+            echo "Full response body:"
+            cat response.json
             exit 1
           fi
