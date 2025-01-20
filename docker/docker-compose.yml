@@ -1,0 +1,77 @@
+version: '3.8'
+services:
+  app:
+    image: ${DOCKERHUB_USERNAME}/${REPO_NAME}:${SHORT_SHA}-${BRANCH_NAME}
+    container_name: dev_afd_app
+    restart: always
+    working_dir: /var/www/html
+    volumes:
+      - app_storage:/var/www/html/storage
+    environment:
+      APP_NAME: ${APP_NAME}
+      APP_ENV: ${APP_ENV}
+      APP_KEY: ${APP_KEY}
+      APP_DEBUG: ${APP_DEBUG}
+      APP_TIMEZONE: ${APP_TIMEZONE}
+      APP_URL: ${APP_URL}
+
+      # Database Configuration
+      DB_CONNECTION: mysql
+      DB_HOST: dev_afd_mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${MYSQL_DATABASE}
+      DB_USERNAME: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+
+      # Mail Configuration
+      MAIL_MAILER: ${MAIL_MAILER}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_ENCRYPTION: ${MAIL_ENCRYPTION}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME}
+    networks:
+      - app_network
+      - proxy
+    depends_on:
+      - mysql
+    command: |
+      sh -c '
+      # Wait for 10 seconds to allow MySQL to start
+      echo "Waiting for MySQL to start...";
+      sleep 10;
+
+      # Run Artisan commands
+      php artisan migrate --force;
+      php artisan storage:link;
+      php artisan make:admin cfadmin "roneybd85@gmail.com" superadmin "8RdYY4gEAneTj44o" || true;
+
+      # Start Apache in the foreground
+      apache2-foreground
+      '
+
+  mysql:
+    image: mysql:5.7
+    container_name: dev_afd_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app_network
+
+volumes:
+  app_storage:
+  mysql_data:
+
+networks:
+  app_network:
+    driver: bridge
+  proxy:
+    external: true

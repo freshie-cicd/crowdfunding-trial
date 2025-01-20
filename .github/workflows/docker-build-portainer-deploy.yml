@@ -62,9 +62,9 @@ jobs:
         id: docker_tags
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-            echo "tags=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:latest,${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.SHORT_SHA }},${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.BRANCH_NAME }}" >> $GITHUB_ENV
+            echo "tags=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:latest,${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.SHORT_SHA }}-${{ env.BRANCH_NAME }}" >> $GITHUB_ENV
           else
-            echo "tags=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.SHORT_SHA }}-${{ env.BRANCH_NAME }},${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.BRANCH_NAME }}" >> $GITHUB_ENV
+            echo "tags=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.SHORT_SHA }}-${{ env.BRANCH_NAME }}" >> $GITHUB_ENV
           fi
 
       - name: Build and push Docker image
