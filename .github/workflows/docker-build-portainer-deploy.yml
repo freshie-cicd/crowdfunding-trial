@@ -1,4 +1,5 @@
 name: Build and Deploy
+
 on:
   push:
     branches:
@@ -10,30 +11,36 @@ jobs:
   build-and-deploy:
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set deployment variables
-        id: vars
+      - name: Set Portainer Secrets
+        id: portainer_secrets
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-            echo "env_prefix=PROD" >> $GITHUB_OUTPUT
-            echo "app_env=production" >> $GITHUB_OUTPUT
-            echo "app_debug=false" >> $GITHUB_OUTPUT
-            echo "stack_name=prod-stack" >> $GITHUB_OUTPUT
+            echo "PORTAINER_URL=${{ secrets.PROD_PORTAINER_URL }}" >> $GITHUB_ENV
+            echo "PORTAINER_TOKEN=${{ secrets.PROD_PORTAINER_TOKEN }}" >> $GITHUB_ENV
+            echo "STACK_ID=${{ secrets.PROD_STACK_ID }}" >> $GITHUB_ENV
+            echo "ENDPOINT_ID=${{ secrets.PROD_ENDPOINT_ID }}" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
-            echo "env_prefix=STAGING" >> $GITHUB_OUTPUT
-            echo "app_env=staging" >> $GITHUB_OUTPUT
-            echo "app_debug=true" >> $GITHUB_OUTPUT
-            echo "stack_name=staging-stack" >> $GITHUB_OUTPUT
+            echo "PORTAINER_URL=${{ secrets.STAGING_PORTAINER_URL }}" >> $GITHUB_ENV
+            echo "PORTAINER_TOKEN=${{ secrets.STAGING_PORTAINER_TOKEN }}" >> $GITHUB_ENV
+            echo "STACK_ID=${{ secrets.STAGING_STACK_ID }}" >> $GITHUB_ENV
+            echo "ENDPOINT_ID=${{ secrets.STAGING_ENDPOINT_ID }}" >> $GITHUB_ENV
           else
-            echo "env_prefix=DEV" >> $GITHUB_OUTPUT
-            echo "app_env=development" >> $GITHUB_OUTPUT
-            echo "app_debug=true" >> $GITHUB_OUTPUT
-            echo "stack_name=dev-stack" >> $GITHUB_OUTPUT
+            echo "PORTAINER_URL=${{ secrets.DEV_PORTAINER_URL }}" >> $GITHUB_ENV
+            echo "PORTAINER_TOKEN=${{ secrets.DEV_PORTAINER_TOKEN }}" >> $GITHUB_ENV
+            echo "STACK_ID=${{ secrets.DEV_STACK_ID }}" >> $GITHUB_ENV
+            echo "ENDPOINT_ID=${{ secrets.DEV_ENDPOINT_ID }}" >> $GITHUB_ENV
           fi
+
+      - name: Debug Secrets (Do not expose sensitive data)
+        run: |
+          echo "Using Portainer URL: $PORTAINER_URL"
+          echo "Using Stack ID: $STACK_ID"
+          echo "Using Endpoint ID: $ENDPOINT_ID"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -47,19 +54,17 @@ jobs:
       - name: Extract metadata
         id: meta
         run: |
-          echo "REPO_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_OUTPUT
-          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+          echo "REPO_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
       - name: Generate Docker tags
         id: docker_tags
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-            # Master branch: latest, commit SHA, and branch name
-            echo "tags=${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:latest,${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.SHORT_SHA }},${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.BRANCH_NAME }}" >> $GITHUB_OUTPUT
+            echo "tags=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:latest,${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.SHORT_SHA }},${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.BRANCH_NAME }}" >> $GITHUB_ENV
           else
-            # Other branches: commit SHA and branch name only
-            echo "tags=${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.SHORT_SHA }}-${{ steps.meta.outputs.BRANCH_NAME }},${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.BRANCH_NAME }}" >> $GITHUB_OUTPUT
+            echo "tags=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.SHORT_SHA }}-${{ env.BRANCH_NAME }},${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.BRANCH_NAME }}" >> $GITHUB_ENV
           fi
 
       - name: Build and push Docker image
@@ -68,81 +73,21 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           push: true
-          tags: ${{ steps.docker_tags.outputs.tags }}
-
-      - name: Install jq
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
-
-      - name: Create environment variables array
-        run: |
-          ENV_ARRAY=$(jq -n -c \
-            --arg app_name "${{ vars.APP_NAME }}" \
-            --arg app_env "${{ steps.vars.outputs.app_env }}" \
-            --arg app_key "${{ secrets.APP_KEY }}" \
-            --arg app_debug "${{ steps.vars.outputs.app_debug }}" \
-            --arg app_timezone "${{ vars.APP_TIMEZONE }}" \
-            --arg app_url "${{ secrets[format('{0}_APP_URL', steps.vars.outputs.env_prefix)] }}" \
-            --arg db_root_pass "${{ secrets.DB_ROOT_PASSWORD }}" \
-            --arg db_name "${{ vars.DB_NAME }}" \
-            --arg db_user "${{ secrets.DB_USER }}" \
-            --arg db_pass "${{ secrets.DB_PASSWORD }}" \
-            --arg mail_mailer "${{ secrets[format('{0}_MAIL_MAILER', steps.vars.outputs.env_prefix)] }}" \
-            --arg mail_host "${{ secrets[format('{0}_MAIL_HOST', steps.vars.outputs.env_prefix)] }}" \
-            --arg mail_port "${{ secrets[format('{0}_MAIL_PORT', steps.vars.outputs.env_prefix)] }}" \
-            --arg mail_user "${{ secrets[format('{0}_MAIL_USERNAME', steps.vars.outputs.env_prefix)] }}" \
-            --arg mail_pass "${{ secrets[format('{0}_MAIL_PASSWORD', steps.vars.outputs.env_prefix)] }}" \
-            --arg mail_enc "${{ secrets[format('{0}_MAIL_ENCRYPTION', steps.vars.outputs.env_prefix)] }}" \
-            --arg mail_from "${{ secrets[format('{0}_MAIL_FROM_ADDRESS', steps.vars.outputs.env_prefix)] }}" \
-            --arg mail_name "${{ secrets[format('{0}_MAIL_FROM_NAME', steps.vars.outputs.env_prefix)] }}" \
-            '[
-              { "name": "APP_NAME", "value": $app_name },
-              { "name": "APP_ENV", "value": $app_env },
-              { "name": "APP_KEY", "value": $app_key },
-              { "name": "APP_DEBUG", "value": $app_debug },
-              { "name": "APP_TIMEZONE", "value": $app_timezone },
-              { "name": "APP_URL", "value": $app_url },
-              { "name": "DB_ROOT_PASSWORD", "value": $db_root_pass },
-              { "name": "DB_DATABASE", "value": $db_name },
-              { "name": "DB_USER", "value": $db_user },
-              { "name": "DB_PASSWORD", "value": $db_pass },
-              { "name": "MAIL_MAILER", "value": $mail_mailer },
-              { "name": "MAIL_HOST", "value": $mail_host },
-              { "name": "MAIL_PORT", "value": $mail_port },
-              { "name": "MAIL_USERNAME", "value": $mail_user },
-              { "name": "MAIL_PASSWORD", "value": $mail_pass },
-              { "name": "MAIL_ENCRYPTION", "value": $mail_enc },
-              { "name": "MAIL_FROM_ADDRESS", "value": $mail_from },
-              { "name": "MAIL_FROM_NAME", "value": $mail_name }
-            ]'
-          )
-          echo "ENV_VARS=$ENV_ARRAY" >> $GITHUB_ENV
+          tags: ${{ env.tags }}
 
       - name: Deploy to Portainer
-        env:
-          PORTAINER_URL: ${{ secrets[format('{0}_PORTAINER_URL', steps.vars.outputs.env_prefix)] }}
-          PORTAINER_TOKEN: ${{ secrets[format('{0}_PORTAINER_TOKEN', steps.vars.outputs.env_prefix)] }}
-          STACK_ID: ${{ secrets[format('{0}_STACK_ID', steps.vars.outputs.env_prefix)] }}
-          ENDPOINT_ID: ${{ secrets[format('{0}_ENDPOINT_ID', steps.vars.outputs.env_prefix)] }}
-          STACK_NAME: ${{ steps.vars.outputs.stack_name }}
         run: |
-          # Disable SSL verification for wget
-          echo "check_certificate = off" >> ~/.wgetrc
-          
           COMPOSE_CONTENT=$(cat docker-compose.yml)
           
           PAYLOAD=$(jq -n \
-            --arg name "$STACK_NAME" \
+            --arg name "deploy-stack" \
             --arg compose "$COMPOSE_CONTENT" \
-            --argjson env "$ENV_VARS" \
             '{
               Name: $name,
-              StackFileContent: $compose,
-              Env: $env
+              StackFileContent: $compose
             }')
-          
-          # First try to update existing stack with SSL verification disabled
+
+          # Update existing stack
           echo "Attempting to update stack..."
           UPDATE_RESPONSE=$(curl -k -s -w "%{http_code}" \
             -H "X-API-Key: $PORTAINER_TOKEN" \
@@ -152,8 +97,7 @@ jobs:
             -o update_response.json \
             "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
             -d "$PAYLOAD")
-          
-          # If update fails with 404, try to create new stack
+
           if [[ "$UPDATE_RESPONSE" -eq 404 ]]; then
             echo "Stack does not exist. Creating new stack..."
             
@@ -165,7 +109,7 @@ jobs:
               -o create_response.json \
               "$PORTAINER_URL/api/stacks?type=2&method=string&endpointId=$ENDPOINT_ID" \
               -d "$PAYLOAD")
-            
+
             if [[ "$CREATE_RESPONSE" -ge 200 && "$CREATE_RESPONSE" -lt 300 ]]; then
               echo "Successfully created new stack"
               cat create_response.json
@@ -180,10 +124,5 @@ jobs:
           else
             echo "Failed to update stack. Status code: $UPDATE_RESPONSE"
             cat update_response.json
-            echo "Curl verbose output:"
-            curl -k -v -H "X-API-Key: $PORTAINER_TOKEN" \
-              -H "Content-Type: application/json" \
-              --insecure \
-              "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID"
             exit 1
           fi
